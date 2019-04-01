@@ -2,7 +2,8 @@
 Add Keys.cs to your root folder
 and ADD YOUR SENDGRID API KEY in it
 
-//Keys.cs file
+#Keys.cs file
+
 namespace Project.Entities
 {
     public class Keys
