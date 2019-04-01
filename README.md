@@ -5,10 +5,15 @@ and ADD YOUR SENDGRID API KEY in it
 #Keys.cs file
 
 namespace Project.Entities
+
 {
+
     public class Keys
+    
     {
-        public static string SendGridKey = "XXXXXXXXX.XXXXXXXXXXXXXXXXXXXXX.XXXXXXX";
+    
+       public static string SendGridKey = "XXXXXXXXX.XXXXXXXXXXXXXXXXXXXXX.XXXXXXX";
 
     }
 }
+
