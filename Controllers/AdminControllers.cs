@@ -56,7 +56,7 @@ namespace Project.Controllers
                     new Claim(ClaimTypes.Name, user.Id.ToString())
                 }),
                 // token dont expire 
-                Expires = DateTime.UtcNow.AddDays(7), 
+                Expires = DateTime.UtcNow.AddHours(12), 
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -88,6 +88,8 @@ namespace Project.Controllers
             var userDto = _mapper.Map<UserDto>(user);
             return Ok(userDto);
         }
+
+        
         [HttpPost("register")]
         public  IActionResult Register([FromBody]AdminDto userDto)
         {

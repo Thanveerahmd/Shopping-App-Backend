@@ -101,7 +101,7 @@ namespace WebApi
                         var adminService = context.HttpContext.RequestServices.GetRequiredService<iAdminServices>();
                         var source = context.Request.Path.Value;
                         bool canParse = int.TryParse(context.Principal.Identity.Name, out var Id);
-                        if (!canParse)
+                        if (canParse)
                         {
                             var admin = adminService.GetById(Id);
                             if (admin == null)
