@@ -55,6 +55,7 @@ namespace WebApi.Controllers
                 var result = await _signmanger.CheckPasswordSignInAsync(user, userDto.Password, false);
                 if (result.Succeeded)
                 {
+                    
                     var appuser = await _usermanger.Users.FirstOrDefaultAsync(u =>
                        u.NormalizedUserName == userDto.Username.ToUpper());
 
@@ -67,6 +68,11 @@ namespace WebApi.Controllers
                         Role = user.Role, 
                         Token = GenrateJwtToken(appuser)
                     });
+                }else{
+                    var emailConfirmed = await _usermanger.IsEmailConfirmedAsync(user);
+                    if(!await _usermanger.IsEmailConfirmedAsync(user)){
+                        return StatusCode(406);
+                    }
                 }
             }
 
@@ -124,6 +130,33 @@ namespace WebApi.Controllers
 
         }
 
+        [AllowAnonymous]
+        [HttpPost("activate")]
+        public async Task<IActionResult> ActivateAsync([FromBody]UserDto userDto)
+        {
+            
+           
+            var useridentity = await _usermanger.FindByNameAsync(userDto.Username);
+
+            if (useridentity != null)
+            {
+                
+                // var userrole = await _usermanger.AddToRoleAsync(useridentity,userDto.Role);
+                var code = await _usermanger.GenerateEmailConfirmationTokenAsync(useridentity);
+
+                var callbackUrl = Url.Action(nameof(ConfirmEmail), "Users",
+                new { userId = useridentity.Id, code = code }, protocol: HttpContext.Request.Scheme);
+
+                await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
+                      $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+
+                //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
+                return StatusCode(201);
+            }
+
+            return BadRequest();
+
+        }
 
         [HttpGet]
         [AllowAnonymous]
