@@ -15,6 +15,7 @@ using Project.Entities;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Web;
 
 namespace WebApi.Controllers
 {
@@ -118,9 +119,11 @@ namespace WebApi.Controllers
 
                 var callbackUrl = Url.Action(nameof(ConfirmEmail), "Users",
                 new { userId = createuser.Id, code = code }, protocol: HttpContext.Request.Scheme);
-
-                await _emailSender.SendEmailAsync(createuser.Email, "Confirm your account",
-                      $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                var mobileCode =  System.Net.WebUtility.UrlEncode(code);
+                var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
+                Uri uri = new Uri(mobileCallbackUrl);
+                         await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
+                      $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
 
                 //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
                 return StatusCode(201);
@@ -147,8 +150,11 @@ namespace WebApi.Controllers
                 var callbackUrl = Url.Action(nameof(ConfirmEmail), "Users",
                 new { userId = useridentity.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
+                var mobileCode =  System.Net.WebUtility.UrlEncode(code);
+                var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
+                Uri uri = new Uri(mobileCallbackUrl);
                 await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
-                      $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                      $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
 
                 //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
                 return StatusCode(201);
@@ -162,17 +168,20 @@ namespace WebApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
+            
             if (userId == null || code == null)
             {
-                return Ok("Error");
+                return StatusCode(400);
             }
             var user = await _usermanger.FindByIdAsync(userId);
             if (user == null)
             {
-                return Ok("Error");
+                return StatusCode(400);
             }
             var result = await _usermanger.ConfirmEmailAsync(user, code);
-            return Ok(result.Succeeded ? "ConfirmEmail" : "Error");
+                if(result.Succeeded)
+                return StatusCode(200,"Email Confirmed");
+                else return StatusCode(400);
         }
 
 
