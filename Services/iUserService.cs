@@ -13,6 +13,7 @@ namespace  Project.Services
          User AuthenticateUser(string username, string password,bool IsSocialMedia);
         IEnumerable<User> GetAllUser();
         User GetById(int id);
+        User GetById(string id);
          User RegisterUser(User user, string password);
         void UpdateUser(User user, string password = null);
         void DeleteUser(int id);

@@ -73,6 +73,11 @@ namespace Project.Services
             return _context.Users.Find(id);
         }
 
+         public User GetById(string id)
+        {
+            return _context.Users.Find(id);
+        }
+
         public User RegisterUser(User user, string password)
         {
             if (!user.IsSocialMedia)

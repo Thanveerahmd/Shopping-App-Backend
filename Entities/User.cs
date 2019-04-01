@@ -5,10 +5,11 @@ namespace  Project.Entities
 {
     public class User : IdentityUser
     {
+        
         public string FirstName { get; set; }
         public string LastName { get; set; }
 
-        public string UserRole { get; set; }
+        public string Role { get; set; }
          public bool IsSocialMedia { get; set; }
         
     }

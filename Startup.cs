@@ -30,21 +30,21 @@ namespace WebApi
             Configuration = configuration;
         }
 
-       
-           public IConfiguration Configuration { get; }
+
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddDbContext<DataContext>(x =>  x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<iAdminServices, AdminServices>();
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
             Mapper.Reset();
             services.AddAutoMapper();
-            
+
 
 
             services.AddMvc(options =>
@@ -54,18 +54,19 @@ namespace WebApi
                 .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddControllersAsServices();
-            
-            
+
+
             //  // configure identity user
-            // IdentityBuilder builder = services.AddIdentityCore<User>(opt =>   
-            // {
-            //      opt.Password.RequireLowercase=false;
-            //      opt.Password.RequireNonAlphanumeric=false;
-            //      opt.Password.RequireUppercase=false;
-            //      opt.SignIn.RequireConfirmedEmail = true;
-            //      opt.User.RequireUniqueEmail = true;
-            // }).AddEntityFrameworkStores<DataContext>()
-            // .AddDefaultTokenProviders()
+            IdentityBuilder builder = services.AddIdentityCore<User>(opt =>
+            {
+                opt.Password.RequireLowercase = false;
+                opt.Password.RequireNonAlphanumeric = false;
+                opt.Password.RequireUppercase = false;
+                opt.SignIn.RequireConfirmedEmail = true;
+                opt.User.RequireUniqueEmail = true;
+            }).AddEntityFrameworkStores<DataContext>()
+            .AddDefaultTokenProviders();
+
             //  builder = new IdentityBuilder(builder.UserType,typeof(Role),builder.Services);
             // //Adds an Entity Framework implementation of identity information store
             //  builder.AddEntityFrameworkStores<DataContext>();
@@ -75,9 +76,9 @@ namespace WebApi
 
             // configure strongly typed settings objects
 
-             services.AddIdentity<User, Role>()
-            .AddEntityFrameworkStores<DataContext>()
-            .AddDefaultTokenProviders();
+            services.AddIdentity<User, Role>()
+           .AddEntityFrameworkStores<DataContext>()
+           .AddDefaultTokenProviders();
 
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
@@ -97,22 +98,34 @@ namespace WebApi
                     OnTokenValidated = context =>
                     {
                         var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
-                         var adminService = context.HttpContext.RequestServices.GetRequiredService<iAdminServices>();
-
-                        var userId = int.Parse(context.Principal.Identity.Name);
+                        var adminService = context.HttpContext.RequestServices.GetRequiredService<iAdminServices>();
                         var source = context.Request.Path.Value;
-                        var user = userService.GetById(userId);
-                        var admin = adminService.GetById(userId);
-
-                        if (admin == null && source.Contains("admin") )
-                        { 
-                            // return unauthorized if user no longer exists
-                            context.Fail("Unauthorized");
+                        bool canParse = int.TryParse(context.Principal.Identity.Name, out var Id);
+                        if (!canParse)
+                        {
+                            var admin = adminService.GetById(Id);
+                            if (admin == null)
+                            {
+                                // return unauthorized if user no longer exists
+                                context.Fail("Unauthorized");
+                            }
                         }
-
-                        if(user == null && source.Contains("user") && !source.Contains("admin")){
-                            context.Fail("Unauthorized");
+                        else
+                        {
+                            var user = userService.GetById(context.Principal.Identity.Name);
+                            if (user == null)
+                            {
+                                context.Fail("Unauthorized");
+                            }
                         }
+                        
+
+
+
+
+
+
+
                         return Task.CompletedTask;
                     }
                 };
@@ -126,7 +139,7 @@ namespace WebApi
                     ValidateAudience = false
                 };
             });
-           
+
 
         }
 
@@ -135,29 +148,31 @@ namespace WebApi
         [System.Obsolete]
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if(env.IsDevelopment())
+            if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
 
-            }else{
-           
-            app.UseExceptionHandler(builder =>
+            }
+            else
             {
-                builder.Run(async context =>
-                {
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
 
-                    var error = context.Features.Get<IExceptionHandlerFeature>();
-                    if(error != null)
+                app.UseExceptionHandler(builder =>
+                {
+                    builder.Run(async context =>
                     {
-                              context.Response.AddAppError(error.Error.Message);
-                        await context.Response.WriteAsync(error.Error.Message);
-                    }
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                        var error = context.Features.Get<IExceptionHandlerFeature>();
+                        if (error != null)
+                        {
+                            context.Response.AddAppError(error.Error.Message);
+                            await context.Response.WriteAsync(error.Error.Message);
+                        }
+                    });
                 });
-            });
 
             }
-            
+
             // global cors policy
             app.UseCors(x => x
                 .AllowAnyOrigin()

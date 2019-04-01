@@ -50,10 +50,10 @@ namespace Project.Data
         CreateAsync(role).Result;
     }
 
-    if (!roleManager.RoleExistsAsync("Modarater").Result)
+    if (!roleManager.RoleExistsAsync("Moderator").Result)
     {
         Role role = new Role();
-        role.Name ="Modarater";
+        role.Name ="Moderator";
         role.discs = "Perform both customer and seller operations.";
         IdentityResult roleResult = roleManager.
         CreateAsync(role).Result;
