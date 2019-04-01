@@ -1,5 +1,19 @@
 # aspnet-core-registration-login-api
+Add Keys.cs to your root folder
+and ADD YOUR SENDGRID API KEY in it
 
-ASP.NET Core 2.2 - API for User Management, Authentication and Registration
+#Keys.cs file
 
-For documentation and instructions check out http://jasonwatmore.com/post/2018/06/26/aspnet-core-21-simple-api-for-authentication-registration-and-user-management
+namespace Project.Entities
+
+{
+
+    public class Keys
+    
+    {
+    
+       public static string SendGridKey = "XXXXXXXXX.XXXXXXXXXXXXXXXXXXXXX.XXXXXXX";
+
+    }
+}
+
