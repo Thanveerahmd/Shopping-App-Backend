@@ -76,7 +76,7 @@ namespace WebApi.Controllers
                     return Ok(new
                     {
                         Id = user.Id,
-                        Imgurl = user.imageUrl, // newly added
+                        Imageurl = user.imageUrl, // newly added
                         Username = user.UserName,
                         FirstName = user.FirstName,
                         LastName = user.LastName,
@@ -138,7 +138,7 @@ namespace WebApi.Controllers
 
                 var file = Convert.FromBase64String(userDto.imageUrl);
                 var filename = user.Id;
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", filename + ".jpg");
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
                 using (var imageFile = new FileStream(path, FileMode.Create))
                 {
                     imageFile.Write(file, 0, file.Length);
