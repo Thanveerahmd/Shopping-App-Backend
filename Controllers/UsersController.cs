@@ -131,9 +131,11 @@ namespace WebApi.Controllers
 
 
 
-            if (result.Succeeded)
+            if (result !=null && result.Succeeded)
             {
                 var user = await _usermanger.FindByNameAsync(getuser.Username);
+                if(userDto.imageUrl !=null){
+
                 var file = Convert.FromBase64String(userDto.imageUrl);
                 var filename = user.Id;
                 var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot\\images", filename + ".jpg");
@@ -145,10 +147,13 @@ namespace WebApi.Controllers
                 
                 
                 var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
-               // var img
+               
                 user.imageUrl = pic+"//"+filename+".jpg";
                 var result2 = await _usermanger.UpdateAsync(user);
 
+
+                }
+                
                 var useridentity = await _usermanger.FindByNameAsync(userDto.Username);
                 // var userrole = await _usermanger.AddToRoleAsync(useridentity,userDto.Role);
                 var code = await _usermanger.GenerateEmailConfirmationTokenAsync(createuser);

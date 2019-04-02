@@ -80,7 +80,7 @@ namespace Project.Services
 
         // public User RegisterUser(User user, string password)
         // {
-        //     if (!user.IsSocialMedia)
+        //     if ()
         //     {
         //         // validation
         //         if (string.IsNullOrWhiteSpace(password))

@@ -11,6 +11,7 @@ namespace  Project.Services
     public interface IUserService
     {
          User AuthenticateUser(string username, string password,bool IsSocialMedia);
+
         IEnumerable<User> GetAllUser();
         User GetById(int id);
         User GetById(string id);
