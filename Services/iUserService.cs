@@ -14,13 +14,11 @@ namespace  Project.Services
         IEnumerable<User> GetAllUser();
         User GetById(int id);
         User GetById(string id);
-         User RegisterUser(User user, string password);
-        void UpdateUser(User user, string password = null);
-        void DeleteUser(int id);
+        
+        // User RegisterUser(User user, string password);
+       // void UpdateUser(User user, string password = null);
+        //void DeleteUser(int id);
     }
 
-    // public class UserService 
-    // {
-        
-    // }
+    
 }

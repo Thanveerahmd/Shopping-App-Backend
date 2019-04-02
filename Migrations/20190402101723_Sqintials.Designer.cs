@@ -9,8 +9,8 @@ using Project.Helpers;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190331221810_UserRoles")]
-    partial class UserRoles
+    [Migration("20190402101723_Sqintials")]
+    partial class Sqintials
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -164,8 +164,6 @@ namespace WebApi.Migrations
 
                     b.Property<string>("FirstName");
 
-                    b.Property<bool>("IsSocialMedia");
-
                     b.Property<string>("LastName");
 
                     b.Property<bool>("LockoutEnabled");
@@ -192,6 +190,8 @@ namespace WebApi.Migrations
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
+
+                    b.Property<string>("imageUrl");
 
                     b.HasKey("Id");
 

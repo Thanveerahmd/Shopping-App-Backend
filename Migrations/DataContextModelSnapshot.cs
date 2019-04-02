@@ -162,8 +162,6 @@ namespace WebApi.Migrations
 
                     b.Property<string>("FirstName");
 
-                    b.Property<bool>("IsSocialMedia");
-
                     b.Property<string>("LastName");
 
                     b.Property<bool>("LockoutEnabled");
@@ -190,6 +188,8 @@ namespace WebApi.Migrations
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256);
+
+                    b.Property<string>("imageUrl");
 
                     b.HasKey("Id");
 

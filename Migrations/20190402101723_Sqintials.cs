@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WebApi.Migrations
 {
-    public partial class SqliteInitial : Migration
+    public partial class Sqintials : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -60,8 +60,8 @@ namespace WebApi.Migrations
                     AccessFailedCount = table.Column<int>(nullable: false),
                     FirstName = table.Column<string>(nullable: true),
                     LastName = table.Column<string>(nullable: true),
-                    UserRole = table.Column<string>(nullable: true),
-                    IsSocialMedia = table.Column<bool>(nullable: false)
+                    Role = table.Column<string>(nullable: true),
+                    imageUrl = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

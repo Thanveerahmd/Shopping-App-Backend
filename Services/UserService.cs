@@ -78,84 +78,79 @@ namespace Project.Services
             return _context.Users.Find(id);
         }
 
-        public User RegisterUser(User user, string password)
-        {
-            if (!user.IsSocialMedia)
-            {
-                // validation
-                if (string.IsNullOrWhiteSpace(password))
-                    throw new AppException("Password is required");
+        // public User RegisterUser(User user, string password)
+        // {
+        //     if (!user.IsSocialMedia)
+        //     {
+        //         // validation
+        //         if (string.IsNullOrWhiteSpace(password))
+        //             throw new AppException("Password is required");
 
-                if (_context.Users.Any(x => x.UserName == user.UserName))
-                    throw new AppException("Username \"" + user.UserName + "\" is already taken");
+        //         if (_context.Users.Any(x => x.UserName == user.UserName))
+        //             throw new AppException("Username \"" + user.UserName + "\" is already taken");
 
-                byte[] passwordHash, passwordSalt;
-                Encoder.CreatePasswordHash(password, out passwordHash, out passwordSalt);
+        //         byte[] passwordHash, passwordSalt;
+        //         Encoder.CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
-                // user.PasswordHash = passwordHash;
-                // user.PasswordSalt = passwordSalt;
+        //         // user.PasswordHash = passwordHash;
+        //         // user.PasswordSalt = passwordSalt;
 
-                _context.Users.Add(user);
-                _context.SaveChanges();
+        //         _context.Users.Add(user);
+        //         _context.SaveChanges();
 
-                return user;
-            }
-            else
-            {
+        //         return user;
+        //     }
+        //     else
+        //     {
 
-                if (_context.Users.Any(x => x.UserName == user.UserName))
-                    throw new AppException("Username \"" + user.UserName + "\" is already taken");
+        //         if (_context.Users.Any(x => x.UserName == user.UserName))
+        //             throw new AppException("Username \"" + user.UserName + "\" is already taken");
 
-                _context.Users.AddAsync(user);
-                _context.SaveChangesAsync();
+        //         _context.Users.AddAsync(user);
+        //         _context.SaveChangesAsync();
 
-                return user;
-            }
+        //         return user;
+        //     }
 
-        }
+        // }
 
-        public void UpdateUser(User userParam, string password = null)
-        {
-            var user = _context.Users.Find(userParam.Id);
+        // public void UpdateUser(User userParam, string password = null)
+        // {
+        //     var user = _context.Users.Find(userParam.Id);
 
-            if (user == null)
-                throw new AppException("User not found");
+        //     if (user == null)
+        //         throw new AppException("User not found");
 
-            if (userParam.UserName != user.UserName)
-            {
-                // username has changed so check if the new username is already taken
-                if (_context.Users.Any(x => x.UserName == userParam.UserName))
-                    throw new AppException("Username " + userParam.UserName + " is already taken");
-            }
-
-            // update user properties
-            user.FirstName = userParam.FirstName;
-            user.LastName = userParam.LastName;
-            user.UserName = userParam.UserName;
-
-            // update password if it was entered
-            if (!string.IsNullOrWhiteSpace(password))
-            {
-                byte[] passwordHash, passwordSalt;
-                Encoder.CreatePasswordHash(password, out passwordHash, out passwordSalt);
-
-                // user.PasswordHash = passwordHash;
-                // user.PasswordSalt = passwordSalt;
-            }
-
-            _context.Users.Update(user);
-            _context.SaveChanges();
-        }
-
-        public void DeleteUser(int id)
-        {
-            var user = _context.Users.Find(id);
-            if (user != null)
-            {
-                _context.Users.Remove(user);
-                _context.SaveChanges();
-            }
-        }
+        //     if (userParam.UserName != user.UserName)
+        //     {
+        //         // username has changed so check if the new username is already taken
+        //         if (_context.Users.Any(x => x.UserName == userParam.UserName))
+        //             throw new AppException("Username " + userParam.UserName + " is already taken");
+        //     }
+        //     // update user properties
+        //     user.FirstName = userParam.FirstName;
+        //     user.LastName = userParam.LastName;
+        //     user.UserName = userParam.UserName;
+        //     // update password if it was entered
+        //     if (!string.IsNullOrWhiteSpace(password))
+        //     {
+        //         byte[] passwordHash, passwordSalt;
+        //         Encoder.CreatePasswordHash(password, out passwordHash, out passwordSalt);
+        //         // user.PasswordHash = passwordHash;
+        //         // user.PasswordSalt = passwordSalt;
+        //     }
+        //     _context.Users.Update(user);
+        //     _context.SaveChanges();
+        // }
+        // public void DeleteUser(int id)
+        // {
+        //     var user = _context.Users.Find(id);
+        //     if (user != null)
+        //     {
+        //         _context.Users.Remove(user);
+        //         _context.SaveChanges();
+        //     }
+        // }
 
         // private helper methods
 
