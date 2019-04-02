@@ -162,6 +162,7 @@ namespace WebApi.Controllers
 
             return BadRequest();
 
+
         }
 
         [HttpGet]
@@ -184,6 +185,70 @@ namespace WebApi.Controllers
                 else return StatusCode(400);
         }
 
+
+        [AllowAnonymous]
+        [HttpPost("ForgetPassword")]
+        public async Task<IActionResult>ForgetPassword([FromBody]ForgetPasswordDto forgetPasswordDto ){
+
+          var email = forgetPasswordDto.Email;
+          var user = await  _usermanger.FindByEmailAsync(email);
+
+           if (user == null||!(await _usermanger.IsEmailConfirmedAsync(user)))
+            {
+                return StatusCode(404); // You dont have account 
+
+            }else{
+                
+                var code = await _usermanger.GeneratePasswordResetTokenAsync(user);
+    
+             var callbackUrl = Url.Action(nameof(ResetPassword),"Users", 
+             new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+
+                var mobileCode =  System.Net.WebUtility.UrlEncode(code);
+                var mobileCallbackUrl = $"http://mahdhir.gungoos.com/passwordreset.php?id={user.Id}&code={mobileCode}";
+                Uri uri = new Uri(mobileCallbackUrl);
+                await _emailSender.SendEmailAsync(email, "Reset Password for your Winkel account",
+                      $"Please click this link to reset password:<a href='{uri.AbsoluteUri}'>mobile link</a>");
+                   
+            return StatusCode(201); // Password Resetting email is send
+            }    
+         }
+         
+        [AllowAnonymous]
+        [HttpGet("ResetPassword")]
+        public  IActionResult ResetPassword(string userId, string code)
+        {
+            if (userId == null || code == null)
+            {
+                return Ok("Error");
+            }  
+            return StatusCode(201);          
+        }
+         
+        [AllowAnonymous]
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPasswordConfirmation(ResetPasswordDto model)
+        {
+
+            //   var user =await _usermanger.FindByNameAsync(model.UserName);
+
+            var user = await _usermanger.FindByIdAsync(model.Id);
+
+            var code = System.Net.WebUtility.UrlDecode(model.code);
+
+            var  result =await _usermanger.ResetPasswordAsync(user,code,model.Password);
+            
+            //code is the token produce when requesting forget password
+
+            if (result.Succeeded)
+            {
+                return StatusCode(200,"Password reset successful!");
+            }
+            else
+            {
+                return StatusCode(400,"Error while resetting the password!");
+            }
+        }
 
 
         // [HttpGet("Getusers")]
