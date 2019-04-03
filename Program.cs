@@ -15,24 +15,24 @@ namespace WebApi
     {
         public static void Main(string[] args)
         {
-            
+
             //BuildWebHost(args).Run();
-             var host = BuildWebHost(args);
-    using (var scope = host.Services.CreateScope())
-    {
-        var serviceProvider = scope.ServiceProvider;
-        try
+            var host = BuildWebHost(args);
+            using (var scope = host.Services.CreateScope())
             {
-                var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
-                 Seed.SeedRoles(roleManager);  
-            }
-        catch(Exception e)
-            {
+                var serviceProvider = scope.ServiceProvider;
+                try
+                {
+                    var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
+                    Seed.SeedRoles(roleManager);
+                }
+                catch (Exception e)
+                {
                     Console.WriteLine(e.ToString());
+                }
             }
-    }
-    host.Run();
-            
+            host.Run();
+
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
