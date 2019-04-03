@@ -38,8 +38,6 @@ namespace WebApi.Controllers
 
         private const string ChampionsImageFolder = "images";
 
-       
-        // Suppose this method is responsible for fetching image path
       
         public UsersController(
             IMapper mapper,
@@ -125,14 +123,10 @@ namespace WebApi.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody]UserDto userDto)
         {
-
             // map dto to entity
             var createuser = _mapper.Map<User>(userDto);
             var result = await _usermanger.CreateAsync(createuser, userDto.Password);
             var getuser = _mapper.Map<UserDto>(createuser);
-
-
-
 
             if (result !=null && result.Succeeded)
             {
@@ -194,7 +188,6 @@ namespace WebApi.Controllers
 
         //     return user;
         // }
-
 
         [AllowAnonymous]
         [HttpPost("activate")]
