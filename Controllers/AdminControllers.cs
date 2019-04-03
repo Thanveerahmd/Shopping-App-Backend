@@ -118,17 +118,17 @@ namespace Project.Controllers
         }
         
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody]AdminDto userDto)
+        public IActionResult Update([FromBody]AdminDto userDto)
         {
             // map dto to entity and set id
             var user = _mapper.Map<Admin>(userDto);
-            user.Id = id;
+            user.Id = userDto.Id;
 
             try 
             {
                 // save 
                 _adminService.UpdateAdmin(user, userDto.Password);
-                return Ok();
+                return StatusCode(200);
             } 
             catch(AppException ex)
             {
