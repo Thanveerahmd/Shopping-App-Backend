@@ -28,6 +28,8 @@ namespace Project.Controllers
         private readonly AppSettings _appSettings;
         private IUserService _userService;
         private readonly IEmailSender _emailSender;
+        int count = 0;
+
 
         public AdminControllers(
             iAdminServices adminService,
@@ -49,8 +51,20 @@ namespace Project.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AdminDto userDto)
         {
-            var user = _adminService.AuthenticateUser(userDto.Username, userDto.Password);
+            var admin = _adminService.GetByEmail(userDto.Username);
 
+            if (admin.FirstLogin)
+            {
+                count++;
+            }
+
+            if (count == 2)
+            {
+                admin.FirstLogin = false;
+                _adminService.UpdateAdmin(admin);
+            }
+            
+            var user = _adminService.AuthenticateUser(userDto.Username, userDto.Password);
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
 

@@ -95,6 +95,7 @@ namespace Project.Services
             user.Username = admin.Username;
             user.ActivationCode = admin.ActivationCode;
             user.IsEmailConfirmed = admin.IsEmailConfirmed;
+            user.FirstLogin=admin.FirstLogin;
 
 
             // update password if it was entered
