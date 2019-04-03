@@ -94,7 +94,7 @@ namespace Project.Services
             user.LastName = admin.LastName;
             user.Username = admin.Username;
             user.ActivationCode = admin.ActivationCode;
-            user.IsEmailConfirmed = true;
+            user.IsEmailConfirmed = admin.IsEmailConfirmed;
             user.FirstLogin=admin.FirstLogin;
 
 
@@ -145,8 +145,9 @@ namespace Project.Services
             {
                 byte[] passwordHash, passwordSalt;
                 Encoder.CreatePasswordHash(password, out passwordHash, out passwordSalt);
-
+                
                 user.FirstLogin = false;
+                user.ActivationCode = null;
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
             }
