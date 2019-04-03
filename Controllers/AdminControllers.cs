@@ -53,6 +53,7 @@ namespace Project.Controllers
         {
             
             var user = _adminService.AuthenticateUser(userDto.Username, userDto.Password);
+            
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
 
@@ -89,7 +90,6 @@ namespace Project.Controllers
                 };
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 var tokenString = tokenHandler.WriteToken(token);
-
                 // return basic user info (without password) and token to store client side
                 return Ok(new
                 {
@@ -197,6 +197,9 @@ namespace Project.Controllers
             // map dto to entity and set id
             var user = _mapper.Map<Admin>(userDto);
             user.Id = userDto.Id;
+            user.IsEmailConfirmed = true;
+            
+
 
             try
             {
