@@ -28,7 +28,7 @@ namespace Project.Controllers
         private readonly AppSettings _appSettings;
         private IUserService _userService;
         private readonly IEmailSender _emailSender;
-        int count = 0;
+      
 
 
         public AdminControllers(
@@ -51,48 +51,55 @@ namespace Project.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AdminDto userDto)
         {
-            var admin = _adminService.GetByEmail(userDto.Username);
-
-            if (admin.FirstLogin)
-            {
-                count++;
-            }
-
-            if (count == 2)
-            {
-                admin.FirstLogin = false;
-                _adminService.UpdateAdmin(admin);
-            }
             
             var user = _adminService.AuthenticateUser(userDto.Username, userDto.Password);
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            if (user.IsEmailConfirmed == false)
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
-                }),
-                // token dont expire 
-                Expires = DateTime.UtcNow.AddHours(12),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
+                user.ActivationCode = Guid.NewGuid().ToString();
+                var code = user.ActivationCode;
+                _adminService.UpdateAdmin(user);
 
-            // return basic user info (without password) and token to store client side
-            return Ok(new
+                var callbackUrl = Url.Action(nameof(ConfirmEmail), "Admin",
+                new { userId = user.Username, code = code }, protocol: HttpContext.Request.Scheme);
+                // var mobileCode = System.Net.WebUtility.UrlEncode(code);
+                // var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
+                //  Uri uri = new Uri(mobileCallbackUrl);
+                _emailSender.SendEmailAsync(user.Username, "Confirm your account",
+            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                return StatusCode(401);
+            }
+            else
             {
-                Id = user.Id,
-                firstLogin = user.FirstLogin,
-                Username = user.Username, //follow the vedio if it failed change Task to normal process
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Token = tokenString
-            });
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                    }),
+                    // token dont expire 
+                    Expires = DateTime.UtcNow.AddHours(12),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+
+                // return basic user info (without password) and token to store client side
+                return Ok(new
+                {
+                    Id = user.Id,
+                    firstLogin = user.FirstLogin,
+                    Username = user.Username, //follow the vedio if it failed change Task to normal process
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Token = tokenString
+                });
+            }
+
         }
 
 
@@ -112,7 +119,7 @@ namespace Project.Controllers
             return Ok(userDto);
         }
 
-
+        [AllowAnonymous]
         [HttpPost("register")]
         public IActionResult Register([FromBody]AdminDto userDto)
         {
@@ -126,7 +133,6 @@ namespace Project.Controllers
 
                 var useridentity = _adminService.GetByEmail(userDto.Username);
                 useridentity.ActivationCode = Guid.NewGuid().ToString();
-                useridentity.FirstLogin = true;
                 var code = useridentity.ActivationCode;
                 _adminService.UpdateAdmin(useridentity);
 
@@ -136,7 +142,7 @@ namespace Project.Controllers
                 // var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
                 //  Uri uri = new Uri(mobileCallbackUrl);
                 _emailSender.SendEmailAsync(useridentity.Username, "Confirm your account",
-            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='uri.AbsoluteUri'>mobile link</a>");
+            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
 
                 //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
                 return Ok();
@@ -167,7 +173,7 @@ namespace Project.Controllers
                 }
                 else
                 {
-                    return Unauthorized();
+                    return Unauthorized("UnAuthorized");
                 }
             }
         }
@@ -180,12 +186,12 @@ namespace Project.Controllers
             return Ok(userDtos);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody]AdminDto userDto)
+        [HttpPut]
+        public IActionResult Update([FromBody]AdminDto userDto)
         {
             // map dto to entity and set id
             var user = _mapper.Map<Admin>(userDto);
-            user.Id = id;
+            user.Id = userDto.Id;
 
             try
             {
@@ -233,7 +239,7 @@ namespace Project.Controllers
                 //var mobileCallbackUrl = $"http://mahdhir.gungoos.com/passwordreset.php?id={user.Id}&code={mobileCode}";
                 // Uri uri = new Uri(mobileCallbackUrl);
                 _emailSender.SendEmailAsync(id, "Reset Password for your Winkel account",
-                     $"Please click this link to reset password:<a href='{ callbackUrl }'>mobile link</a>");
+                     $"Please click this link to reset password:<a href='{ callbackUrl }'>link</a>");
 
                 return StatusCode(201); // Password Resetting email is send
             }

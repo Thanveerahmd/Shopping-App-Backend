@@ -9,7 +9,7 @@ namespace Project.Services
         IEnumerable<Admin> GetAllAdmins();
         Admin GetById(int id);
         Admin AddAdmin(Admin admin, string password);
-        void UpdateAdmin(Admin admin);
+        void UpdateAdmin(Admin admin, string password=null);
         Admin GetByEmail(string id);
         void DeleteAdmin(int id);
         void UpdateAdminPassword(Admin admin, string password);

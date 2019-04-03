@@ -9,8 +9,8 @@ using Project.Helpers;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190402101723_Sqintials")]
-    partial class Sqintials
+    [Migration("20190403071109_intialconfig")]
+    partial class intialconfig
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -107,7 +107,13 @@ namespace WebApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("ActivationCode");
+
+                    b.Property<bool>("FirstLogin");
+
                     b.Property<string>("FirstName");
+
+                    b.Property<bool>("IsEmailConfirmed");
 
                     b.Property<string>("LastName");
 

@@ -17,6 +17,6 @@ namespace pro.backend.Dtos
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 
-         public System.Guid ActivationCode { get; set; }
+         public string ActivationCode { get; set; }
     }
 }
