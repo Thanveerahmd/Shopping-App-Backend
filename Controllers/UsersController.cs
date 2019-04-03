@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Web;
+using System.IO;
 
 namespace WebApi.Controllers
 {
@@ -50,13 +51,13 @@ namespace WebApi.Controllers
         public async Task<IActionResult> AuthenticateAsync([FromBody]UserDto userDto)
         {
             var user = await _usermanger.FindByNameAsync(userDto.Username);
-            
+
             if (user != null)
             {
                 var result = await _signmanger.CheckPasswordSignInAsync(user, userDto.Password, false);
                 if (result.Succeeded)
                 {
-                    
+
                     var appuser = await _usermanger.Users.FirstOrDefaultAsync(u =>
                        u.NormalizedUserName == userDto.Username.ToUpper());
 
@@ -66,12 +67,15 @@ namespace WebApi.Controllers
                         Username = user.UserName,
                         FirstName = user.FirstName,
                         LastName = user.LastName,
-                        Role = user.Role, 
+                        Role = user.Role,
                         Token = GenrateJwtToken(appuser)
                     });
-                }else{
+                }
+                else
+                {
                     var emailConfirmed = await _usermanger.IsEmailConfirmedAsync(user);
-                    if(!await _usermanger.IsEmailConfirmedAsync(user)){
+                    if (!await _usermanger.IsEmailConfirmedAsync(user))
+                    {
                         return StatusCode(406);
                     }
                 }
@@ -119,11 +123,11 @@ namespace WebApi.Controllers
 
                 var callbackUrl = Url.Action(nameof(ConfirmEmail), "Users",
                 new { userId = createuser.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                var mobileCode =  System.Net.WebUtility.UrlEncode(code);
+                var mobileCode = System.Net.WebUtility.UrlEncode(code);
                 var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
                 Uri uri = new Uri(mobileCallbackUrl);
-                         await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
-                      $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
+                await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
+             $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
 
                 //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
                 return StatusCode(201);
@@ -137,20 +141,20 @@ namespace WebApi.Controllers
         [HttpPost("activate")]
         public async Task<IActionResult> ActivateAsync([FromBody]UserDto userDto)
         {
-            
-           
+
+
             var useridentity = await _usermanger.FindByNameAsync(userDto.Username);
 
             if (useridentity != null)
             {
-                
+
                 // var userrole = await _usermanger.AddToRoleAsync(useridentity,userDto.Role);
                 var code = await _usermanger.GenerateEmailConfirmationTokenAsync(useridentity);
 
                 var callbackUrl = Url.Action(nameof(ConfirmEmail), "Users",
                 new { userId = useridentity.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
-                var mobileCode =  System.Net.WebUtility.UrlEncode(code);
+                var mobileCode = System.Net.WebUtility.UrlEncode(code);
                 var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
                 Uri uri = new Uri(mobileCallbackUrl);
                 await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
@@ -169,7 +173,7 @@ namespace WebApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> ConfirmEmail(string userId, string code)
         {
-            
+
             if (userId == null || code == null)
             {
                 return StatusCode(400);
@@ -180,51 +184,54 @@ namespace WebApi.Controllers
                 return StatusCode(400);
             }
             var result = await _usermanger.ConfirmEmailAsync(user, code);
-                if(result.Succeeded)
-                return StatusCode(200,"Email Confirmed");
-                else return StatusCode(400);
+            if (result.Succeeded)
+                return StatusCode(200, "Email Confirmed");
+            else return StatusCode(400);
         }
 
 
         [AllowAnonymous]
         [HttpPost("ForgetPassword")]
-        public async Task<IActionResult>ForgetPassword([FromBody]ForgetPasswordDto forgetPasswordDto ){
+        public async Task<IActionResult> ForgetPassword([FromBody]ForgetPasswordDto forgetPasswordDto)
+        {
 
-          var email = forgetPasswordDto.Email;
-          var user = await  _usermanger.FindByEmailAsync(email);
+            var email = forgetPasswordDto.Email;
+            var user = await _usermanger.FindByEmailAsync(email);
 
-           if (user == null||!(await _usermanger.IsEmailConfirmedAsync(user)))
+            if (user == null || !(await _usermanger.IsEmailConfirmedAsync(user)))
             {
                 return StatusCode(404); // You dont have account 
 
-            }else{
-                
-                var code = await _usermanger.GeneratePasswordResetTokenAsync(user);
-    
-             var callbackUrl = Url.Action(nameof(ResetPassword),"Users", 
-             new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+            }
+            else
+            {
 
-                var mobileCode =  System.Net.WebUtility.UrlEncode(code);
+                var code = await _usermanger.GeneratePasswordResetTokenAsync(user);
+
+                var callbackUrl = Url.Action(nameof(ResetPassword), "Users",
+                new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
+
+                var mobileCode = System.Net.WebUtility.UrlEncode(code);
                 var mobileCallbackUrl = $"http://mahdhir.gungoos.com/passwordreset.php?id={user.Id}&code={mobileCode}";
                 Uri uri = new Uri(mobileCallbackUrl);
                 await _emailSender.SendEmailAsync(email, "Reset Password for your Winkel account",
                       $"Please click this link to reset password:<a href='{uri.AbsoluteUri}'>mobile link</a>");
-                   
-            return StatusCode(201); // Password Resetting email is send
-            }    
-         }
-         
+
+                return StatusCode(201); // Password Resetting email is send
+            }
+        }
+
         [AllowAnonymous]
         [HttpGet("ResetPassword")]
-        public  IActionResult ResetPassword(string userId, string code)
+        public IActionResult ResetPassword(string userId, string code)
         {
             if (userId == null || code == null)
             {
                 return Ok("Error");
-            }  
-            return StatusCode(201);          
+            }
+            return StatusCode(201);
         }
-         
+
         [AllowAnonymous]
         [HttpPost("ResetPassword")]
         public async Task<IActionResult> ResetPasswordConfirmation(ResetPasswordDto model)
@@ -236,17 +243,17 @@ namespace WebApi.Controllers
 
             var code = System.Net.WebUtility.UrlDecode(model.code);
 
-            var  result =await _usermanger.ResetPasswordAsync(user,code,model.Password);
-            
+            var result = await _usermanger.ResetPasswordAsync(user, code, model.Password);
+
             //code is the token produce when requesting forget password
 
             if (result.Succeeded)
             {
-                return StatusCode(200,"Password reset successful!");
+                return StatusCode(200, "Password reset successful!");
             }
             else
             {
-                return StatusCode(400,"Error while resetting the password!");
+                return StatusCode(400, "Error while resetting the password!");
             }
         }
 
