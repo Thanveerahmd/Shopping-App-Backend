@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WebApi.Migrations
 {
-    public partial class Sqintials : Migration
+    public partial class intialconfig : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,7 +17,10 @@ namespace WebApi.Migrations
                     LastName = table.Column<string>(nullable: true),
                     Username = table.Column<string>(nullable: true),
                     PasswordHash = table.Column<byte[]>(nullable: true),
-                    PasswordSalt = table.Column<byte[]>(nullable: true)
+                    PasswordSalt = table.Column<byte[]>(nullable: true),
+                    FirstLogin = table.Column<bool>(nullable: false),
+                    ActivationCode = table.Column<string>(nullable: true),
+                    IsEmailConfirmed = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {

@@ -105,7 +105,7 @@ namespace WebApi.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<Guid>("ActivationCode");
+                    b.Property<string>("ActivationCode");
 
                     b.Property<bool>("FirstLogin");
 

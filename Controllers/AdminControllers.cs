@@ -28,7 +28,7 @@ namespace Project.Controllers
         private readonly AppSettings _appSettings;
         private IUserService _userService;
         private readonly IEmailSender _emailSender;
-        int count = 0;
+      
 
 
         public AdminControllers(
@@ -51,15 +51,14 @@ namespace Project.Controllers
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AdminDto userDto)
         {
-            var admin = _adminService.GetByEmail(userDto.Username);
-
+            
             var user = _adminService.AuthenticateUser(userDto.Username, userDto.Password);
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
 
             if (user.IsEmailConfirmed == false)
             {
-                user.ActivationCode = Guid.NewGuid();
+                user.ActivationCode = Guid.NewGuid().ToString();
                 var code = user.ActivationCode;
                 _adminService.UpdateAdmin(user);
 
@@ -133,7 +132,7 @@ namespace Project.Controllers
                 _adminService.AddAdmin(user, userDto.Password);
 
                 var useridentity = _adminService.GetByEmail(userDto.Username);
-                useridentity.ActivationCode = Guid.NewGuid();
+                useridentity.ActivationCode = Guid.NewGuid().ToString();
                 var code = useridentity.ActivationCode;
                 _adminService.UpdateAdmin(useridentity);
 
@@ -157,7 +156,7 @@ namespace Project.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public IActionResult ConfirmEmail(string userId, System.Guid code)
+        public IActionResult ConfirmEmail(string userId, string code)
         {
             var user = _adminService.GetByEmail(userId);
             if (userId == null || code == null || user == null)
@@ -229,7 +228,7 @@ namespace Project.Controllers
             }
             else
             {
-                user.ActivationCode = Guid.NewGuid();
+                user.ActivationCode = Guid.NewGuid().ToString();
                 var code = user.ActivationCode;
                 _adminService.UpdateAdmin(user);
 
@@ -248,7 +247,7 @@ namespace Project.Controllers
 
         [AllowAnonymous]
         [HttpGet("ResetPassword")]
-        public IActionResult ResetPassword(string userId, System.Guid code)
+        public IActionResult ResetPassword(string userId, string code)
         {
             if (userId == null || code == null)
             {

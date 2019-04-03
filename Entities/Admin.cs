@@ -9,7 +9,7 @@ namespace Project.Entities
         public byte[] PasswordHash { get; set; }
         public byte[] PasswordSalt { get; set; }
         public bool FirstLogin { get; set; }
-        public System.Guid ActivationCode { get; set; }
+        public string ActivationCode { get; set; }
         public bool IsEmailConfirmed { get; set; }
 
     }
