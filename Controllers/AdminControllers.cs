@@ -53,17 +53,6 @@ namespace Project.Controllers
         {
             var admin = _adminService.GetByEmail(userDto.Username);
 
-            if (admin.FirstLogin)
-            {
-                count++;
-            }
-
-            if (count == 2)
-            {
-                admin.FirstLogin = false;
-                _adminService.UpdateAdmin(admin);
-            }
-            
             var user = _adminService.AuthenticateUser(userDto.Username, userDto.Password);
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
@@ -275,7 +264,7 @@ namespace Project.Controllers
 
             var user = _adminService.GetByEmail(model.Username);
 
-            if (user.ActivationCode == model.ActivationCode || model.ConfirmPassword == model.Password)
+            if (user.ActivationCode == model.ActivationCode)
             {
                 _adminService.UpdateAdminPassword(user, model.Password);
                 return StatusCode(200, "Password reset successful!");
