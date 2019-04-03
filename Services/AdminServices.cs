@@ -95,6 +95,7 @@ namespace Project.Services
             user.Username = admin.Username;
             user.ActivationCode = admin.ActivationCode;
             user.IsEmailConfirmed = admin.IsEmailConfirmed;
+            user.FirstLogin=admin.FirstLogin;
 
             _context.Admins.Update(user);
             _context.SaveChanges();
