@@ -54,31 +54,50 @@ namespace Project.Controllers
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            if (user.IsEmailConfirmed == false)
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
-                }),
-                // token dont expire 
-                Expires = DateTime.UtcNow.AddHours(12),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
+                user.ActivationCode = Guid.NewGuid();
+                var code = user.ActivationCode;
+                _adminService.UpdateAdmin(user);
 
-            // return basic user info (without password) and token to store client side
-            return Ok(new
+                var callbackUrl = Url.Action(nameof(ConfirmEmail), "Admin",
+                new { userId = user.Username, code = code }, protocol: HttpContext.Request.Scheme);
+                // var mobileCode = System.Net.WebUtility.UrlEncode(code);
+                // var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
+                //  Uri uri = new Uri(mobileCallbackUrl);
+                _emailSender.SendEmailAsync(user.Username, "Confirm your account",
+            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+                return StatusCode(401);
+            }
+            else
             {
-                Id = user.Id,
-                firstLogin = user.FirstLogin,
-                Username = user.Username, //follow the vedio if it failed change Task to normal process
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Token = tokenString
-            });
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
+                var tokenDescriptor = new SecurityTokenDescriptor
+                {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
+                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                    }),
+                    // token dont expire 
+                    Expires = DateTime.UtcNow.AddHours(12),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+
+                // return basic user info (without password) and token to store client side
+                return Ok(new
+                {
+                    Id = user.Id,
+                    firstLogin = user.FirstLogin,
+                    Username = user.Username, //follow the vedio if it failed change Task to normal process
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Token = tokenString
+                });
+            }
+
         }
 
 
@@ -98,7 +117,7 @@ namespace Project.Controllers
             return Ok(userDto);
         }
 
-
+        [AllowAnonymous]
         [HttpPost("register")]
         public IActionResult Register([FromBody]AdminDto userDto)
         {
@@ -111,7 +130,7 @@ namespace Project.Controllers
                 _adminService.AddAdmin(user, userDto.Password);
 
                 var useridentity = _adminService.GetByEmail(userDto.Username);
-                useridentity.ActivationCode = new System.Guid();
+                useridentity.ActivationCode = Guid.NewGuid();
                 var code = useridentity.ActivationCode;
                 _adminService.UpdateAdmin(useridentity);
 
@@ -121,7 +140,7 @@ namespace Project.Controllers
                 // var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
                 //  Uri uri = new Uri(mobileCallbackUrl);
                 _emailSender.SendEmailAsync(useridentity.Username, "Confirm your account",
-            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='uri.AbsoluteUri'>mobile link</a>");
+            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
 
                 //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
                 return Ok();
@@ -152,7 +171,7 @@ namespace Project.Controllers
                 }
                 else
                 {
-                    return Unauthorized();
+                    return Unauthorized("UnAuthorized");
                 }
             }
         }
@@ -218,7 +237,7 @@ namespace Project.Controllers
                 //var mobileCallbackUrl = $"http://mahdhir.gungoos.com/passwordreset.php?id={user.Id}&code={mobileCode}";
                 // Uri uri = new Uri(mobileCallbackUrl);
                 _emailSender.SendEmailAsync(id, "Reset Password for your Winkel account",
-                     $"Please click this link to reset password:<a href='{ callbackUrl }'>mobile link</a>");
+                     $"Please click this link to reset password:<a href='{ callbackUrl }'>link</a>");
 
                 return StatusCode(201); // Password Resetting email is send
             }

@@ -75,7 +75,7 @@ namespace Project.Services
             return _context.Admins.Find(id);
         }
 
-        public void UpdateAdmin(Admin admin)
+        public void UpdateAdmin(Admin admin,string password)
         {
             var user = _context.Admins.Find(admin.Id);
 
@@ -95,6 +95,18 @@ namespace Project.Services
             user.Username = admin.Username;
             user.ActivationCode = admin.ActivationCode;
             user.IsEmailConfirmed = admin.IsEmailConfirmed;
+
+
+            // update password if it was entered
+            if (!string.IsNullOrWhiteSpace(password))
+            {
+                byte[] passwordHash, passwordSalt;
+                Encoder.CreatePasswordHash(password, out passwordHash, out passwordSalt);
+                
+                user.FirstLogin = false;
+                user.PasswordHash = passwordHash;
+                user.PasswordSalt = passwordSalt;
+            }
 
             _context.Admins.Update(user);
             _context.SaveChanges();
@@ -127,6 +139,7 @@ namespace Project.Services
                 byte[] passwordHash, passwordSalt;
                 Encoder.CreatePasswordHash(password, out passwordHash, out passwordSalt);
 
+                user.FirstLogin = false;
                 user.PasswordHash = passwordHash;
                 user.PasswordSalt = passwordSalt;
             }
