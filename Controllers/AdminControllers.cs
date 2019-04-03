@@ -62,13 +62,15 @@ namespace Project.Controllers
                 var code = user.ActivationCode;
                 _adminService.UpdateAdmin(user);
 
+                var userId = user.Username;
+                var url = $"http://localhost:4200/emailVerification/{userId}?code={code}";
                 var callbackUrl = Url.Action(nameof(ConfirmEmail), "Admin",
                 new { userId = user.Username, code = code }, protocol: HttpContext.Request.Scheme);
                 // var mobileCode = System.Net.WebUtility.UrlEncode(code);
                 // var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
                 //  Uri uri = new Uri(mobileCallbackUrl);
                 _emailSender.SendEmailAsync(user.Username, "Confirm your account",
-            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+            $"Please confirm your account by clicking this link: <a href='{url}'>link</a>");
                 return StatusCode(401);
             }
             else
@@ -119,7 +121,7 @@ namespace Project.Controllers
             return Ok(userDto);
         }
 
-        [AllowAnonymous]
+        
         [HttpPost("register")]
         public IActionResult Register([FromBody]AdminDto userDto)
         {
@@ -136,13 +138,16 @@ namespace Project.Controllers
                 var code = useridentity.ActivationCode;
                 _adminService.UpdateAdmin(useridentity);
 
+                var userId = useridentity.Username;
+                var url = $"http://localhost:4200/emailVerification/{userId}?code={code}";
+
                 var callbackUrl = Url.Action(nameof(ConfirmEmail), "Admin",
                 new { userId = useridentity.Username, code = code }, protocol: HttpContext.Request.Scheme);
                 // var mobileCode = System.Net.WebUtility.UrlEncode(code);
                 // var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
                 //  Uri uri = new Uri(mobileCallbackUrl);
                 _emailSender.SendEmailAsync(useridentity.Username, "Confirm your account",
-            $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
+            $"Please confirm your account by clicking this link: <a href='{url}'>link</a>");
 
                 //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
                 return Ok();
@@ -178,7 +183,7 @@ namespace Project.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet("all")]
         public IActionResult GetAll()
         {
             var users = _adminService.GetAllAdmins();
@@ -196,7 +201,7 @@ namespace Project.Controllers
             try
             {
                 // save 
-                _adminService.UpdateAdmin(user);
+                _adminService.UpdateAdmin(user,userDto.Password);
                 return Ok();
             }
             catch (AppException ex)
@@ -215,10 +220,10 @@ namespace Project.Controllers
 
         [AllowAnonymous]
         [HttpPost("ForgetPassword")]
-        public IActionResult ForgetPassword([FromBody]AdminPasswordResetDto forgetPasswordDto)
+        public IActionResult ForgetPassword(ForgetPasswordDto forgetPasswordDto)
         {
 
-            var id = forgetPasswordDto.Username;
+            var id = forgetPasswordDto.Email;
             var user = _adminService.GetByEmail(id);
 
             if (user == null || !user.IsEmailConfirmed)
@@ -232,14 +237,15 @@ namespace Project.Controllers
                 var code = user.ActivationCode;
                 _adminService.UpdateAdmin(user);
 
+                var url = $"http://localhost:4200/resetPassword/{forgetPasswordDto.Email}?code={code}";
                 var callbackUrl = Url.Action(nameof(ResetPassword), "Admin",
                 new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
                 // var mobileCode = System.Net.WebUtility.UrlEncode(code);
                 //var mobileCallbackUrl = $"http://mahdhir.gungoos.com/passwordreset.php?id={user.Id}&code={mobileCode}";
                 // Uri uri = new Uri(mobileCallbackUrl);
-                _emailSender.SendEmailAsync(id, "Reset Password for your Winkel account",
-                     $"Please click this link to reset password:<a href='{ callbackUrl }'>link</a>");
+                _emailSender.SendEmailAsync(id, "Reset Password for your account",
+                     $"Please click this link to reset password:<a href='{ url }'>link</a>");
 
                 return StatusCode(201); // Password Resetting email is send
             }
@@ -258,7 +264,7 @@ namespace Project.Controllers
 
         [AllowAnonymous]
         [HttpPost("ResetPassword")]
-        public IActionResult ResetPasswordConfirmation([FromBody]AdminPasswordResetDto model)
+        public IActionResult ResetPasswordConfirmation(AdminPasswordResetDto model)
         {
 
             var user = _adminService.GetByEmail(model.Username);

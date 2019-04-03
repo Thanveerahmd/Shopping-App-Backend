@@ -18,5 +18,6 @@ namespace pro.backend.Dtos
         public string ConfirmPassword { get; set; }
 
          public string ActivationCode { get; set; }
+         
     }
 }

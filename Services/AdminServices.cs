@@ -94,7 +94,7 @@ namespace Project.Services
             user.LastName = admin.LastName;
             user.Username = admin.Username;
             user.ActivationCode = admin.ActivationCode;
-            user.IsEmailConfirmed = admin.IsEmailConfirmed;
+            user.IsEmailConfirmed = true;
             user.FirstLogin=admin.FirstLogin;
 
 
@@ -115,8 +115,14 @@ namespace Project.Services
 
         public Admin GetByEmail(string id)
         {
-            var admin = _context.Admins.Single(a => a.Username == id);
-            return admin;
+            try{
+                var admin = _context.Admins.Single(a => a.Username == id);
+                return admin;
+                }
+            catch{
+                return null;
+            }
+            
 
         }
 
