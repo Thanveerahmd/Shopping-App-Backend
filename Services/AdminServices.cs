@@ -121,9 +121,7 @@ namespace Project.Services
                 }
             catch{
                 return null;
-            }
-            
-
+            }  
         }
 
         public void UpdateAdminPassword(Admin admin, string password)
