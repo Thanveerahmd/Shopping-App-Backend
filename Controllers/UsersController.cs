@@ -70,9 +70,13 @@ namespace WebApi.Controllers
 
                     var appuser = await _usermanger.Users.FirstOrDefaultAsync(u =>
                        u.NormalizedUserName == userDto.Username.ToUpper());
+                       string image = null;
+                        if (user.imageUrl != null) {
                         string path = user.imageUrl;
                         byte[] b = System.IO.File.ReadAllBytes(path);
-                        string image ="data:image/jpg;base64," + Convert.ToBase64String(b);
+                        image ="data:image/jpg;base64," + Convert.ToBase64String(b);
+                        }
+                        
                     return Ok(new
                     {
                         Id = user.Id,
