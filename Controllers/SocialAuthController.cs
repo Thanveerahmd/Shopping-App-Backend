@@ -41,7 +41,7 @@ namespace pro.backend.Controllers
 
         [AllowAnonymous]
         [HttpPost("facebook")]
-        public async Task<IActionResult> Facebook(FacebookAuthDto model)
+        public async Task<IActionResult> Facebook([FromBody]FacebookAuthDto model)
         {
             // 1.generate an app access token
             var appAccessTokenResponse = await Client.GetStringAsync($"https://graph.facebook.com/oauth/access_token?client_id={Keys.FacebookAppId}&client_secret={Keys.FacebookAppSecret}&grant_type=client_credentials");
@@ -96,7 +96,7 @@ namespace pro.backend.Controllers
             return Ok(new
                     {
                         Id = localUser.Id,
-                        Imageurl = localUser.imageUrl, // newly added
+                        imageurl = localUser.imageUrl, // newly added
                         Username = localUser.UserName,
                         FirstName = localUser.FirstName,
                         LastName = localUser.LastName,

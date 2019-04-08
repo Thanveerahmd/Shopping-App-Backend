@@ -85,12 +85,12 @@ namespace WebApi.Controllers
                     return Ok(new
                     {
                         Id = user.Id,
-                        Imageurl = user.imageUrl, // newly added
+                        // Imageurl = user.imageUrl, // newly added
                         Username = user.UserName,
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Role = user.Role,
-                        imageUrl = image,
+                        imageurl = image,
                         Token = token
                     });
                 }
