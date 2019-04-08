@@ -21,6 +21,7 @@ using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 
+
 namespace WebApi
 {
     public class Startup
@@ -42,6 +43,7 @@ namespace WebApi
             services.AddScoped<iAdminServices, AdminServices>();
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
+            
             Mapper.Reset();
             services.AddAutoMapper();
 
