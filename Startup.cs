@@ -20,6 +20,7 @@ using Project.Data;
 using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using pro.backend.Controllers;
 
 namespace WebApi
 {
@@ -40,6 +41,7 @@ namespace WebApi
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<iAdminServices, AdminServices>();
+            services.AddScoped<Token>();
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
             Mapper.Reset();
