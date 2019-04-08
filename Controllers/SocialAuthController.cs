@@ -9,9 +9,15 @@ using pro.backend.Dtos;
 using pro.backend.Entities;
 using Project.Entities;
 using Project.Helpers;
+using Microsoft.AspNetCore.Authorization;
+
+
+
 
 namespace pro.backend.Controllers
 {
+    [ApiController]
+    [Route("socialauth")]
     public class SocialAuthController : Controller
     {
         private readonly DataContext _appDbContext;
@@ -33,11 +39,12 @@ namespace pro.backend.Controllers
             _token = token;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Facebook([FromBody]FacebookAuthDto model)
+        [AllowAnonymous]
+        [HttpPost("facebook")]
+        public async Task<IActionResult> Facebook(FacebookAuthDto model)
         {
             // 1.generate an app access token
-            var appAccessTokenResponse = await Client.GetStringAsync($"https://graph.facebook.com/oauth/access_token?client_id={_fbAuthSettings.AppId}&client_secret={_fbAuthSettings.AppSecret}&grant_type=client_credentials");
+            var appAccessTokenResponse = await Client.GetStringAsync($"https://graph.facebook.com/oauth/access_token?client_id={Keys.FacebookAppId}&client_secret={Keys.FacebookAppSecret}&grant_type=client_credentials");
             var appAccessToken = JsonConvert.DeserializeObject<FacebookAppAccessToken>(appAccessTokenResponse);
             // 2. validate the user access token
             var userAccessTokenValidationResponse = await Client.GetStringAsync($"https://graph.facebook.com/debug_token?input_token={model.AccessToken}&access_token={appAccessToken.AccessToken}");
@@ -64,6 +71,7 @@ namespace pro.backend.Controllers
                     FacebookId = userInfo.Id,
                     Email = userInfo.Email,
                     UserName = userInfo.Email,
+                    Role = "Buyer",
                     imageUrl = userInfo.Picture.Data.Url
                 };
 
@@ -85,7 +93,16 @@ namespace pro.backend.Controllers
 
              var jwt= _token.GenrateJwtToken(localUser);
            
-            return new OkObjectResult(jwt);
+            return Ok(new
+                    {
+                        Id = localUser.Id,
+                        Imageurl = localUser.imageUrl, // newly added
+                        Username = localUser.UserName,
+                        FirstName = localUser.FirstName,
+                        LastName = localUser.LastName,
+                        Role = localUser.Role,
+                        Token = jwt
+                    });
         }
     }
 

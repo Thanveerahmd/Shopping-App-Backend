@@ -81,6 +81,7 @@ namespace WebApi.Controllers
                         image ="data:image/jpg;base64," + Convert.ToBase64String(b);
                         }
                         
+                        var token =  _token.GenrateJwtToken(appuser);
                     return Ok(new
                     {
                         Id = user.Id,
@@ -90,7 +91,7 @@ namespace WebApi.Controllers
                         LastName = user.LastName,
                         Role = user.Role,
                         imageUrl = image,
-                        Token = _token.GenrateJwtToken(appuser)
+                        Token = token
                     });
                 }
                 else
