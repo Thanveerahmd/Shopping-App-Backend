@@ -11,7 +11,10 @@ namespace pro.backend.Controllers
     public  class Token
     {
           private readonly AppSettings _appSettings;
-
+        
+         public Token(AppSettings appSettings){
+            _appSettings = appSettings;
+        }
         public  String GenrateJwtToken(User user)
         {
 
