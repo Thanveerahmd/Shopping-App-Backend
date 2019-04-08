@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using static System.Net.Mime.MediaTypeNames;
 using Microsoft.AspNetCore.Hosting;
+using pro.backend.Controllers;
 
 namespace WebApi.Controllers
 {
@@ -28,6 +29,7 @@ namespace WebApi.Controllers
     [Route("[controller]")]
     public class UsersController : ControllerBase
     {
+        private readonly Token _token;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
         private readonly UserManager<User> _usermanger;
@@ -40,6 +42,7 @@ namespace WebApi.Controllers
 
       
         public UsersController(
+            Token token,
             IMapper mapper,
             IOptions<AppSettings> appSettings,
             UserManager<User> usermanger,
@@ -52,6 +55,7 @@ namespace WebApi.Controllers
             _signmanger = signmanger;
             _emailSender = EmailSender;
             this.hostingEnv = hostingEnv;
+            _token = token;
             _mapper = mapper;
             _appSettings = appSettings.Value;
         }
@@ -86,7 +90,7 @@ namespace WebApi.Controllers
                         LastName = user.LastName,
                         Role = user.Role,
                         imageUrl = image,
-                        Token = GenrateJwtToken(appuser)
+                        Token = _token.GenrateJwtToken(appuser)
                     });
                 }
                 else
@@ -103,25 +107,7 @@ namespace WebApi.Controllers
 
         }
 
-        private String GenrateJwtToken(User user)
-        {
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
-                }),
-                // token dont expire 
-                // Expires = DateTime.UtcNow.AddDays(7), 
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
-            return tokenString;
-        }
+        
 
         [AllowAnonymous]
         [HttpPost("register")]
@@ -167,7 +153,6 @@ namespace WebApi.Controllers
                 await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
              $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
 
-                //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
                 return StatusCode(201);
             }
 
@@ -175,30 +160,11 @@ namespace WebApi.Controllers
 
         }
 
-        // public User UploadImage(byte[] file, User user)
-        // {
-        //      var filename = user.Id;
-        //      var path = Path.Combine(Directory.GetCurrentDirectory(), "images", filename);
-        //         using (var imageFile = new FileStream(path, FileMode.Create))
-        //         {
-        //             imageFile.Write( file ,0,  file.Length);
-        //             imageFile.Flush();
-        //         }
-        //     // using (var fileStream = new FileStream(path, FileMode.Create))
-        //     // {
-        //     //     file.CopyTo(fileStream);
-        //     // }
-        //     user.imageUrl = path;
-
-        //     return user;
-        // }
-
+       
         [AllowAnonymous]
         [HttpPost("activate")]
         public async Task<IActionResult> ActivateAsync([FromBody]UserDto userDto)
         {
-
-
             var useridentity = await _usermanger.FindByNameAsync(userDto.Username);
 
             if (useridentity != null)
@@ -216,13 +182,9 @@ namespace WebApi.Controllers
                 await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
                       $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
 
-                //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
                 return StatusCode(201);
             }
-
             return BadRequest();
-
-
         }
 
         [HttpGet]
@@ -261,7 +223,6 @@ namespace WebApi.Controllers
             }
             else
             {
-
                 var code = await _usermanger.GeneratePasswordResetTokenAsync(user);
 
                 var callbackUrl = Url.Action(nameof(ResetPassword), "Users",

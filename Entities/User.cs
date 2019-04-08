@@ -8,7 +8,7 @@ namespace  Project.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Role { get; set; }
-        
+        public long? FacebookId { get; set; }
         public string imageUrl { get; set; }
     }
 }

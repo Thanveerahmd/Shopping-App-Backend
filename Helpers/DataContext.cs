@@ -10,10 +10,6 @@ namespace  Project.Helpers
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
-        
-
-        
-
         public DbSet<Admin> Admins { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
