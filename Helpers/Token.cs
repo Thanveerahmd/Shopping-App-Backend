@@ -2,6 +2,7 @@ using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Project.Entities;
 using Project.Helpers;
@@ -12,8 +13,8 @@ namespace pro.backend.Controllers
     {
           private readonly AppSettings _appSettings;
         
-         public Token(AppSettings appSettings){
-            _appSettings = appSettings;
+         public Token(IOptions<AppSettings> appSettings){
+            _appSettings = appSettings.Value;
         }
         public  String GenrateJwtToken(User user)
         {
