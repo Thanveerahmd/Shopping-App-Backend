@@ -21,15 +21,15 @@ namespace pro.backend.Controllers
     public class SocialAuthController : Controller
     {
         private readonly DataContext _appDbContext;
-         private readonly Token _token;
+        private readonly Token _token;
         private readonly UserManager<User> _userManager;
         private readonly FacebookAuthSettings _fbAuthSettings;
-       
+
         private static readonly HttpClient Client = new HttpClient();
 
         public SocialAuthController(IOptions<FacebookAuthSettings> fbAuthSettingsAccessor,
          UserManager<User> userManager,
-          DataContext  appDbContext,
+          DataContext appDbContext,
            Token token
           )
         {
@@ -41,7 +41,7 @@ namespace pro.backend.Controllers
 
         [AllowAnonymous]
         [HttpPost("facebook")]
-        public async Task<IActionResult> Facebook([FromBody]FacebookAuthDto model)
+        public async Task<IActionResult> Facebook([FromBody]SocialAuthDto model)
         {
             // 1.generate an app access token
             var appAccessTokenResponse = await Client.GetStringAsync($"https://graph.facebook.com/oauth/access_token?client_id={Keys.FacebookAppId}&client_secret={Keys.FacebookAppSecret}&grant_type=client_credentials");
@@ -91,19 +91,90 @@ namespace pro.backend.Controllers
                 return BadRequest("login_failure - Failed to create local user account");
             }
 
-             var jwt= _token.GenrateJwtToken(localUser);
-           
+            var jwt = _token.GenrateJwtToken(localUser);
+
             return Ok(new
-                    {
-                        Id = localUser.Id,
-                        imageurl = localUser.imageUrl, // newly added
-                        Username = localUser.UserName,
-                        FirstName = localUser.FirstName,
-                        LastName = localUser.LastName,
-                        Role = localUser.Role,
-                        Token = jwt
-                    });
+            {
+                Id = localUser.Id,
+                imageurl = localUser.imageUrl, // newly added
+                Username = localUser.UserName,
+                FirstName = localUser.FirstName,
+                LastName = localUser.LastName,
+                Role = localUser.Role,
+                Token = jwt
+            });
         }
+
+
+        [AllowAnonymous]
+        [HttpPost("google")]
+        public async Task<IActionResult> Google([FromBody]SocialAuthDto model)
+        {
+        
+            // 1. validate the user access token
+            var userAccessTokenValidationResponse = await Client.GetStringAsync($"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={model.AccessToken}");
+            var userAccessTokenValidation = JsonConvert.DeserializeObject<FacebookUserAccessTokenValidation>(userAccessTokenValidationResponse);
+
+            //CHANGE TO userAccessTokenValidation.error
+            if (!userAccessTokenValidation.Data.IsValid)
+            {
+                return BadRequest("login_failure-Invalid google token");
+            }
+
+            // 2. we've got a valid token so we can request user data from fb
+            var userInfoResponse = await Client.GetStringAsync($"https://www.googleapis.com/plus/v1/people/me?access_token={model.AccessToken}");
+            var userInfo = JsonConvert.DeserializeObject<FacebookUserData>(userInfoResponse);
+
+            // 3. ready to create the local user account (if necessary) and jwt
+            var user = await _userManager.FindByEmailAsync(userInfo.Email);
+
+            if (user == null)
+            {
+                var appUser = new User
+                {
+                    FirstName = userInfo.FirstName,
+                    LastName = userInfo.LastName,
+                    FacebookId = userInfo.Id,
+                    Email = userInfo.Email,
+                    UserName = userInfo.Email,
+                    Role = "Buyer",
+                    imageUrl = userInfo.Picture.Data.Url
+                };
+
+                var result = await _userManager.CreateAsync(appUser, Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8));
+
+                if (!result.Succeeded) return new BadRequestObjectResult(result.Errors);
+
+                // await _appDbContext.Users.AddAsync(new Customer { IdentityId = appUser.Id, Location = "", Locale = userInfo.Locale, Gender = userInfo.Gender });
+                // await _appDbContext.SaveChangesAsync();
+            }
+
+            // generate the jwt for the local user...
+            var localUser = await _userManager.FindByNameAsync(userInfo.Email);
+
+            if (localUser == null)
+            {
+                return BadRequest("login_failure - Failed to create local user account");
+            }
+
+            var jwt = _token.GenrateJwtToken(localUser);
+
+            return Ok(new
+            {
+                Id = localUser.Id,
+                imageurl = localUser.imageUrl, // newly added
+                Username = localUser.UserName,
+                FirstName = localUser.FirstName,
+                LastName = localUser.LastName,
+                Role = localUser.Role,
+                Token = jwt
+            });
+        }
+
+
+
     }
+
+
 
 }
