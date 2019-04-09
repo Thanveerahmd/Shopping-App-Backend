@@ -21,6 +21,7 @@ using System.IO;
 using static System.Net.Mime.MediaTypeNames;
 using Microsoft.AspNetCore.Hosting;
 using pro.backend.Controllers;
+using pro.backend.Dtos;
 
 namespace WebApi.Controllers
 {
@@ -40,7 +41,7 @@ namespace WebApi.Controllers
 
         private const string ChampionsImageFolder = "images";
 
-      
+
         public UsersController(
             Token token,
             IMapper mapper,
@@ -74,14 +75,15 @@ namespace WebApi.Controllers
 
                     var appuser = await _usermanger.Users.FirstOrDefaultAsync(u =>
                        u.NormalizedUserName == userDto.Username.ToUpper());
-                       string image = null;
-                        if (user.imageUrl != null) {
+                    string image = null;
+                    if (user.imageUrl != null)
+                    {
                         string path = user.imageUrl;
                         byte[] b = System.IO.File.ReadAllBytes(path);
-                        image ="data:image/jpg;base64," + Convert.ToBase64String(b);
-                        }
-                        
-                        var token =  _token.GenrateJwtToken(appuser);
+                        image = "data:image/jpg;base64," + Convert.ToBase64String(b);
+                    }
+
+                    var token = _token.GenrateJwtToken(appuser);
                     return Ok(new
                     {
                         Id = user.Id,
@@ -108,7 +110,7 @@ namespace WebApi.Controllers
 
         }
 
-        
+
 
         [AllowAnonymous]
         [HttpPost("register")]
@@ -119,29 +121,30 @@ namespace WebApi.Controllers
             var result = await _usermanger.CreateAsync(createuser, userDto.Password);
             var getuser = _mapper.Map<UserDto>(createuser);
 
-            if (result !=null && result.Succeeded)
+            if (result != null && result.Succeeded)
             {
                 var user = await _usermanger.FindByNameAsync(getuser.Username);
-                if(userDto.imageUrl !=null){
-
-                var file = Convert.FromBase64String(userDto.imageUrl);
-                var filename = user.Id;
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
-                using (var imageFile = new FileStream(path, FileMode.Create))
+                if (userDto.imageUrl != null)
                 {
-                    imageFile.Write(file, 0, file.Length);
-                    imageFile.Flush();
-                }
-                
-                
-                var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
-               
-                user.imageUrl = pic+"//"+filename+".jpg";
-                var result2 = await _usermanger.UpdateAsync(user);
+
+                    var file = Convert.FromBase64String(userDto.imageUrl);
+                    var filename = user.Id;
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
+                    using (var imageFile = new FileStream(path, FileMode.Create))
+                    {
+                        imageFile.Write(file, 0, file.Length);
+                        imageFile.Flush();
+                    }
+
+
+                    var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
+
+                    user.imageUrl = pic + "//" + filename + ".jpg";
+                    var result2 = await _usermanger.UpdateAsync(user);
 
 
                 }
-                
+
                 var useridentity = await _usermanger.FindByNameAsync(userDto.Username);
                 // var userrole = await _usermanger.AddToRoleAsync(useridentity,userDto.Role);
                 var code = await _usermanger.GenerateEmailConfirmationTokenAsync(createuser);
@@ -161,7 +164,7 @@ namespace WebApi.Controllers
 
         }
 
-       
+
         [AllowAnonymous]
         [HttpPost("activate")]
         public async Task<IActionResult> ActivateAsync([FromBody]UserDto userDto)
@@ -274,43 +277,26 @@ namespace WebApi.Controllers
         }
 
 
-        // [HttpGet("Getusers")]
-        // public IActionResult GetAll()
-        // {
-        //     var users =  _userService.GetAllUser();
-        //     var userDtos = _mapper.Map<IList<UserDto>>(users);
-        //     return Ok(userDtos);
-        // }
-        // [HttpGet("{id}")]
-        // public IActionResult GetById(int id)
-        // {
-        //    // var user =  _userService.GetById(id);
-        //     var userDto = _mapper.Map<UserDto>(user);
-        //     return Ok(userDto);
-        // }
-        // [HttpPut("{id}")]
-        // public IActionResult Update(int id, [FromBody]UserDto userDto)
-        // {
-        //     // map dto to entity and set id
-        //     var user = _mapper.Map<User>(userDto);
-        //     //  user.Id = id;
-        //     try
-        //     {
-        //         // save 
-        //         //     _userService.UpdateUser(user, userDto.Password);
-        //         return Ok();
-        //     }
-        //     catch (AppException ex)
-        //     {
-        //         // return error message if there was an exception
-        //         return BadRequest(new { message = ex.Message });
-        //     }
-        // }
-        // [HttpDelete("{id}")]
-        // public IActionResult Delete(int id)
-        // {
-        //     //  _userService.DeleteUser(id);
-        //     return Ok();
-        // }
+        [AllowAnonymous]
+        [HttpPost("Update")]
+        public async Task<IActionResult> Update(UpdateUserDto model)
+        {
+
+            var user = await _usermanger.FindByIdAsync(model.Id);
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.PasswordHash = model.Password;
+            var result = await _usermanger.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                return StatusCode(200, "Update successful!");
+            }
+            else
+            {
+                return StatusCode(400, "Error while Update!");
+            }
+        }
+
     }
 }
