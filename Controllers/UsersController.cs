@@ -41,7 +41,7 @@ namespace WebApi.Controllers
 
         private const string ChampionsImageFolder = "images";
 
-
+      
         public UsersController(
             Token token,
             IMapper mapper,
@@ -75,15 +75,15 @@ namespace WebApi.Controllers
 
                     var appuser = await _usermanger.Users.FirstOrDefaultAsync(u =>
                        u.NormalizedUserName == userDto.Username.ToUpper());
-                    string image = null;
-                    if (user.imageUrl != null)
-                    {
+                       string image = null;
+                        if (user.imageUrl != null) 
+                        {
                         string path = user.imageUrl;
                         byte[] b = System.IO.File.ReadAllBytes(path);
                         image = "data:image/jpg;base64," + Convert.ToBase64String(b);
-                    }
-
-                    var token = _token.GenrateJwtToken(appuser);
+                        }
+                        
+                        var token = _token.GenrateJwtToken(appuser);
                     return Ok(new
                     {
                         Id = user.Id,
@@ -110,7 +110,7 @@ namespace WebApi.Controllers
 
         }
 
-
+        
 
         [AllowAnonymous]
         [HttpPost("register")]
@@ -127,24 +127,24 @@ namespace WebApi.Controllers
                 if (userDto.imageUrl != null)
                 {
 
-                    var file = Convert.FromBase64String(userDto.imageUrl);
-                    var filename = user.Id;
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
-                    using (var imageFile = new FileStream(path, FileMode.Create))
-                    {
-                        imageFile.Write(file, 0, file.Length);
-                        imageFile.Flush();
-                    }
-
-
-                    var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
-
-                    user.imageUrl = pic + "//" + filename + ".jpg";
-                    var result2 = await _usermanger.UpdateAsync(user);
+                var file = Convert.FromBase64String(userDto.imageUrl);
+                var filename = user.Id;
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
+                using (var imageFile = new FileStream(path, FileMode.Create))
+                {
+                    imageFile.Write(file, 0, file.Length);
+                    imageFile.Flush();
+                }
+                
+                
+                var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
+               
+                user.imageUrl = pic + "//" + filename + ".jpg";
+                var result2 = await _usermanger.UpdateAsync(user);
 
 
                 }
-
+                
                 var useridentity = await _usermanger.FindByNameAsync(userDto.Username);
                 // var userrole = await _usermanger.AddToRoleAsync(useridentity,userDto.Role);
                 var code = await _usermanger.GenerateEmailConfirmationTokenAsync(createuser);
@@ -164,7 +164,7 @@ namespace WebApi.Controllers
 
         }
 
-
+       
         [AllowAnonymous]
         [HttpPost("activate")]
         public async Task<IActionResult> ActivateAsync([FromBody]UserDto userDto)
@@ -277,17 +277,17 @@ namespace WebApi.Controllers
         }
 
 
-        [AllowAnonymous]
+          [AllowAnonymous]
         [HttpPost("Update")]
         public async Task<IActionResult> Update(UpdateUserDto model)
         {
-
+            
             var user = await _usermanger.FindByIdAsync(model.Id);
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.PasswordHash = model.Password;
-            var result = await _usermanger.UpdateAsync(user);
-
+              var result = await _usermanger.UpdateAsync(user);
+            
             if (result.Succeeded)
             {
                 return StatusCode(200, "Update successful!");
