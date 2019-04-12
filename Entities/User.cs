@@ -9,7 +9,6 @@ namespace  Project.Entities
         public string LastName { get; set; }
         public string Role { get; set; }
         public long? FacebookId { get; set; }
-
         public string GoogleId { get; set; }
         public string imageUrl { get; set; }
     }
