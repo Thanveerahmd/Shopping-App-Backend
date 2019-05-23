@@ -11,24 +11,6 @@ namespace Project.Data
     
     public static class Seed
     {
-         // private readonly RoleManager<Role> _roleManager;
-        //  public Seed(RoleManager<Role> roleManager){
-        //     _roleManager = roleManager;  
-        // }
-        // public void SeedRoles()
-        // {
-        
-        // var roles = new List<Role>
-        //     {
-        //         new Role{Name="Customer"},
-        //         new Role{Name="Seller"},
-        //         new Role{Name="Modarater"},
-        //     };
-        // foreach (var role in roles)
-        // {
-        //     _roleManager.CreateAsync(role).Wait();
-        // }
-        // } 
   public static void SeedRoles(RoleManager<Role> roleManager)
 {
     if (!roleManager.RoleExistsAsync("Customer").Result)

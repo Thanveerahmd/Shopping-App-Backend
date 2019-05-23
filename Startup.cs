@@ -42,6 +42,7 @@ namespace WebApi
             services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<iAdminServices, AdminServices>();
+            services.AddTransient<iProductService,ProductService>();
             services.AddScoped<Token>();
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);

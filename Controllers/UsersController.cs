@@ -146,7 +146,7 @@ namespace WebApi.Controllers
                 }
                 
                 var useridentity = await _usermanger.FindByNameAsync(userDto.Username);
-                // var userrole = await _usermanger.AddToRoleAsync(useridentity,userDto.Role);
+               // var userrole = await _usermanger.AddToRoleAsync(useridentity,userDto.Role);
                 var code = await _usermanger.GenerateEmailConfirmationTokenAsync(createuser);
 
                 var callbackUrl = Url.Action(nameof(ConfirmEmail), "Users",
