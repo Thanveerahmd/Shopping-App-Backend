@@ -277,8 +277,8 @@ namespace WebApi.Controllers
         }
 
 
-          [AllowAnonymous]
-        [HttpPost("Update")]
+        [AllowAnonymous]
+        [HttpPut]
         public async Task<IActionResult> Update(UpdateUserDto model)
         {
             
@@ -286,8 +286,11 @@ namespace WebApi.Controllers
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.PasswordHash = model.Password;
-              var result = await _usermanger.UpdateAsync(user);
+            user.Role = model.Role;
             
+            var result = await _usermanger.UpdateAsync(user);
+
+
             if (result.Succeeded)
             {
                 return StatusCode(200, "Update successful!");
