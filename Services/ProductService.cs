@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Project.Dtos;
 using pro.backend.Entities;
 using Project.Helpers;
-using  Project.Services;
+using Project.Services;
 
 namespace pro.backend.Services
 {
@@ -19,39 +19,55 @@ namespace pro.backend.Services
         {
             _context = context;
         }
-        public void addProduct(int id, string name, int quantity, int reorderLevel, float price, string description){
+        public async Task createProduct(ProductViewModel vm ){
             _context.Products.Add(new Product
             {
-                id = id,
-                Product_name = name,
-                Quantity = quantity,
-                ReorderLevel = reorderLevel,
-                Price = price,
-                Product_Discription = description 
+                id = vm.id,
+                Product_name = vm.name,
+                Quantity = vm.quantity,
+                ReorderLevel = vm.reorderLevel,
+                Price = vm.price,
+                Product_Discription = vm.description,
+                Category = vm.category,
+                Sub_category = vm.sub_category
             });
+
+            await _context.SaveChangesAsync();
         }
-        public void getProduct(){
-            _context.Products.ToList().Select(x => new ProductViewModel{
+        public IEnumerable<ProductViewModel2> getProduct() => 
+            _context.Products.ToList().Select(x => new ProductViewModel2{
                 id = x.id,
                 name = x.name,
                 quantity = x.quantity,
                 reorderLevel = x.reorderLevel,
                 price = x.price.ToString("N2"), // 1100.50 => 1,100.50
-                description = x.description 
+                description = x.description,
+                category = x.category,
+                sub_category = x.sub_category
             });
+        
+        public async Task<Response> updateProduct(Request request){
+            var product = _context.Products.FirstOrDefault(x => x.id == request.id);
+            
+            product.name = request.name;
+            product.quantity = request.quantity;
+            product.reorderLevel = request.reorderLevel; 
+            product.price = request.price;
+            product.description = request.description;
+            product.category = request.category; 
+            product.sub_category = request.sub_category; 
+
+            await _context.SaveChangesAsync();
+            return new Response{
+                id = product.id,
+                name = product.name,
+                quantity = product.quantity,
+                reorderLevel = product.reorderLevel,
+                price = product.price,
+                description = product.description,
+                category = product.category,
+                sub_category = product.sub_category
+            };
         }
-    }
-    public class ProductViewModel{
-        public string id { get; set; }
-        public string name { get; set; }
-
-        public int quantity { get; set; }
-
-        public int reorderLevel { get; set; }
-
-        public string price { get; set; }
-
-        public string description { get; set; }
-    
     }
 }
