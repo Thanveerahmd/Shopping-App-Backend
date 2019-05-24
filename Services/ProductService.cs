@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Project.Dtos;
-using Project.Entities;
+using pro.backend.Entities;
 using Project.Helpers;
 using  Project.Services;
 
@@ -30,5 +30,28 @@ namespace pro.backend.Services
                 Product_Discription = description 
             });
         }
+        public void getProduct(){
+            _context.Products.ToList().Select(x => new ProductViewModel{
+                id = x.id,
+                name = x.name,
+                quantity = x.quantity,
+                reorderLevel = x.reorderLevel,
+                price = x.price.ToString("N2"), // 1100.50 => 1,100.50
+                description = x.description 
+            });
+        }
+    }
+    public class ProductViewModel{
+        public string id { get; set; }
+        public string name { get; set; }
+
+        public int quantity { get; set; }
+
+        public int reorderLevel { get; set; }
+
+        public string price { get; set; }
+
+        public string description { get; set; }
+    
     }
 }
