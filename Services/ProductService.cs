@@ -4,10 +4,9 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Project.Dtos;
+using pro.backend.Dtos;
 using pro.backend.Entities;
 using Project.Helpers;
-using Project.Services;
 
 namespace pro.backend.Services
 {
@@ -19,55 +18,53 @@ namespace pro.backend.Services
         {
             _context = context;
         }
-        public async Task createProduct(ProductViewModel vm ){
-            _context.Products.Add(new Product
-            {
-                id = vm.id,
-                Product_name = vm.name,
-                Quantity = vm.quantity,
-                ReorderLevel = vm.reorderLevel,
-                Price = vm.price,
-                Product_Discription = vm.description,
-                Category = vm.category,
-                Sub_category = vm.sub_category
-            });
+        public Product AddProduct(Product product){
 
-            await _context.SaveChangesAsync();
+            _context.Products.Add(product);
+            _context.SaveChanges();
+
+            return product;
         }
-        public IEnumerable<ProductViewModel2> getProduct() => 
-            _context.Products.ToList().Select(x => new ProductViewModel2{
-                id = x.id,
-                name = x.name,
-                quantity = x.quantity,
-                reorderLevel = x.reorderLevel,
-                price = x.price.ToString("N2"), // 1100.50 => 1,100.50
-                description = x.description,
-                category = x.category,
-                sub_category = x.sub_category
-            });
-        
-        public async Task<Response> updateProduct(Request request){
-            var product = _context.Products.FirstOrDefault(x => x.id == request.id);
-            
-            product.name = request.name;
-            product.quantity = request.quantity;
-            product.reorderLevel = request.reorderLevel; 
-            product.price = request.price;
-            product.description = request.description;
-            product.category = request.category; 
-            product.sub_category = request.sub_category; 
+        public void DeleteProduct(int id){
 
-            await _context.SaveChangesAsync();
-            return new Response{
-                id = product.id,
-                name = product.name,
-                quantity = product.quantity,
-                reorderLevel = product.reorderLevel,
-                price = product.price,
-                description = product.description,
-                category = product.category,
-                sub_category = product.sub_category
-            };
+            var product = _context.Products.Find(id);
+            if (product != null)
+            {
+                _context.Products.Remove(product);
+                _context.SaveChanges();
+            }
+        }
+        // public IEnumerable<ProductViewModel2> getProduct() => 
+        //     _context.Products.ToList().Select(x => new ProductViewModel2{
+        //         id = x.id,
+        //         name = x.name,
+        //         quantity = x.quantity,
+        //         reorderLevel = x.reorderLevel,
+        //         price = x.price.ToString("N2"), // 1100.50 => 1,100.50
+        //         description = x.description,
+        //         category = x.category,
+        //         sub_category = x.sub_category
+        //     });
+        
+        public void UpdateProduct(Product product){
+
+            var prod = _context.Products.Find(product.Id);
+
+            if (prod == null)
+                throw new AppException("Product not found");
+
+            // update user properties
+            prod.Id = product.Id;
+            prod.Product_name = product.Product_name;
+            prod.Quantity = product.Quantity;
+            prod.ReorderLevel = product.ReorderLevel;
+            prod.Price = product.Price;
+            prod.Product_Discription = product.Product_Discription;
+            prod.Category = product.Category;
+            prod.Sub_category = product.Sub_category;
+
+            _context.Products.Update(product);
+            _context.SaveChanges();
         }
     }
 }

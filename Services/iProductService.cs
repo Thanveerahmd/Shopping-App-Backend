@@ -8,9 +8,9 @@ namespace pro.backend.Services
 {
     public interface iProductService
     {
-          Task createProduct(ProductViewModel vm );
-          IEnumerable<ProductViewModel2> getProduct();
-          Task<Response> updateProduct(Request request);
+        Product AddProduct(Product product);
+        void DeleteProduct(int id);
+        void UpdateProduct(Product product);
 
     }
 }
