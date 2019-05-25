@@ -53,5 +53,32 @@ namespace pro.backend.Controllers
             }
             
         }
+        
+        [HttpDelete("{productid}")]
+        public IActionResult Delete(int id)
+        {
+            _productService.DeleteProduct(id);
+            return Ok();
+        }
+
+        [HttpPut]
+        public IActionResult UpdateProduct([FromBody]ProductDto productDto)
+        {
+            // map dto to entity and set id
+            var prod = _mapper.Map<Product>(productDto);
+            prod.Id = productDto.Id;
+
+            try
+            {
+                // save 
+                _productService.UpdateProduct(prod);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 }
 }
