@@ -1,12 +1,6 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoMapper;
-using Microsoft.EntityFrameworkCore;
-using pro.backend.Dtos;
 using pro.backend.Entities;
 using Project.Helpers;
+using System.Collections.Generic;
 
 namespace pro.backend.Services
 {
@@ -18,13 +12,21 @@ namespace pro.backend.Services
         {
             _context = context;
         }
-        public Product AddProduct(Product product){
+        public void AddProduct(Product product){
 
             _context.Products.Add(product);
             _context.SaveChanges();
 
-            return product;
         }
+        public IEnumerable<Product> GetAllProducts() 
+        {
+            return _context.Products;
+        }
+        public Product GetById(int id)
+        {
+            return _context.Products.Find(id);
+        }
+
         public void DeleteProduct(int id){
 
             var product = _context.Products.Find(id);
