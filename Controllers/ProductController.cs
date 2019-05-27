@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using pro.backend.Dtos;
 using pro.backend.Entities;
@@ -22,7 +23,9 @@ namespace pro.backend.Controllers
             _mapper = mapper;
             _productService = productService;
         }
+        
     [HttpGet("products")]
+    [AllowAnonymous]
     public IActionResult GetAllProducts()
     {
         var products = _productService.GetAllProducts();
@@ -39,6 +42,7 @@ namespace pro.backend.Controllers
         }
 
         [HttpPost("addProduct")]
+        [AllowAnonymous]
         public IActionResult AddProduct([FromBody]ProductDto productDto)
         {
             // map dto to entity
