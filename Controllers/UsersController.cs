@@ -286,6 +286,7 @@ namespace WebApi.Controllers
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.PasswordHash = model.Password;
+            
               var result = await _usermanger.UpdateAsync(user);
             
             if (result.Succeeded)
