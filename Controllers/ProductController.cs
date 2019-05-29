@@ -25,7 +25,7 @@ namespace pro.backend.Controllers
         }
         
     [HttpGet("products")]
-    [AllowAnonymous]
+    
     public IActionResult GetAllProducts()
     {
         var products = _productService.GetAllProducts();
