@@ -286,12 +286,12 @@ namespace WebApi.Controllers
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
             user.PasswordHash = model.Password;
-<<<<<<< HEAD
+
             
               var result = await _usermanger.UpdateAsync(user);
-=======
+
             user.Role = model.Role;
->>>>>>> 1dc634f084851e64d575e7e1e12952f2af3172bc
+
             
             var result = await _usermanger.UpdateAsync(user);
 
