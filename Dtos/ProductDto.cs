@@ -1,6 +1,6 @@
-namespace pro.backend.Entities
+namespace pro.backend.Dtos
 {
-    public class Product
+    public class ProductDto
     {
         public int Id { get; set; }
         public string  Product_name { get; set; }
@@ -17,5 +17,4 @@ namespace pro.backend.Entities
 
         public string Sub_category { get; set; }
     }
-
 }
