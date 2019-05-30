@@ -25,6 +25,7 @@ namespace pro.backend.Controllers
         }
         
     [HttpGet("products")]
+    [AllowAnonymous]
     
     public IActionResult GetAllProducts()
     {
@@ -34,6 +35,7 @@ namespace pro.backend.Controllers
     }
 
     [HttpGet("products/{id}")]
+    [AllowAnonymous]
         public IActionResult GetProductById(int id)
         {
             var product = _productService.GetById(id);
