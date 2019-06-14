@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using pro.backend.Dtos;
 using pro.backend.Entities;
+using pro.backend.iServices;
 using pro.backend.Services;
 using Project.Helpers;
 
@@ -17,28 +19,33 @@ namespace pro.backend.Controllers
     {
         private readonly iProductService _productService;
         private readonly IMapper _mapper;
+
+        public readonly iShoppingRepo _repo;
+
         public ProductController(iProductService productService,
-        IMapper mapper)
+        IMapper mapper, iShoppingRepo repo)
         {
             _mapper = mapper;
+            _repo = repo;
             _productService = productService;
         }
-        
-    [HttpGet("products")]
-    
-    public IActionResult GetAllProducts()
-    {
-        var products = _productService.GetAllProducts();
-        var productDtos = _mapper.Map<IList<ProductDto>>(products);
-        return Ok(productDtos);
-    }
 
-    [HttpGet("products/{id}")]
-        public IActionResult GetProductById(int id)
+        [HttpGet("products")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllProducts()
         {
-            var product = _productService.GetById(id);
-            var productDto = _mapper.Map<ProductDto>(product);
-            return Ok(productDto);
+            var products = await _repo.GetAllProducts();
+            var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+            return Ok(productsToReturn);
+        }
+
+        [HttpGet("products/{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProductById(int id)
+        {
+            var product = await _repo.GetProduct(id);
+            var productToReturn = _mapper.Map<ProductDto>(product);
+            return Ok(productToReturn);
         }
 
         [HttpPost("addProduct")]
@@ -47,17 +54,20 @@ namespace pro.backend.Controllers
         {
             // map dto to entity
             var product = _mapper.Map<Product>(productDto);
-            try{
+            try
+            {
                 _productService.AddProduct(product);
                 return Ok();
 
-            }catch (AppException ex){
-                
+            }
+            catch (AppException ex)
+            {
+
                 return BadRequest(new { message = ex.Message });
             }
-            
+
         }
-        
+
         [HttpDelete("{productid}")]
         public IActionResult Delete(int id)
         {
@@ -84,5 +94,5 @@ namespace pro.backend.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
-}
+    }
 }

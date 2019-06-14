@@ -16,6 +16,7 @@ namespace pro.backend.Services
 
             _context.Products.Add(product);
             _context.SaveChanges();
+            
 
         }
         public IEnumerable<Product> GetAllProducts() 

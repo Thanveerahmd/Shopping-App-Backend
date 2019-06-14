@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using pro.backend.Controllers;
 using pro.backend.Services;
+using pro.backend.iServices;
 
 namespace WebApi
 {
@@ -44,6 +45,7 @@ namespace WebApi
             services.AddScoped<iAdminServices, AdminServices>();
             services.AddTransient<iProductService,ProductService>();
             services.AddScoped<Token>();
+            services.AddScoped<iShoppingRepo,ShoppingRepo>(); 
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
             

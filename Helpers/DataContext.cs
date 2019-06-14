@@ -14,6 +14,7 @@ namespace  Project.Helpers
         public DbSet<Admin> Admins { get; set; }
 
         public DbSet<Product> Products { get; set; }
+        public DbSet<Photo> Photos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
