@@ -10,6 +10,7 @@ using pro.backend.Dtos;
 using pro.backend.Entities;
 using pro.backend.iServices;
 using Project.Entities;
+using Microsoft.AspNetCore.Http;
 
 namespace pro.backend.Controllers
 {
@@ -36,8 +37,7 @@ namespace pro.backend.Controllers
 
         [HttpPost("addPhoto/{product_id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AddPhotoForProduct(int product_id,
-        [FromForm]PhotoUploadDto PhotoUploadDto)
+        public async Task<IActionResult> AddPhotoForProduct(int product_id,[FromForm]PhotoUploadDto PhotoUploadDto)
         {
             var product = await _repo.GetProduct(product_id);
 
@@ -45,7 +45,7 @@ namespace pro.backend.Controllers
 
             var Upload_result = new ImageUploadResult();
 
-            if (file.Length > 0)
+            if (file != null && file.Length > 0)
             {
                 using (var stream = file.OpenReadStream())
                 {
@@ -61,6 +61,7 @@ namespace pro.backend.Controllers
             }
 
             PhotoUploadDto.Url = Upload_result.Uri.ToString();
+
             PhotoUploadDto.PublicID = Upload_result.PublicId;
 
             var photo = _mapper.Map<Photo>(PhotoUploadDto);
@@ -125,7 +126,7 @@ namespace pro.backend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> DeletePhoto(int ProductId, int id)
         {
-           
+
             var product = await _repo.GetProduct(ProductId);
 
             if (!product.Photos.Any(p => p.Id == id))
@@ -133,14 +134,14 @@ namespace pro.backend.Controllers
 
             var photoFromRepo = await _repo.GetPhoto(id);
 
-            if (photoFromRepo.isMain)
-                return BadRequest("You cannot delete your main photo");
+            // if (photoFromRepo.isMain)
+            //     return BadRequest("You cannot delete your main photo");
 
             if (photoFromRepo.PublicID != null)
             {
                 var delParams = new DelResParams()
                 {
-                    PublicIds = new List<string>() {photoFromRepo.PublicID},
+                    PublicIds = new List<string>() { photoFromRepo.PublicID },
                     Invalidate = true
                 };
                 var delResult = _cloudinary.DeleteResources(delParams);

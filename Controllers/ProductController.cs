@@ -76,6 +76,7 @@ namespace pro.backend.Controllers
         }
 
         [HttpPut]
+        [AllowAnonymous]
         public IActionResult UpdateProduct([FromBody]ProductDto productDto)
         {
             // map dto to entity and set id
