@@ -12,6 +12,7 @@ namespace pro.backend.Entities
         public string  Product_Discription { get; set; }
         public string Category { get; set; }
         public string Sub_category { get; set; }
+        
         public ICollection<Photo> Photos { get; set; }
     }
 

@@ -12,5 +12,6 @@ namespace pro.backend.Entities
         public  string PublicID { get; set; }
         public Product Product { get; set; }
         public int ProductId { get; set; }
+
     }
 }
