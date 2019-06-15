@@ -57,7 +57,7 @@ namespace pro.backend.Controllers
             try
             {
                 _productService.AddProduct(product);
-                return Ok();
+                return Ok(product.Id);
 
             }
             catch (AppException ex)
