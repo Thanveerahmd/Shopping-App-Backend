@@ -30,7 +30,7 @@ namespace pro.backend.Controllers
             _productService = productService;
         }
 
-        [HttpGet("products")]
+        [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllProducts()
         {
@@ -39,7 +39,7 @@ namespace pro.backend.Controllers
             return Ok(productsToReturn);
         }
 
-        [HttpGet("products/{id}")]
+        [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetProductById(int id)
         {
@@ -96,7 +96,7 @@ namespace pro.backend.Controllers
             }
         }
 
-         [HttpGet("{sellerID}/products")]
+        [HttpGet("seller/{sellerID}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllProduct(string sellerID)
         {

@@ -18,7 +18,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Web;
 using Microsoft.AspNetCore.Http;
 using System.IO;
-using static System.Net.Mime.MediaTypeNames;
 using Microsoft.AspNetCore.Hosting;
 using pro.backend.Controllers;
 using pro.backend.Dtos;
@@ -152,7 +151,7 @@ namespace WebApi.Controllers
                 var callbackUrl = Url.Action(nameof(ConfirmEmail), "Users",
                 new { userId = createuser.Id, code = code }, protocol: HttpContext.Request.Scheme);
                 var mobileCode = System.Net.WebUtility.UrlEncode(code);
-                var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
+                var mobileCallbackUrl = $"http://mahdhir.epizy.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
                 Uri uri = new Uri(mobileCallbackUrl);
                 await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
              $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
@@ -181,7 +180,7 @@ namespace WebApi.Controllers
                 new { userId = useridentity.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
                 var mobileCode = System.Net.WebUtility.UrlEncode(code);
-                var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
+                var mobileCallbackUrl = $"http://mahdhir.epizy.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
                 Uri uri = new Uri(mobileCallbackUrl);
                 await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
                       $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
@@ -233,7 +232,7 @@ namespace WebApi.Controllers
                 new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
                 var mobileCode = System.Net.WebUtility.UrlEncode(code);
-                var mobileCallbackUrl = $"http://mahdhir.gungoos.com/passwordreset.php?id={user.Id}&code={mobileCode}";
+                var mobileCallbackUrl = $"http://mahdhir.epizy.com/passwordreset.php?id={user.Id}&code={mobileCode}";
                 Uri uri = new Uri(mobileCallbackUrl);
                 await _emailSender.SendEmailAsync(email, "Reset Password for your Winkel account",
                       $"Please click this link to reset password:<a href='{uri.AbsoluteUri}'>mobile link</a>");
@@ -285,7 +284,9 @@ namespace WebApi.Controllers
             var user = await _usermanger.FindByIdAsync(model.Id);
             user.FirstName = model.FirstName;
             user.LastName = model.LastName;
-            user.PasswordHash = model.Password;
+            
+            if(model.Password != null)
+            await _usermanger.ChangePasswordAsync(user,model.OldPassword,model.Password);
 
             user.Role = model.Role;
 
@@ -302,6 +303,27 @@ namespace WebApi.Controllers
                 return StatusCode(400, "Error while Update!");
             }
         }
+
+        [AllowAnonymous]
+        [HttpPut("password")]
+        public async Task<IActionResult> UpdatePassword(UpdateUserDto model)
+        {
+            
+            var user = await _usermanger.FindByIdAsync(model.Id);
+
+            var result = await _usermanger.ChangePasswordAsync(user,model.OldPassword,model.Password);
+
+
+            if (result.Succeeded)
+            {
+                return StatusCode(200, "Update successful!");
+            }
+            else
+            {
+                return StatusCode(400, "Error while Update!");
+            }
+        }
+
 
     }
 }
