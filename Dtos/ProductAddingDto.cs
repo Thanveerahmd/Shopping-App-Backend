@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using pro.backend.Entities;
 
 namespace pro.backend.Dtos
 {
-    public class ProductDto
+    public class ProductAddingDto
     {
         public int Id { get; set; }
         public string SellerId { get; set; }
@@ -17,7 +16,10 @@ namespace pro.backend.Dtos
         public string Sub_category { get; set; }
         public string PhotoUrl { get; set; }  
         public ICollection<PhotoDto> Photos { get; set; }
-     
-        
+        public DateTime DateAdded { get; set; }
+        public ProductAddingDto()
+        {
+            DateAdded = DateTime.Now;
+        }
     }
 }
