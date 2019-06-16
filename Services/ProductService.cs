@@ -57,7 +57,6 @@ namespace pro.backend.Services
                 throw new AppException("Product not found");
 
             // update user properties
-            prod.Id = product.Id;
             prod.Product_name = product.Product_name;
             prod.Quantity = product.Quantity;
             prod.ReorderLevel = product.ReorderLevel;
@@ -66,7 +65,7 @@ namespace pro.backend.Services
             prod.Category = product.Category;
             prod.Sub_category = product.Sub_category;
 
-            _context.Products.Update(product);
+            _context.Products.Update(prod);
             _context.SaveChanges();
         }
     }
