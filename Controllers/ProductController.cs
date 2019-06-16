@@ -50,7 +50,7 @@ namespace pro.backend.Controllers
 
         [HttpPost("addProduct")]
         [AllowAnonymous]
-        public IActionResult AddProduct([FromBody]ProductDto productDto)
+        public IActionResult AddProduct([FromBody]ProductAddingDto productDto)
         {
             // map dto to entity
             var product = _mapper.Map<Product>(productDto);
@@ -94,6 +94,15 @@ namespace pro.backend.Controllers
                 // return error message if there was an exception
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+         [HttpGet("{sellerID}/products")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllProduct(string sellerID)
+        {
+            var products = await _repo.GetAllProductsOfSeller(sellerID);
+            var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+            return Ok(productsToReturn);
         }
     }
 }

@@ -33,6 +33,14 @@ namespace pro.backend.Services
             return products;
         }
 
+        public async Task<IEnumerable<Product>> GetAllProductsOfSeller(string sellerID) //have to change
+        {
+           var products = await _context.Products.Where(p =>p.SellerId == sellerID)
+           .Include(p => p.Photos).ToListAsync();
+
+            return products;
+        }
+
         public async Task<Photo> GetMainPhotoForUserAsync(int ProductId)
         {
             return await _context.Photos.Where(u => u.ProductId == ProductId)
