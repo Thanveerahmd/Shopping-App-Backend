@@ -69,9 +69,9 @@ namespace pro.backend.Controllers
         }
 
         [HttpDelete("{productid}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int productid)
         {
-            _productService.DeleteProduct(id);
+            _productService.DeleteProduct(productid);
             return Ok();
         }
 
