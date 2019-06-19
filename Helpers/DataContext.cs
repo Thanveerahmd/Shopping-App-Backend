@@ -5,16 +5,16 @@ using Project.Entities;
 using pro.backend.Entities;
 
 
-namespace  Project.Helpers
+namespace Project.Helpers
 {
-    public class DataContext : IdentityDbContext<User,Role,string>
+    public class DataContext : IdentityDbContext<User, Role, string>
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
 
         public DbSet<Admin> Admins { get; set; }
-
+        public DbSet<Cart> Cart { get; set; }
         public DbSet<Product> Products { get; set; }
-        
+        public DbSet<CartProduct> CartProduct { get; set; }
         public DbSet<Photo> Photos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -41,5 +41,5 @@ namespace  Project.Helpers
 
     }
 
-     
+
 }

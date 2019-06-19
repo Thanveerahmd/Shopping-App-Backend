@@ -17,8 +17,13 @@ namespace pro.backend.Services
             _context.Products.Add(product);
             _context.SaveChanges();
             
+         }
+        // public void AddCart(Product product){
 
-        }
+        //     _context.Products.Add(product);
+        //     _context.SaveChanges();
+
+        // }
         public IEnumerable<Product> GetAllProducts() 
         {
             return _context.Products;
@@ -37,6 +42,8 @@ namespace pro.backend.Services
                 _context.SaveChanges();
             }
         }
+
+        
         // public IEnumerable<ProductViewModel2> getProduct() => 
         //     _context.Products.ToList().Select(x => new ProductViewModel2{
         //         id = x.id,

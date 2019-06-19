@@ -12,6 +12,7 @@ namespace pro.backend.iServices
         Task<IEnumerable<Product>> GetAllProducts();
         Task<IEnumerable<Product>> GetAllProductsOfSeller(string sellerID);
         Task<Product> GetProduct(int id);
+        Task<Cart> GetCart(int id);
         Task<Photo> GetPhoto(int id);
         Task<Photo> GetMainPhotoForUserAsync(int ProductId);
     }

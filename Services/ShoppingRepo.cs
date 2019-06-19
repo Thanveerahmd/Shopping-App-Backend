@@ -35,10 +35,18 @@ namespace pro.backend.Services
 
         public async Task<IEnumerable<Product>> GetAllProductsOfSeller(string sellerID) //have to change
         {
-           var products = await _context.Products.Where(p =>p.SellerId == sellerID)
-           .Include(p => p.Photos).ToListAsync();
+            var products = await _context.Products.Where(p => p.SellerId == sellerID)
+            .Include(p => p.Photos).ToListAsync();
 
             return products;
+        }
+
+        public async Task<Cart> GetCart(int id)
+        {
+            var cart = await _context.Cart.Include(p => p.CartDetails)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+            return cart;
         }
 
         public async Task<Photo> GetMainPhotoForUserAsync(int ProductId)
