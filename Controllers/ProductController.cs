@@ -104,5 +104,14 @@ namespace pro.backend.Controllers
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
         }
+
+        [HttpGet("{parameter}/{searchQuery}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProductsByQuery(string searchQuery, string parameter){
+
+            var products = await _repo.GetProductsBySearchQuery(searchQuery,parameter);
+            var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+            return Ok(productsToReturn);
+        }
     }
 }
