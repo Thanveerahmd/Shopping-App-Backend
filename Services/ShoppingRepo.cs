@@ -133,7 +133,7 @@ namespace pro.backend.Services
             return info;
         }
 
-      public async  Task<IEnumerable<DeliveryInfo>> GetDeliveryInfosOfUser(string userId)
+      public async  Task<ICollection<DeliveryInfo>> GetDeliveryInfosOfUser(string userId)
         {
             var info = await _context.DeliveryInfo.Where(i => i.UserId == userId).ToListAsync();
             
@@ -144,6 +144,12 @@ namespace pro.backend.Services
 
             var info = await _context.DeliveryInfo.Where(i => i.UserId == userId)
             .FirstOrDefaultAsync(i => i.isDefault == true);
+
+            return info;
+        }
+
+        public async Task<DeliveryInfo> SetAlternateDefault(string userId){
+            var info = await _context.DeliveryInfo.Where(i => i.UserId == userId).FirstOrDefaultAsync(i => i.isDefault == false);
 
             return info;
         }

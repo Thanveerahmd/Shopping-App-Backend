@@ -32,7 +32,7 @@ namespace pro.backend.Controllers
             var deliveryInfo = _mapper.Map<DeliveryInfo>(DeliveryInfoDto);
             var info = await _repo.GetDeliveryInfosOfUser(deliveryInfo.UserId);
             deliveryInfo.isDefault = false;
-            if (info == null)
+            if (info.Count == 0)
                 deliveryInfo.isDefault = true;
 
             _repo.Add(deliveryInfo);
@@ -79,7 +79,11 @@ namespace pro.backend.Controllers
         {
 
             var info = await _repo.GetDeliveryInfo(Id);
-
+            var list = await _repo.GetDeliveryInfosOfUser(info.UserId);
+            if(list.Count != 1){
+                var data = await _repo.SetAlternateDefault(info.UserId);
+                data.isDefault = true;
+            }
             _repo.Delete(info);
 
             if (await _repo.SaveAll())
