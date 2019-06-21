@@ -68,10 +68,10 @@ namespace pro.backend.Controllers
 
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [HttpDelete("{productid}")]
+        public IActionResult Delete(int productid)
         {
-            _productService.DeleteProduct(id);
+            _productService.DeleteProduct(productid);
             return Ok();
         }
 
@@ -101,6 +101,15 @@ namespace pro.backend.Controllers
         public async Task<IActionResult> GetAllProduct(string sellerID)
         {
             var products = await _repo.GetAllProductsOfSeller(sellerID);
+            var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+            return Ok(productsToReturn);
+        }
+
+        [HttpGet("{parameter}/{searchQuery}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProductsByQuery(string searchQuery, string parameter){
+
+            var products = await _repo.GetProductsBySearchQuery(searchQuery,parameter);
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
         }
