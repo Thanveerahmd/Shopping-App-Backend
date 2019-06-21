@@ -35,6 +35,14 @@ namespace Project.Helpers
 
             CreateMap<Photo, PhotoDto>();
 
+            CreateMap<Cart, CartDto>();
+
+            CreateMap<DeliveryInfo, DeliveryInfoDto>();
+
+            CreateMap<CartProduct, CartProductDto>();
+
+            CreateMap<CartProduct, CartProductToReturn>();
+
             CreateMap<Photo, PhotoForReturnDto>();
 
             CreateMap<PhotoUploadDto, Photo>();

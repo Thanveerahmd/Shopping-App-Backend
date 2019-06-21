@@ -94,7 +94,8 @@ namespace WebApi.Controllers
                         LastName = user.LastName,
                         Role = user.Role,
                         imageurl = image,
-                        Token = token
+                        Token = token,
+                        cart = _mapper.Map<CartDto>(_repo.GetCart(user.Id)) 
                     });
                 }
                 else
@@ -145,13 +146,16 @@ namespace WebApi.Controllers
 
 
                 }
-                
-                 var cart = new Cart();
-                 cart.BuyerId = getuser.Id;
+
+                var cart = new Cart();
+                cart.BuyerId = getuser.Id;
                 try
                 {
                     _repo.Add(cart);
-                    //return Ok(product.CartId);
+
+                    if (!(await _repo.SaveAll()))
+                        return BadRequest("Could not create Cart");
+                   
                 }
                 catch (AppException ex)
                 {

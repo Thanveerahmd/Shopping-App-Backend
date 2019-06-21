@@ -16,7 +16,6 @@ namespace pro.backend.Controllers
     {
         private readonly iProductService _productService;
         private readonly IMapper _mapper;
-
         public readonly iShoppingRepo _repo;
 
         public CartController(iProductService productService,
@@ -27,34 +26,16 @@ namespace pro.backend.Controllers
             _productService = productService;
         }
 
-        [HttpPost("addtocart")]
+        [HttpPost("{Buyer_Id}/addtocart")]
         [AllowAnonymous]
-        public async Task<IActionResult> AddCartProduct([FromBody]CartProductDto productDto)
+        public async Task<IActionResult> AddCartProduct([FromBody]CartProductDto productDto, string Buyer_Id)
         {
-
-            //map dto to entity
-            var cart = _mapper.Map<Cart>(productDto);
-            try
-            {
-                _repo.Add(cart);
-                //return Ok(product.CartId);
-
-            }
-            catch (AppException ex)
-            {
-
-                return BadRequest(new { message = ex.Message });
-            }
-
-
-             //var cart = await _repo.GetCart(product.CartId);
-             var cartProduct = _mapper.Map<CartProduct>(productDto);
-             cart.CartDetails.Add(cartProduct);
-             //product.Photos.Add(photo);
-
+            var cart = await _repo.GetCart(Buyer_Id);
+            var cartProduct = _mapper.Map<CartProduct>(productDto);
+            cart.CartDetails.Add(cartProduct);
             if (await _repo.SaveAll())
             {
-               // var photoToReturn = _mapper.Map<PhotoForReturnDto>(photo);
+                // var photoToReturn = _mapper.Map<PhotoForReturnDto>(photo);
                 //return CreatedAtRoute("GetPhoto", new { id = photo.Id }, photoToReturn);
                 return Ok(cart.Id);
             }
@@ -62,16 +43,37 @@ namespace pro.backend.Controllers
 
 
         }
-        // [HttpGet("{id}", Name = "GetPhoto")]
+
+
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetCart(string id)
+        {
+            var cart = await _repo.GetCart(id);
+            var cartToReturn = _mapper.Map<CartDto>(cart);
+            return Ok(cartToReturn);
+        }
+
+
+        // [HttpDelete("{Buyer_Id}/{ProductId}")]
         // [AllowAnonymous]
-        // public async Task<IActionResult> GetPhoto(int id)
+        // public async Task<IActionResult> DeletePhoto(int ProductId, string Buyer_Id)
         // {
-        //     var photoFromRepo = await _repo.GetPhoto(id);
+        //     var cart = await _repo.GetCart(Buyer_Id);
 
-        //     var photo = _mapper.Map<PhotoForReturnDto>(photoFromRepo);
+            // // if (!product.Photos.Any(p => p.Id == id))
+            // //     return Unauthorized();
 
-        //     return Ok(photo);
+            // var CartProduct = await _repo.GetCartProduct(ProductId);
+
+            // _repo.Delete(photoFromRepo);
+
+
+        //     if (await _repo.SaveAll())
+        //         return Ok();
+        //     return BadRequest("Failed to delete the photo");
         // }
+
 
     }
 

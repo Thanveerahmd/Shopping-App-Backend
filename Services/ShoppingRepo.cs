@@ -41,10 +41,10 @@ namespace pro.backend.Services
             return products;
         }
 
-        public async Task<Cart> GetCart(int id)
+        public async Task<Cart> GetCart(string id)
         {
             var cart = await _context.Cart.Include(p => p.CartDetails)
-            .FirstOrDefaultAsync(i => i.Id == id);
+            .FirstOrDefaultAsync(i => i.BuyerId == id);
 
             return cart;
         }
@@ -80,6 +80,44 @@ namespace pro.backend.Services
         public async Task<bool> SaveAll()
         {
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async void UpdateDeliveryInfo(DeliveryInfo DeliveryInfo)
+        {
+            var prod = await  _context.DeliveryInfo.FindAsync(DeliveryInfo.Id);
+            if (prod == null)
+                throw new AppException("DeliveryInfo not found");
+            
+            prod.FName =DeliveryInfo.FName;
+            prod.Address =DeliveryInfo.Address;
+            prod.District=DeliveryInfo.District;
+            prod.City=DeliveryInfo.City;
+            prod.MobileNumber=prod.MobileNumber;
+
+            _context.DeliveryInfo.Update(prod);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<DeliveryInfo> GetDeliveryInfo(int id)
+        {
+              var info = await _context.DeliveryInfo.FirstOrDefaultAsync(i => i.Id == id);
+
+            return info;
+        }
+
+      public async  Task<IEnumerable<DeliveryInfo>> GetDeliveryInfosOfUser(string userId)
+        {
+            var info = await _context.DeliveryInfo.Where(i => i.UserId == userId).ToListAsync();
+            
+            return info;
+        }
+
+        public async Task<DeliveryInfo> GetDeliveryInfoOfDefault(string userId){
+
+            var info = await _context.DeliveryInfo.Where(i => i.UserId == userId)
+            .FirstOrDefaultAsync(i => i.isDefault == true);
+
+            return info;
         }
     }
 }

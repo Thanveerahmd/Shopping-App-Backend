@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
+using pro.backend.Entities;
 
 namespace  Project.Entities
 {
@@ -11,5 +12,6 @@ namespace  Project.Entities
         public long? FacebookId { get; set; }
         public string GoogleId { get; set; }
         public string imageUrl { get; set; }
+        public ICollection<DeliveryInfo> DeliveryDetails { get; set; }
     }
 }
