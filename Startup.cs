@@ -129,12 +129,6 @@ namespace WebApi
                         }
 
 
-
-
-
-
-
-
                         return Task.CompletedTask;
                     }
                 };
@@ -146,7 +140,8 @@ namespace WebApi
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    ValidateLifetime = false
+                    
+                    
                 };
             });
 

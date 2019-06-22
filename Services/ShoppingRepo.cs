@@ -65,28 +65,28 @@ namespace pro.backend.Services
         public async Task<IEnumerable<Product>> GetProductsBySearchQuery(string searchQuery,string parameter)
         {
             List <Product> products = null;
-
+            searchQuery = searchQuery.ToLower();
             if(parameter == "Sub Category"){
-                products = await _context.Products.Where(p =>p.Sub_category.Contains(searchQuery))
+                products = await _context.Products.Where(p =>p.Sub_category.ToLower().Contains(searchQuery))
                 .Include(p => p.Photos).ToListAsync();
             }else{
                 if(parameter == "Category"){
-                    products = await _context.Products.Where(p =>p.Category.Contains(searchQuery))
+                    products = await _context.Products.Where(p =>p.Category.ToLower().Contains(searchQuery))
                 .Include(p => p.Photos).ToListAsync();
                 }else{
                     if(parameter == "Name"){
-                        products = await _context.Products.Where(p =>p.Product_name.Contains(searchQuery))
+                        products = await _context.Products.Where(p =>p.Product_name.ToLower().Contains(searchQuery))
                 .Include(p => p.Photos).ToListAsync();
                     }else{
                         if(parameter == "Description"){
-                            products = await _context.Products.Where(p =>p.Product_Discription.Contains(searchQuery))
+                            products = await _context.Products.Where(p =>p.Product_Discription.ToLower().Contains(searchQuery))
                 .Include(p => p.Photos).ToListAsync();
                         }else{
                             if(parameter == "All"){
-                                products = await _context.Products.Where(p =>p.Product_Discription.Contains(searchQuery) 
-                                || p.Product_name.Contains(searchQuery)
-                                || p.Category.Contains(searchQuery)
-                                || p.Sub_category.Contains(searchQuery)
+                                products = await _context.Products.Where(p =>p.Product_Discription.ToLower().Contains(searchQuery) 
+                                || p.Product_name.ToLower().Contains(searchQuery)
+                                || p.Category.ToLower().Contains(searchQuery)
+                                || p.Sub_category.ToLower().Contains(searchQuery)
                                 )
                 .Include(p => p.Photos).ToListAsync();
                             }

@@ -95,7 +95,7 @@ namespace WebApi.Controllers
                         Role = user.Role,
                         imageurl = image,
                         Token = token,
-                        cart = _mapper.Map<CartDto>(_repo.GetCart(user.Id)) 
+                        // cart = _mapper.Map<Cart>(_repo.GetCart(user.Id)) 
                     });
                 }
                 else
@@ -155,7 +155,7 @@ namespace WebApi.Controllers
 
                     if (!(await _repo.SaveAll()))
                         return BadRequest("Could not create Cart");
-                   
+
                 }
                 catch (AppException ex)
                 {
@@ -307,6 +307,25 @@ namespace WebApi.Controllers
 
             user.Role = model.Role;
 
+            if (model.imageUrl != null)
+            {
+
+                var file = Convert.FromBase64String(model.imageUrl);
+                var filename = user.Id;
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
+                using (var imageFile = new FileStream(path, FileMode.Create))
+                {
+                    imageFile.Write(file, 0, file.Length);
+                    imageFile.Flush();
+                }
+
+
+                var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
+
+                user.imageUrl = pic + "//" + filename + ".jpg";
+
+            }
+
 
             var result = await _usermanger.UpdateAsync(user);
 
@@ -341,6 +360,28 @@ namespace WebApi.Controllers
             }
         }
 
+        
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUserDetailsById(string userId)
+        {
 
+            var user = await _usermanger.FindByIdAsync(userId);
+            string image = null;
+            if (user.imageUrl != null)
+            {
+                string path = user.imageUrl;
+                byte[] b = System.IO.File.ReadAllBytes(path);
+                image = "data:image/jpg;base64," + Convert.ToBase64String(b);
+            }
+            return Ok(new
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = user.Role,
+                imageurl = image,
+            });
+        }
     }
 }
