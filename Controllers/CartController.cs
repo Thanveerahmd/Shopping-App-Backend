@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -55,26 +56,37 @@ namespace pro.backend.Controllers
         }
 
 
-        // [HttpDelete("{Buyer_Id}/{ProductId}")]
-        // [AllowAnonymous]
-        // public async Task<IActionResult> DeletePhoto(int ProductId, string Buyer_Id)
-        // {
-        //     var cart = await _repo.GetCart(Buyer_Id);
+        [HttpDelete("{User_Id}/{CartProductId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeleteCartProduct(int CartProductId, string User_Id)
+        {
+            var cart = await _repo.GetCart(User_Id);
 
-            // // if (!product.Photos.Any(p => p.Id == id))
-            // //     return Unauthorized();
+            if (!cart.CartDetails.Any(p => p.Id == CartProductId))
+                return Unauthorized();
+            
+            var CartProduct = await _repo.GetCartProduct(CartProductId);
 
-            // var CartProduct = await _repo.GetCartProduct(ProductId);
+            _repo.Delete(CartProduct);
 
-            // _repo.Delete(photoFromRepo);
-
-
-        //     if (await _repo.SaveAll())
-        //         return Ok();
-        //     return BadRequest("Failed to delete the photo");
-        // }
+            if (await _repo.SaveAll())
+                return Ok("Deleted Successfully");
+            return BadRequest("Failed to delete the CartProduct");
+        }
 
 
+       [HttpDelete("{CartId}")]
+       [AllowAnonymous]
+        public async Task<IActionResult> DeleteCart(int CartId)
+        {
+            var cartProducts = await _repo.GetAllCartProduct(CartId);
+
+            _repo.DeleteAll(cartProducts);
+
+            if (await _repo.SaveAll())
+                return Ok("Deleted Successfully");
+            return BadRequest("Failed to delete the All Cart Products");
+        }
     }
 
 }

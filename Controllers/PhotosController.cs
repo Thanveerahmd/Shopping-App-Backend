@@ -95,9 +95,7 @@ namespace pro.backend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> SetMainPhoto(int ProductId, int id)
         {
-            // if (userId != int.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value))
-            //     return Unauthorized();
-
+           
             var product = await _repo.GetProduct(ProductId);
 
             if (!product.Photos.Any(p => p.Id == id))
@@ -110,9 +108,8 @@ namespace pro.backend.Controllers
 
             var currentMainPhoto = await _repo.GetMainPhotoForUserAsync(ProductId);
 
-            if (!(currentMainPhoto == null))
+            if (currentMainPhoto != null)
                 currentMainPhoto.isMain = false;
-
             photoFromRepo.isMain = true;
 
             if (await _repo.SaveAll())

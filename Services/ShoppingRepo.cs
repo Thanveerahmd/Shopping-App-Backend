@@ -26,6 +26,11 @@ namespace pro.backend.Services
             _context.Remove(entity);
         }
 
+         public void DeleteAll<T>(ICollection<T> entity) where T : class
+        {
+            _context.RemoveRange(entity);
+        }
+
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
             var products = await _context.Products.Include(p => p.Photos).ToListAsync();
@@ -133,7 +138,7 @@ namespace pro.backend.Services
             return info;
         }
 
-      public async  Task<ICollection<DeliveryInfo>> GetDeliveryInfosOfUser(string userId)
+        public async  Task<ICollection<DeliveryInfo>> GetDeliveryInfosOfUser(string userId)
         {
             var info = await _context.DeliveryInfo.Where(i => i.UserId == userId).ToListAsync();
             
@@ -152,6 +157,21 @@ namespace pro.backend.Services
             var info = await _context.DeliveryInfo.Where(i => i.UserId == userId).FirstOrDefaultAsync(i => i.isDefault == false);
 
             return info;
+        }
+
+        public async Task<CartProduct> GetCartProduct(int CartproductId)
+        {
+            var CartProduct = await _context.CartProduct.FirstOrDefaultAsync(p => p.Id == CartproductId);
+
+            return CartProduct;
+        }
+
+        public async Task<ICollection<CartProduct>> GetAllCartProduct(int CartId)
+        {
+            var cartProducts =await _context.CartProduct.
+            Where(i => i.CartId == CartId).ToListAsync();
+
+            return cartProducts;
         }
     }
 }

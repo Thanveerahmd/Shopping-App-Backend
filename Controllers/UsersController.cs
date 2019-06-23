@@ -85,6 +85,9 @@ namespace WebApi.Controllers
                     }
 
                     var token = _token.GenrateJwtToken(appuser);
+                    var cart = _repo.GetCart(user.Id).Result;
+                    var cartToReturn = _mapper.Map<CartDto>(cart);
+                    
                     return Ok(new
                     {
                         Id = user.Id,
@@ -95,7 +98,7 @@ namespace WebApi.Controllers
                         Role = user.Role,
                         imageurl = image,
                         Token = token,
-                        // cart = _mapper.Map<Cart>(_repo.GetCart(user.Id)) 
+                        cartToReturn
                     });
                 }
                 else
