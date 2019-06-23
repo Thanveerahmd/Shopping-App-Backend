@@ -335,7 +335,7 @@ namespace WebApi.Controllers
 
             if (result.Succeeded)
             {
-                return StatusCode(200, "Update successful!");
+                return Ok();
             }
             else
             {
@@ -355,7 +355,7 @@ namespace WebApi.Controllers
 
             if (result.Succeeded)
             {
-                return StatusCode(200, "Update successful!");
+                return Ok();
             }
             else
             {
