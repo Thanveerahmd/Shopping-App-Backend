@@ -27,28 +27,28 @@ namespace pro.backend.Controllers
             _productService = productService;
         }
 
-        [HttpPost("{Buyer_Id}/addtocart")]
+        [HttpPost("addtocart/{buyerId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AddCartProduct([FromBody]CartProductDto productDto, string Buyer_Id)
+        public async Task<IActionResult> AddCartProduct(CartProductDto productDto, string buyerId)
         {
-            var cart = await _repo.GetCart(Buyer_Id);
+            var cart = await _repo.GetCart(buyerId);
             var cartProduct = _mapper.Map<CartProduct>(productDto);
             cart.CartDetails.Add(cartProduct);
             if (await _repo.SaveAll())
             {
                 return Ok(cart.Id);
             }
-            return BadRequest("Coudn't add the Product to Cart");
+            return BadRequest();
 
 
         }
 
 
-        [HttpGet("{id}")]
+        [HttpGet("{userId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetCart(string id)
+        public async Task<IActionResult> GetCart(string userId)
         {
-            var cart = await _repo.GetCart(id);
+            var cart = await _repo.GetCart(userId);
             var cartToReturn = _mapper.Map<CartDto>(cart);
             return Ok(cartToReturn);
         }
@@ -68,8 +68,8 @@ namespace pro.backend.Controllers
             _repo.Delete(CartProduct);
 
             if (await _repo.SaveAll())
-                return Ok("Deleted Successfully");
-            return BadRequest("Failed to delete the CartProduct");
+                return Ok();
+            return BadRequest();
         }
 
 
@@ -82,8 +82,8 @@ namespace pro.backend.Controllers
             _repo.DeleteAll(cartProducts);
 
             if (await _repo.SaveAll())
-                return Ok("Deleted Successfully");
-            return BadRequest("Failed to delete the All Cart Products");
+                return Ok();
+            return BadRequest();
         }
 
          [HttpPut]
