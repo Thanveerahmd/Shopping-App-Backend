@@ -36,8 +36,6 @@ namespace pro.backend.Controllers
             cart.CartDetails.Add(cartProduct);
             if (await _repo.SaveAll())
             {
-                // var photoToReturn = _mapper.Map<PhotoForReturnDto>(photo);
-                //return CreatedAtRoute("GetPhoto", new { id = photo.Id }, photoToReturn);
                 return Ok(cart.Id);
             }
             return BadRequest("Coudn't add the Product to Cart");
@@ -87,6 +85,28 @@ namespace pro.backend.Controllers
                 return Ok("Deleted Successfully");
             return BadRequest("Failed to delete the All Cart Products");
         }
+
+         [HttpPut]
+        [AllowAnonymous]
+        public IActionResult UpdateCart([FromBody]CartProductDto productDto)
+        {
+            // map dto to entity and set id
+            var prod = _mapper.Map<CartProduct>(productDto);
+            prod.Id = productDto.Id;
+
+            try
+            {
+                // save 
+                _repo.UpdateCartDetails(prod);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
+
 
 }

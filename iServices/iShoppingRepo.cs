@@ -21,9 +21,9 @@ namespace pro.backend.iServices
         Task<ICollection<DeliveryInfo>> GetDeliveryInfosOfUser(string userId);
         Task<DeliveryInfo> GetDeliveryInfo(int id);
         Task<DeliveryInfo> GetDeliveryInfoOfDefault(string userId);
-
         Task<DeliveryInfo> SetAlternateDefault(string userId);
         Task<CartProduct> GetCartProduct(int CartproductId);
         Task<ICollection<CartProduct>> GetAllCartProduct(int CartId);
+        void UpdateCartDetails(CartProduct CartProduct);
     }
 }

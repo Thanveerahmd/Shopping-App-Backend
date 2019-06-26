@@ -26,7 +26,7 @@ namespace pro.backend.Services
             _context.Remove(entity);
         }
 
-         public void DeleteAll<T>(ICollection<T> entity) where T : class
+        public void DeleteAll<T>(ICollection<T> entity) where T : class
         {
             _context.RemoveRange(entity);
         }
@@ -67,28 +67,41 @@ namespace pro.backend.Services
             return photo;
         }
 
-        public async Task<IEnumerable<Product>> GetProductsBySearchQuery(string searchQuery,string parameter)
+        public async Task<IEnumerable<Product>> GetProductsBySearchQuery(string searchQuery, string parameter)
         {
-            List <Product> products = null;
+            List<Product> products = null;
             searchQuery = searchQuery.ToLower();
-            if(parameter == "Sub Category"){
-                products = await _context.Products.Where(p =>p.Sub_category.ToLower().Contains(searchQuery))
+            if (parameter == "Sub Category")
+            {
+                products = await _context.Products.Where(p => p.Sub_category.ToLower().Contains(searchQuery))
                 .Include(p => p.Photos).ToListAsync();
-            }else{
-                if(parameter == "Category"){
-                    products = await _context.Products.Where(p =>p.Category.ToLower().Contains(searchQuery))
+            }
+            else
+            {
+                if (parameter == "Category")
+                {
+                    products = await _context.Products.Where(p => p.Category.ToLower().Contains(searchQuery))
                 .Include(p => p.Photos).ToListAsync();
-                }else{
-                    if(parameter == "Name"){
-                        products = await _context.Products.Where(p =>p.Product_name.ToLower().Contains(searchQuery))
+                }
+                else
+                {
+                    if (parameter == "Name")
+                    {
+                        products = await _context.Products.Where(p => p.Product_name.ToLower().Contains(searchQuery))
                 .Include(p => p.Photos).ToListAsync();
-                    }else{
-                        if(parameter == "Description"){
-                            products = await _context.Products.Where(p =>p.Product_Discription.ToLower().Contains(searchQuery))
+                    }
+                    else
+                    {
+                        if (parameter == "Description")
+                        {
+                            products = await _context.Products.Where(p => p.Product_Discription.ToLower().Contains(searchQuery))
                 .Include(p => p.Photos).ToListAsync();
-                        }else{
-                            if(parameter == "All"){
-                                products = await _context.Products.Where(p =>p.Product_Discription.ToLower().Contains(searchQuery) 
+                        }
+                        else
+                        {
+                            if (parameter == "All")
+                            {
+                                products = await _context.Products.Where(p => p.Product_Discription.ToLower().Contains(searchQuery)
                                 || p.Product_name.ToLower().Contains(searchQuery)
                                 || p.Category.ToLower().Contains(searchQuery)
                                 || p.Sub_category.ToLower().Contains(searchQuery)
@@ -99,7 +112,7 @@ namespace pro.backend.Services
                     }
                 }
             }
-            
+
             return products;
         }
 
@@ -117,15 +130,15 @@ namespace pro.backend.Services
 
         public async void UpdateDeliveryInfo(DeliveryInfo DeliveryInfo)
         {
-            var prod = await  _context.DeliveryInfo.FindAsync(DeliveryInfo.Id);
+            var prod = await _context.DeliveryInfo.FindAsync(DeliveryInfo.Id);
             if (prod == null)
                 throw new AppException("DeliveryInfo not found");
-            
-            prod.FName =DeliveryInfo.FName;
-            prod.Address =DeliveryInfo.Address;
-            prod.District=DeliveryInfo.District;
-            prod.City=DeliveryInfo.City;
-            prod.MobileNumber=prod.MobileNumber;
+
+            prod.FName = DeliveryInfo.FName;
+            prod.Address = DeliveryInfo.Address;
+            prod.District = DeliveryInfo.District;
+            prod.City = DeliveryInfo.City;
+            prod.MobileNumber = DeliveryInfo.MobileNumber;
 
             _context.DeliveryInfo.Update(prod);
             await _context.SaveChangesAsync();
@@ -133,19 +146,20 @@ namespace pro.backend.Services
 
         public async Task<DeliveryInfo> GetDeliveryInfo(int id)
         {
-              var info = await _context.DeliveryInfo.FirstOrDefaultAsync(i => i.Id == id);
+            var info = await _context.DeliveryInfo.FirstOrDefaultAsync(i => i.Id == id);
 
             return info;
         }
 
-        public async  Task<ICollection<DeliveryInfo>> GetDeliveryInfosOfUser(string userId)
+        public async Task<ICollection<DeliveryInfo>> GetDeliveryInfosOfUser(string userId)
         {
             var info = await _context.DeliveryInfo.Where(i => i.UserId == userId).ToListAsync();
-            
+
             return info;
         }
 
-        public async Task<DeliveryInfo> GetDeliveryInfoOfDefault(string userId){
+        public async Task<DeliveryInfo> GetDeliveryInfoOfDefault(string userId)
+        {
 
             var info = await _context.DeliveryInfo.Where(i => i.UserId == userId)
             .FirstOrDefaultAsync(i => i.isDefault == true);
@@ -153,7 +167,8 @@ namespace pro.backend.Services
             return info;
         }
 
-        public async Task<DeliveryInfo> SetAlternateDefault(string userId){
+        public async Task<DeliveryInfo> SetAlternateDefault(string userId)
+        {
             var info = await _context.DeliveryInfo.Where(i => i.UserId == userId).FirstOrDefaultAsync(i => i.isDefault == false);
 
             return info;
@@ -168,10 +183,26 @@ namespace pro.backend.Services
 
         public async Task<ICollection<CartProduct>> GetAllCartProduct(int CartId)
         {
-            var cartProducts =await _context.CartProduct.
+            var cartProducts = await _context.CartProduct.
             Where(i => i.CartId == CartId).ToListAsync();
 
             return cartProducts;
+        }
+
+        public async void UpdateCartDetails(CartProduct CartProduct)
+        {
+            var cartProducts = await _context.CartProduct.FindAsync(CartProduct.Id);
+            if (cartProducts == null)
+                throw new AppException("Product is not avilable ");
+
+            cartProducts.Size = CartProduct.Size;
+            cartProducts.Count=CartProduct.Count;
+            cartProducts.Colour=CartProduct.Colour;
+            cartProducts.Option=CartProduct.Option;
+            cartProducts.Price=CartProduct.Price;
+        
+            _context.CartProduct.Update(cartProducts);
+            await _context.SaveChangesAsync();
         }
     }
 }
