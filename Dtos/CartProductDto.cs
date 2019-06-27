@@ -5,6 +5,7 @@ namespace pro.backend.Dtos
     public class CartProductDto
     {
         public int Id { get; set; }
+        public int ProductId { get; set; }
         public string BuyerId { get; set; }
         public string product_Name { get; set; }
         public string MainPhotoUrl { get; set; }
