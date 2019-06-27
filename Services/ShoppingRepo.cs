@@ -197,7 +197,7 @@ namespace pro.backend.Services
 
             cartProducts.Count=CartProduct.Count;
             cartProducts.Price=CartProduct.Price;
-        
+            
             _context.CartProduct.Update(cartProducts);
         }
 
