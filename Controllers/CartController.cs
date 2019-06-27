@@ -32,12 +32,27 @@ namespace pro.backend.Controllers
         public async Task<IActionResult> AddCartProduct(CartProductDto productDto, string buyerId)
         {
             var cart = await _repo.GetCart(buyerId);
+
             var cartProduct = _mapper.Map<CartProduct>(productDto);
-            cart.CartDetails.Add(cartProduct);
-            if (await _repo.SaveAll())
+
+            var preAddedProduct = await _repo.FindProductMatchInCart(productDto.productId, cart.Id);
+
+            if (preAddedProduct == null)
             {
-                return Ok(cart.Id);
+                cart.CartDetails.Add(cartProduct);
+                
             }
+            else
+            {
+                cartProduct.Id = preAddedProduct.Id;
+                cartProduct.Count = preAddedProduct.Count + cartProduct.Count;
+                await _repo.UpdateCartDetails(cartProduct);
+            }
+
+            if (await _repo.SaveAll())
+                {
+                    return Ok(cart.Id);
+                }
             return BadRequest();
 
 
@@ -62,7 +77,7 @@ namespace pro.backend.Controllers
 
             if (!cart.CartDetails.Any(p => p.Id == CartProductId))
                 return Unauthorized();
-            
+
             var CartProduct = await _repo.GetCartProduct(CartProductId);
 
             _repo.Delete(CartProduct);
@@ -73,8 +88,8 @@ namespace pro.backend.Controllers
         }
 
 
-       [HttpDelete("{CartId}")]
-       [AllowAnonymous]
+        [HttpDelete("{CartId}")]
+        [AllowAnonymous]
         public async Task<IActionResult> DeleteCart(int CartId)
         {
             var cartProducts = await _repo.GetAllCartProduct(CartId);
@@ -86,25 +101,23 @@ namespace pro.backend.Controllers
             return BadRequest();
         }
 
-         [HttpPut]
+        [HttpPut]
         [AllowAnonymous]
-        public IActionResult UpdateCart([FromBody]CartProductDto productDto)
+        public async Task<IActionResult> UpdateCart([FromBody]CartProductDto productDto)
         {
             // map dto to entity and set id
             var prod = _mapper.Map<CartProduct>(productDto);
             prod.Id = productDto.Id;
 
-            try
-            {
-                // save 
-                _repo.UpdateCartDetails(prod);
-                return Ok();
-            }
-            catch (AppException ex)
-            {
-                // return error message if there was an exception
-                return BadRequest(new { message = ex.Message });
-            }
+        
+            await _repo.UpdateCartDetails(prod);
+            if (await _repo.SaveAll())
+                {
+                    return Ok(prod.Id);
+                }
+            return BadRequest();
+
+
         }
     }
 

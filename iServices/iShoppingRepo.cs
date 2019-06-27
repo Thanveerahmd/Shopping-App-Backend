@@ -17,13 +17,15 @@ namespace pro.backend.iServices
         Task<Photo> GetPhoto(int id);
         Task<Photo> GetMainPhotoForUserAsync(int ProductId);
         void UpdateDeliveryInfo(DeliveryInfo DeliveryInfo);
-        Task<IEnumerable<Product>> GetProductsBySearchQuery(string searchQuery,string paramter);
+        Task<IEnumerable<Product>> GetProductsBySearchQuery(string searchQuery, string paramter);
         Task<ICollection<DeliveryInfo>> GetDeliveryInfosOfUser(string userId);
         Task<DeliveryInfo> GetDeliveryInfo(int id);
         Task<DeliveryInfo> GetDeliveryInfoOfDefault(string userId);
         Task<DeliveryInfo> SetAlternateDefault(string userId);
         Task<CartProduct> GetCartProduct(int CartproductId);
         Task<ICollection<CartProduct>> GetAllCartProduct(int CartId);
-        void UpdateCartDetails(CartProduct CartProduct);
+        Task UpdateCartDetails(CartProduct CartProduct);
+
+        Task<CartProduct> FindProductMatchInCart(int productId, int cartId);
     }
 }

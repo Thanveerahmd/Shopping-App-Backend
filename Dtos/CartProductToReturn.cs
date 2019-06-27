@@ -10,6 +10,7 @@ namespace pro.backend.Dtos
         public int Size { get; set; }
         public string Colour { get; set; }
         public string Option { get; set; }
+        public int ProductId {get;set;}
       
 
     }

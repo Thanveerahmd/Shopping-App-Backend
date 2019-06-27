@@ -189,7 +189,7 @@ namespace pro.backend.Services
             return cartProducts;
         }
 
-        public async void UpdateCartDetails(CartProduct CartProduct)
+        public async Task UpdateCartDetails(CartProduct CartProduct)
         {
             var cartProducts = await _context.CartProduct.FindAsync(CartProduct.Id);
             if (cartProducts == null)
@@ -199,7 +199,13 @@ namespace pro.backend.Services
             cartProducts.Price=CartProduct.Price;
         
             _context.CartProduct.Update(cartProducts);
-            await _context.SaveChangesAsync();
+        }
+
+        public async Task<CartProduct> FindProductMatchInCart(int productId,int cartId){
+
+            var prod = await _context.CartProduct.Where(p => p.productId == productId).FirstOrDefaultAsync(p => p.CartId == cartId);
+
+            return prod;
         }
     }
 }
