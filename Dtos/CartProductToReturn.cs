@@ -7,9 +7,7 @@ namespace pro.backend.Dtos
         public string MainPhotoUrl { get; set; }
         public float Price { get; set; }
         public int Count { get; set; }
-        public int Size { get; set; }
-        public string Colour { get; set; }
-        public string Option { get; set; }
+      public string Description { get; set; }
       
 
     }
