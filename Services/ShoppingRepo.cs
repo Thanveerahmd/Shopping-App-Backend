@@ -195,10 +195,7 @@ namespace pro.backend.Services
             if (cartProducts == null)
                 throw new AppException("Product is not avilable ");
 
-            cartProducts.Size = CartProduct.Size;
             cartProducts.Count=CartProduct.Count;
-            cartProducts.Colour=CartProduct.Colour;
-            cartProducts.Option=CartProduct.Option;
             cartProducts.Price=CartProduct.Price;
         
             _context.CartProduct.Update(cartProducts);

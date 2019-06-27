@@ -7,9 +7,7 @@ namespace pro.backend.Entities
         public string MainPhotoUrl { get; set; }
         public float Price { get; set; }
         public int  Count { get; set; }
-        public int Size { get; set; }
-        public string Colour { get; set; }
-        public string Option { get; set; }
+         
          public int CartId { get; set; }
          public Cart cart { get; set; }
     }
