@@ -11,6 +11,7 @@ using pro.backend.Entities;
 using pro.backend.iServices;
 using Project.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 
 namespace pro.backend.Controllers
 {
@@ -20,12 +21,14 @@ namespace pro.backend.Controllers
     {
         private readonly IMapper _mapper;
         public readonly iShoppingRepo _repo;
+        private readonly UserManager<User> _usermanger;
         private Cloudinary _cloudinary;
 
-        public PhotosController(IMapper mapper, iShoppingRepo repo)
+        public PhotosController(IMapper mapper, iShoppingRepo repo, UserManager<User> usermanger)
         {
             _repo = repo;
             _mapper = mapper;
+            _usermanger = usermanger;
 
             Account acc = new Account(
             Keys.Cloudinary_cloud_name,
@@ -37,7 +40,7 @@ namespace pro.backend.Controllers
 
         [HttpPost("addPhoto/{product_id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AddPhotoForProduct(int product_id,[FromForm]PhotoUploadDto PhotoUploadDto)
+        public async Task<IActionResult> AddPhotoForProduct(int product_id, [FromForm]PhotoUploadDto PhotoUploadDto)
         {
             var product = await _repo.GetProduct(product_id);
 
@@ -59,6 +62,11 @@ namespace pro.backend.Controllers
                     Upload_result = _cloudinary.Upload(UploadParams);
                 }
             }
+            else
+            {
+                return BadRequest("your file is corrupted");
+            }
+
 
             PhotoUploadDto.Url = Upload_result.Uri.ToString();
 
@@ -90,12 +98,11 @@ namespace pro.backend.Controllers
             return Ok(photo);
         }
 
-
         [HttpPost("{ProductId}/{id}/setMain")]  // id reffer to Photo id
         [AllowAnonymous]
         public async Task<IActionResult> SetMainPhoto(int ProductId, int id)
         {
-           
+
             var product = await _repo.GetProduct(ProductId);
 
             if (!product.Photos.Any(p => p.Id == id))
@@ -117,7 +124,6 @@ namespace pro.backend.Controllers
 
             return BadRequest("Could not set photo to main");
         }
-
 
         [HttpDelete("{ProductId}/{id}")]
         [AllowAnonymous]
@@ -159,6 +165,110 @@ namespace pro.backend.Controllers
             return BadRequest("Failed to delete the photo");
         }
 
+        [HttpPost("addPhotoforuser/{user_id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AddPhotoForUser(string user_id, [FromForm]PhotoUploadDto PhotoUploadDto)
+        {
+            var user = await _usermanger.FindByIdAsync(user_id);
+
+            var file = PhotoUploadDto.file;
+
+            var Upload_result = new ImageUploadResult();
+
+            if (file != null && file.Length > 0)
+            {
+                using (var stream = file.OpenReadStream())
+                {
+                    var UploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(file.Name, stream),
+                        Transformation = new Transformation()
+                         .Width(500).Height(500).Crop("fill").Gravity("face")
+                    };
+
+                    Upload_result = _cloudinary.Upload(UploadParams);
+                }
+            }
+            else
+            {
+                return BadRequest("your file is corrupted");
+            }
+
+            PhotoUploadDto.Url = Upload_result.Uri.ToString();
+
+            PhotoUploadDto.PublicID = Upload_result.PublicId;
+
+            var photo = _mapper.Map<PhotoForUser>(PhotoUploadDto);
+           
+            photo.UserId= user.Id;
+
+            user.Photo = photo;
+
+            user.imageUrl = photo.Url;
+
+            var result = await _usermanger.UpdateAsync(user);
+
+
+
+            if (result.Succeeded)
+            {
+                var photoToReturn = _mapper.Map<PhotoForReturnDto>(photo);
+                return Ok(photoToReturn.Url);
+            }
+            else
+            {
+                return BadRequest("Coudn't add the Photo");
+            }
+
+        }
+
+        [HttpDelete("Delete/{UserId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeleteUserPhoto(string UserId)
+        {
+
+           var user = await _usermanger.FindByIdAsync(UserId);
+            
+
+            var photoFromRepo = await _repo.GetPhotoOfUser(UserId);
+
+            if (photoFromRepo.PublicID != null)
+            {
+                var delParams = new DelResParams()
+                {
+                    PublicIds = new List<string>() { photoFromRepo.PublicID },
+                    Invalidate = true
+                };
+                var delResult = _cloudinary.DeleteResources(delParams);
+
+                if (!delResult.Partial)
+                {
+                    _repo.Delete(photoFromRepo);
+                    user.imageUrl = null;
+                    await _usermanger.UpdateAsync(user);
+                }
+            }
+
+            if (photoFromRepo.PublicID == null)
+            {
+                _repo.Delete(photoFromRepo);
+            }
+
+            if (await _repo.SaveAll())
+                return Ok();
+            return BadRequest("Failed to delete the photo");
+        }
+
+        [HttpGet("UserImage/{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserPhoto(string id)
+        {
+            var photoFromRepo = await _repo.GetPhotoOfUser(id);
+
+            var photo = _mapper.Map<PhotoForReturnDto>(photoFromRepo);
+
+            return Ok(photo);
+        }
 
     }
 }

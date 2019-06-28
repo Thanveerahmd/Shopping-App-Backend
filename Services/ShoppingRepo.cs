@@ -201,5 +201,12 @@ namespace pro.backend.Services
             _context.CartProduct.Update(cartProducts);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<PhotoForUser> GetPhotoOfUser(string UserId)
+        {
+           var photo = await _context.PhotoForUsers.FirstOrDefaultAsync(p => p.UserId==UserId);
+
+            return photo;
+        }
     }
 }

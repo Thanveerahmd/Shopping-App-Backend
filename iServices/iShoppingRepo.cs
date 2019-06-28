@@ -25,5 +25,6 @@ namespace pro.backend.iServices
         Task<CartProduct> GetCartProduct(int CartproductId);
         Task<ICollection<CartProduct>> GetAllCartProduct(int CartId);
         void UpdateCartDetails(CartProduct CartProduct);
+        Task<PhotoForUser> GetPhotoOfUser(string UserId);
     }
 }

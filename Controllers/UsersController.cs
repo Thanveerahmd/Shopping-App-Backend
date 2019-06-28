@@ -129,26 +129,20 @@ namespace WebApi.Controllers
             if (result != null && result.Succeeded)
             {
                 var user = await _usermanger.FindByNameAsync(getuser.Username);
-                if (userDto.imageUrl != null)
-                {
-
-                    var file = Convert.FromBase64String(userDto.imageUrl);
-                    var filename = user.Id;
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
-                    using (var imageFile = new FileStream(path, FileMode.Create))
-                    {
-                        imageFile.Write(file, 0, file.Length);
-                        imageFile.Flush();
-                    }
-
-
-                    var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
-
-                    user.imageUrl = pic + "//" + filename + ".jpg";
-                    var result2 = await _usermanger.UpdateAsync(user);
-
-
-                }
+                // if (userDto.imageUrl != null)
+                // {
+                //     var file = Convert.FromBase64String(userDto.imageUrl);
+                //     var filename = user.Id;
+                //     var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
+                //     using (var imageFile = new FileStream(path, FileMode.Create))
+                //     {
+                //         imageFile.Write(file, 0, file.Length);
+                //         imageFile.Flush();
+                //     }
+                //     var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
+                //     user.imageUrl = pic + "//" + filename + ".jpg";
+                //     var result2 = await _usermanger.UpdateAsync(user);
+                // }
 
                 var cart = new Cart();
                 cart.BuyerId = getuser.Id;
@@ -328,7 +322,6 @@ namespace WebApi.Controllers
                 user.imageUrl = pic + "//" + filename + ".jpg";
 
             }
-
 
             var result = await _usermanger.UpdateAsync(user);
 
