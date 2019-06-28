@@ -49,6 +49,10 @@ namespace Project.Helpers
 
             CreateMap<PhotoUploadDto, Photo>();
 
+            CreateMap<Rating, RatingDto>();
+
+            CreateMap<RatingDto, Rating>();
+
         }
     }
 }

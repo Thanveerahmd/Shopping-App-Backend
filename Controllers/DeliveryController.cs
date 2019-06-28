@@ -41,7 +41,7 @@ namespace pro.backend.Controllers
             {
                 return Ok();
             }
-            return BadRequest("Coudn't add the DeliveryInfo");
+            return BadRequest();
         }
 
         [HttpPut]
@@ -88,7 +88,7 @@ namespace pro.backend.Controllers
 
             if (await _repo.SaveAll())
                 return Ok();
-            return BadRequest("Failed to delete the Data");
+            return BadRequest();
 
         }
 
@@ -104,7 +104,7 @@ namespace pro.backend.Controllers
 
             if (await _repo.SaveAll())
                 return Ok();
-            return BadRequest("Failed to change default");
+            return BadRequest();
         
         }
     }

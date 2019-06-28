@@ -8,6 +8,7 @@ namespace pro.backend.iServices
     {
         void Add<T>(T entity) where T : class;
         void Delete<T>(T entity) where T : class;
+
         void DeleteAll<T>(ICollection<T> entity) where T : class;
         Task<bool> SaveAll();
         Task<IEnumerable<Product>> GetAllProducts();
@@ -27,5 +28,9 @@ namespace pro.backend.iServices
         Task UpdateCartDetails(CartProduct CartProduct);
 
         Task<CartProduct> FindProductMatchInCart(int productId, int cartId);
+
+        Task UpdateRating (Rating rating);
+
+        Task<Rating> GetRatingById(Rating rating);
     }
 }

@@ -113,5 +113,54 @@ namespace pro.backend.Controllers
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
         }
+
+        [HttpPost("rating")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AddProductRating(RatingDto rating){
+
+            var rate = _mapper.Map<Rating>(rating);
+            
+            _repo.Add(rate);
+
+            if (await _repo.SaveAll())
+                return Ok();
+            return BadRequest();
+        }
+
+        [HttpPut("rating")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateProductRating(RatingDto rating){
+
+            var rate = _mapper.Map<Rating>(rating);
+            try{
+                var prevRate = await _repo.GetRatingById(rate);
+                if(rating.UserId != prevRate.UserId){
+                return Unauthorized();
+            }
+            }catch{
+                return BadRequest();
+            }
+            await _repo.UpdateRating(rate);
+
+            if (await _repo.SaveAll())
+                {
+                    return Ok();
+                }
+            return BadRequest();
+        }
+
+        [HttpDelete("rating")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeleteProductRating(RatingDto rating){
+
+            var rate = _mapper.Map<Rating>(rating);
+            
+            _repo.Delete(rate);
+            if (await _repo.SaveAll())
+                {
+                    return Ok();
+                }
+            return BadRequest();
+        }
     }
 }
