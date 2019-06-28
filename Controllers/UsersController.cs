@@ -77,12 +77,12 @@ namespace WebApi.Controllers
                     var appuser = await _usermanger.Users.FirstOrDefaultAsync(u =>
                        u.NormalizedUserName == userDto.Username.ToUpper());
                     string image = null;
-                    if (user.imageUrl != null)
-                    {
-                        string path = user.imageUrl;
-                        byte[] b = System.IO.File.ReadAllBytes(path);
-                        image = "data:image/jpg;base64," + Convert.ToBase64String(b);
-                    }
+                    // if (user.imageUrl != null)
+                    // {
+                    //     string path = user.imageUrl;
+                    //     byte[] b = System.IO.File.ReadAllBytes(path);
+                    //     image = "data:image/jpg;base64," + Convert.ToBase64String(b);
+                    // }
 
                     var token = _token.GenrateJwtToken(appuser);
                     var cart = _repo.GetCart(user.Id).Result;
@@ -96,7 +96,7 @@ namespace WebApi.Controllers
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Role = user.Role,
-                        imageurl = image,
+                        imageurl = user.imageUrl,
                         Token = token,
                         cartToReturn
                     });
@@ -370,12 +370,17 @@ namespace WebApi.Controllers
 
             var user = await _usermanger.FindByIdAsync(userId);
             string image = null;
-            if (user.imageUrl != null)
-            {
-                string path = user.imageUrl;
-                byte[] b = System.IO.File.ReadAllBytes(path);
-                image = "data:image/jpg;base64," + Convert.ToBase64String(b);
-            }
+            // if (user.imageUrl != null)
+            // {
+            //     string path = user.imageUrl;
+            //     try{
+            //         byte[] b = System.IO.File.ReadAllBytes(path);
+            //         image = "data:image/jpg;base64," + Convert.ToBase64String(b);
+            //     }catch{
+
+            //     }
+                
+            // }
             return Ok(new
             {
                 Id = user.Id,
@@ -383,7 +388,7 @@ namespace WebApi.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Role = user.Role,
-                imageurl = image,
+                imageurl = user.imageUrl,
             });
         }
     }
