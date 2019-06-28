@@ -73,6 +73,8 @@ namespace WebApi
                 opt.Password.RequireLowercase = false;
                 opt.Password.RequireNonAlphanumeric = false;
                 opt.Password.RequireUppercase = false;
+                opt.Password.RequiredLength = 8;
+                opt.Password.RequireDigit = false;
                 opt.SignIn.RequireConfirmedEmail = true;
                 opt.User.RequireUniqueEmail = true;
             }).AddEntityFrameworkStores<DataContext>()

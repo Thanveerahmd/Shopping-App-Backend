@@ -26,9 +26,11 @@ namespace pro.backend.Services
             _context.Remove(entity);
         }
 
+        
         public void DeleteAll<T>(ICollection<T> entity) where T : class
         {
             _context.RemoveRange(entity);
+            
         }
 
         public async Task<IEnumerable<Product>> GetAllProducts()
@@ -118,7 +120,7 @@ namespace pro.backend.Services
 
         public async Task<Product> GetProduct(int id)
         {
-            var product = await _context.Products.Include(p => p.Photos).FirstOrDefaultAsync(i => i.Id == id);
+            var product = await _context.Products.Include(p => p.Photos).Include(p => p.Ratings).FirstOrDefaultAsync(i => i.Id == id);
 
             return product;
         }
@@ -189,7 +191,7 @@ namespace pro.backend.Services
             return cartProducts;
         }
 
-        public async void UpdateCartDetails(CartProduct CartProduct)
+        public async Task UpdateCartDetails(CartProduct CartProduct)
         {
             var cartProducts = await _context.CartProduct.FindAsync(CartProduct.Id);
             if (cartProducts == null)
@@ -199,7 +201,34 @@ namespace pro.backend.Services
             cartProducts.Price=CartProduct.Price;
             
             _context.CartProduct.Update(cartProducts);
-            await _context.SaveChangesAsync();
+        }
+
+        public async Task<CartProduct> FindProductMatchInCart(int productId,int cartId){
+
+            var prod = await _context.CartProduct.Where(p => p.ProductId == productId).FirstOrDefaultAsync(p => p.CartId == cartId);
+
+            return prod;
+        }
+
+        public async Task UpdateRating (Rating rating){
+            var rate = await _context.Ratings.FindAsync(rating.Id);
+            if(rating == null)
+                throw new AppException("rating not available");
+
+            
+            rate.RatingValue = rating.RatingValue;
+            rate.Comment = rating.Comment;
+
+            _context.Ratings.Update(rate);
+        }
+
+        public async Task<Rating> GetRatingById(Rating rating){
+            var rate = await _context.Ratings.FindAsync(rating.Id);
+
+            if(rate == null)
+                throw new AppException("Rating Not Found");
+
+            return rate;
         }
 
         public async Task<PhotoForUser> GetPhotoOfUser(string UserId)

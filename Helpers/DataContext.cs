@@ -16,8 +16,9 @@ namespace Project.Helpers
         public DbSet<Product> Products { get; set; }
         public DbSet<CartProduct> CartProduct { get; set; }
         public DbSet<Photo> Photos { get; set; }
-        public DbSet<DeliveryInfo>DeliveryInfo { get; set; }
-        public DbSet<PhotoForUser>PhotoForUsers { get; set; }
+        public DbSet<DeliveryInfo> DeliveryInfo { get; set; }
+
+        public DbSet<Rating> Ratings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
