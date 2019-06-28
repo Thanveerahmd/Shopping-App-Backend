@@ -76,7 +76,7 @@ namespace WebApi.Controllers
 
                     var appuser = await _usermanger.Users.FirstOrDefaultAsync(u =>
                        u.NormalizedUserName == userDto.Username.ToUpper());
-                    string image = null;
+                    // string image = null;
                     // if (user.imageUrl != null)
                     // {
                     //     string path = user.imageUrl;
@@ -369,7 +369,7 @@ namespace WebApi.Controllers
         {
 
             var user = await _usermanger.FindByIdAsync(userId);
-            string image = null;
+            // string image = null;
             // if (user.imageUrl != null)
             // {
             //     string path = user.imageUrl;
