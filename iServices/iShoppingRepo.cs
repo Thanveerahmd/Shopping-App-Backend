@@ -32,5 +32,7 @@ namespace pro.backend.iServices
         Task UpdateRating (Rating rating);
 
         Task<Rating> GetRatingById(Rating rating);
+
+        Task<PhotoForUser> GetPhotoOfUser(string UserId);
     }
 }

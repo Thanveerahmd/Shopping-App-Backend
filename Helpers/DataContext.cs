@@ -20,6 +20,8 @@ namespace Project.Helpers
 
         public DbSet<Rating> Ratings { get; set; }
 
+        public DbSet<PhotoForUser> PhotoForUsers {get;set;}
+
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
