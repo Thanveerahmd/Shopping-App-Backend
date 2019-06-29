@@ -170,7 +170,7 @@ namespace WebApi.Controllers
                 await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
              $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
 
-                return StatusCode(201);
+                return Ok(user.Id);
             }
 
             return BadRequest(result.Errors);
