@@ -87,7 +87,10 @@ namespace WebApi.Controllers
                     var token = _token.GenrateJwtToken(appuser);
                     var cart = _repo.GetCart(user.Id).Result;
                     var cartToReturn = _mapper.Map<CartDto>(cart);
-                    
+                    var image =await _repo.GetPhotoOfUser(user.Id);
+                    string imageUrl=null;
+                    if(image != null)
+                    imageUrl = image.Url;
                     return Ok(new
                     {
                         Id = user.Id,
@@ -96,7 +99,7 @@ namespace WebApi.Controllers
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Role = user.Role,
-                        imageurl = user.imageUrl,
+                        imageurl = imageUrl,
                         Token = token,
                         cartToReturn
                     });
@@ -151,7 +154,7 @@ namespace WebApi.Controllers
                     _repo.Add(cart);
 
                     if (!(await _repo.SaveAll()))
-                        return BadRequest("Could not create Cart");
+                        return BadRequest(new{message = "Could not create Cart"});
 
                 }
                 catch (AppException ex)
@@ -170,7 +173,7 @@ namespace WebApi.Controllers
                 await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
              $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
 
-                return Ok(user.Id);
+                return Ok(new{Id = user.Id});
             }
 
             return BadRequest(result.Errors);
@@ -362,18 +365,10 @@ namespace WebApi.Controllers
         {
 
             var user = await _usermanger.FindByIdAsync(userId);
-            // string image = null;
-            // if (user.imageUrl != null)
-            // {
-            //     string path = user.imageUrl;
-            //     try{
-            //         byte[] b = System.IO.File.ReadAllBytes(path);
-            //         image = "data:image/jpg;base64," + Convert.ToBase64String(b);
-            //     }catch{
-
-            //     }
-                
-            // }
+            var image =await _repo.GetPhotoOfUser(user.Id);
+            string imageUrl=null;
+                    if(image != null)
+                    imageUrl = image.Url;
             return Ok(new
             {
                 Id = user.Id,
@@ -381,7 +376,7 @@ namespace WebApi.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Role = user.Role,
-                imageurl = user.imageUrl,
+                imageurl = imageUrl,
             });
         }
     }

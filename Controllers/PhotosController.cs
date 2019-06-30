@@ -191,7 +191,7 @@ namespace pro.backend.Controllers
             }
             else
             {
-                return BadRequest("your file is corrupted");
+                return BadRequest(new{message ="Your file is corrupted"});
             }
 
             PhotoUploadDto.Url = Upload_result.Uri.ToString();
@@ -213,11 +213,11 @@ namespace pro.backend.Controllers
             if (result.Succeeded)
             {
                 var photoToReturn = _mapper.Map<PhotoForReturnDto>(photo);
-                return Ok(photoToReturn.Url);
+                return Ok(new{imageUrl = photoToReturn.Url});
             }
             else
             {
-                return BadRequest("Coudn't add the Photo");
+                return BadRequest(new{message = "Coudn't add the Photo"});
             }
 
         }
