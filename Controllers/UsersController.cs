@@ -307,24 +307,24 @@ namespace WebApi.Controllers
 
             user.Role = model.Role;
 
-            if (model.imageUrl != null)
-            {
+            // if (model.imageUrl != null)
+            // {
 
-                var file = Convert.FromBase64String(model.imageUrl);
-                var filename = user.Id;
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
-                using (var imageFile = new FileStream(path, FileMode.Create))
-                {
-                    imageFile.Write(file, 0, file.Length);
-                    imageFile.Flush();
-                }
+            //     var file = Convert.FromBase64String(model.imageUrl);
+            //     var filename = user.Id;
+            //     var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
+            //     using (var imageFile = new FileStream(path, FileMode.Create))
+            //     {
+            //         imageFile.Write(file, 0, file.Length);
+            //         imageFile.Flush();
+            //     }
 
 
-                var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
+            //     var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
 
-                user.imageUrl = pic + "//" + filename + ".jpg";
+            //     user.imageUrl = pic + "//" + filename + ".jpg";
 
-            }
+            // }
 
             var result = await _usermanger.UpdateAsync(user);
 

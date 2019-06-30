@@ -12,7 +12,7 @@ namespace pro.backend.Dtos
         public string Password { get; set; }
 
         public string OldPassword {get; set;}
-        public string imageUrl { get; set; }
+        
     }
 
 }

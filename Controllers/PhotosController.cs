@@ -222,7 +222,7 @@ namespace pro.backend.Controllers
 
         }
 
-        [HttpDelete("Delete/{UserId}")]
+        [HttpDelete("delete/{UserId}")]
         [AllowAnonymous]
         public async Task<IActionResult> DeleteUserPhoto(string UserId)
         {
@@ -243,9 +243,10 @@ namespace pro.backend.Controllers
 
                 if (!delResult.Partial)
                 {
-                    _repo.Delete(photoFromRepo);
                     user.imageUrl = null;
                     await _usermanger.UpdateAsync(user);
+                    _repo.Delete(photoFromRepo);
+                    
                 }
             }
 
@@ -254,9 +255,9 @@ namespace pro.backend.Controllers
                 _repo.Delete(photoFromRepo);
             }
 
-            if (await _repo.SaveAll())
+            if ( await _repo.SaveAll())
                 return Ok();
-            return BadRequest("Failed to delete the photo");
+            return BadRequest(new{message = "Failed to delete photo"});
         }
 
         [HttpGet("UserImage/{id}")]
