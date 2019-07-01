@@ -46,7 +46,7 @@ namespace pro.backend.Controllers
 
         [HttpPut]
         [AllowAnonymous]
-        public IActionResult UpdateDeliveryInfo(DeliveryInfoDto DeliveryUpdateInfoDto)
+        public async Task<IActionResult> UpdateDeliveryInfo(DeliveryInfoDto DeliveryUpdateInfoDto)
         {
             var prod = _mapper.Map<DeliveryInfo>(DeliveryUpdateInfoDto);
             prod.Id = DeliveryUpdateInfoDto.Id;
@@ -54,7 +54,7 @@ namespace pro.backend.Controllers
             try
             {
                 // save 
-                _repo.UpdateDeliveryInfo(prod);
+                await _repo.UpdateDeliveryInfo(prod);
                 return Ok();
             }
             catch (AppException ex)
