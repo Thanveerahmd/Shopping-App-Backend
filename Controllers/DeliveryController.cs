@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OtpNet;
 using pro.backend.Dtos;
 using pro.backend.Entities;
 using pro.backend.Helpers;
@@ -143,7 +142,7 @@ namespace pro.backend.Controllers
             return BadRequest();
         }
 
-        [HttpPut]
+        [HttpPut("billing")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateBillingInfo(DeliveryInfoDto BillingUpdate)
         {
@@ -161,7 +160,7 @@ namespace pro.backend.Controllers
             }
         }
 
-        [HttpPost("Authenticate/{user_Id}/{OTP}")]
+        [HttpPost("authenticate/{user_Id}/{OTP}")]
         [AllowAnonymous]
         public async Task<IActionResult> AuthenticatePhoneNumber(string user_Id, string OTP)
         {
@@ -183,7 +182,7 @@ namespace pro.backend.Controllers
             }
         }
 
-        [HttpGet("BillingInfo/{UserId}")]
+        [HttpGet("billing/{UserId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetBillingInfo(string UserId)
         {
@@ -192,7 +191,7 @@ namespace pro.backend.Controllers
             return Ok(BillingInfo);
         }
 
-        [HttpDelete("BillingInfo/{Id}")]
+        [HttpDelete("billing/{Id}")]
         [AllowAnonymous]
         public async Task<IActionResult> DeleteBillingInfo(int Id)
         {
@@ -212,7 +211,7 @@ namespace pro.backend.Controllers
 
         }
 
-        [HttpPost("BillingInfo/{Id}")]
+        [HttpPost("billing/{Id}")]
         [AllowAnonymous]
         public async Task<IActionResult> SetTheDefault(int Id)
         {
