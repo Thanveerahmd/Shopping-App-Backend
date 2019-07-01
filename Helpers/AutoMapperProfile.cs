@@ -37,13 +37,13 @@ namespace Project.Helpers
 
             CreateMap<PhotoForUser, PhotoDto>();
 
-            CreateMap<PhotoForUser,PhotoForReturnDto>();
+            CreateMap<PhotoForUser, PhotoForReturnDto>();
 
-             CreateMap<PhotoUploadDto, PhotoForUser>();
+            CreateMap<PhotoUploadDto, PhotoForUser>();
 
             CreateMap<Cart, CartDto>();
-            
-            CreateMap<CartDto,Cart>();
+
+            CreateMap<CartDto, Cart>();
 
             CreateMap<DeliveryInfo, DeliveryInfoDto>();
 
@@ -58,6 +58,10 @@ namespace Project.Helpers
             CreateMap<Rating, RatingDto>();
 
             CreateMap<RatingDto, Rating>();
+
+            CreateMap<BillingInfo, DeliveryInfoDto>();
+
+            CreateMap<DeliveryInfoDto, BillingInfo>();
 
         }
     }

@@ -221,6 +221,35 @@ namespace WebApi.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("pro.backend.Entities.BillingInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Address");
+
+                    b.Property<string>("City");
+
+                    b.Property<string>("District");
+
+                    b.Property<string>("FName");
+
+                    b.Property<string>("MobileNumber");
+
+                    b.Property<string>("OTP");
+
+                    b.Property<string>("UserId");
+
+                    b.Property<bool>("isDefault");
+
+                    b.Property<bool>("isMobileVerfied");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BillingInfo");
+                });
+
             modelBuilder.Entity("pro.backend.Entities.Cart", b =>
                 {
                     b.Property<int>("Id")
@@ -280,6 +309,8 @@ namespace WebApi.Migrations
                     b.Property<string>("UserId");
 
                     b.Property<bool>("isDefault");
+
+                    b.Property<bool>("isMobileVerified");
 
                     b.HasKey("Id");
 
@@ -454,6 +485,13 @@ namespace WebApi.Migrations
                         .WithMany("Photos")
                         .HasForeignKey("ProductId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.PhotoForUser", b =>
+                {
+                    b.HasOne("Project.Entities.User", "user")
+                        .WithOne("Photo")
+                        .HasForeignKey("pro.backend.Entities.PhotoForUser", "UserId");
                 });
 
             modelBuilder.Entity("pro.backend.Entities.Rating", b =>

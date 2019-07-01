@@ -379,5 +379,15 @@ namespace WebApi.Controllers
                 imageurl = imageUrl,
             });
         }
+
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllUsers()
+        {
+         var users =await  _usermanger.Users.ToListAsync();
+         return Ok(users);
+        }
+        
     }
 }

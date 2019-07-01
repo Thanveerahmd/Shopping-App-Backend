@@ -130,9 +130,7 @@ namespace pro.backend.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        
-
-        public async void UpdateDeliveryInfo(DeliveryInfo DeliveryInfo)
+        public async Task UpdateDeliveryInfo(DeliveryInfo DeliveryInfo)
         {
             var prod = await _context.DeliveryInfo.FindAsync(DeliveryInfo.Id);
             if (prod == null)
@@ -238,6 +236,58 @@ namespace pro.backend.Services
            var photo = await _context.PhotoForUsers.FirstOrDefaultAsync(p => p.UserId==UserId);
 
             return photo;
+        }
+  
+        public async Task<BillingInfo> GetBillingInfo(int id)
+        {
+             var info = await _context.BillingInfo.FirstOrDefaultAsync(i => i.Id == id);
+
+            return info;
+        }
+
+        public async Task<BillingInfo> GetBillingInfoOfDefault(string userId)
+        {
+             var info = await _context.BillingInfo.Where(i => i.UserId == userId)
+            .FirstOrDefaultAsync(i => i.isDefault == true);
+
+            return info;
+        }
+
+        public async Task<BillingInfo> AlternateDefault(string userId)
+        {
+            var info = await _context.BillingInfo.Where(i => i.UserId == userId).FirstOrDefaultAsync(i => i.isDefault == false);
+
+            return info;
+        }
+
+        public async Task<ICollection<BillingInfo>> GetBillingInfosOfUser(string userId)
+        {
+             var info = await _context.BillingInfo.Where(i => i.UserId == userId).ToListAsync();
+            return info;
+        }
+
+        public async Task UpdateBillingInfo(BillingInfo BillingInfo)
+        {
+             var billinginfo = await _context.BillingInfo.FindAsync(BillingInfo.Id);
+            if (billinginfo == null)
+                throw new AppException("Product is not avilable ");
+
+           billinginfo.FName = BillingInfo.FName;
+           billinginfo.District=BillingInfo.District;
+           billinginfo.MobileNumber = BillingInfo.MobileNumber;
+           billinginfo.Address=BillingInfo.Address;
+           billinginfo.City=BillingInfo.City;
+
+           if(billinginfo.isMobileVerfied)
+                billinginfo.isMobileVerfied=false;
+            
+            _context.BillingInfo.Update(billinginfo);
+        }
+
+        public async Task<BillingInfo> GetBillingInfobyOtp(string userId, string otp)
+        {
+             var info = await _context.BillingInfo.Where(i => i.UserId == userId).FirstOrDefaultAsync(q => q.OTP == otp);
+            return info;
         }
     }
 }

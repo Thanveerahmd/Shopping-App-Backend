@@ -1,6 +1,6 @@
 namespace pro.backend.Entities
 {
-    public class DeliveryInfo
+    public class BillingInfo
     {
         public int Id { get; set; }
         public string UserId { get; set; }
@@ -9,8 +9,8 @@ namespace pro.backend.Entities
         public string District { get; set; }
         public string City { get; set; }
         public string MobileNumber { get; set; }
-
-        public bool isMobileVerified {get;set;}
+        public bool isMobileVerfied {get;set;}
+        public string OTP {get;set;}
         public bool isDefault { get; set; }
     }
 }

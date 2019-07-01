@@ -1,12 +1,17 @@
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OtpNet;
 using pro.backend.Dtos;
 using pro.backend.Entities;
+using pro.backend.Helpers;
 using pro.backend.iServices;
 using Project.Helpers;
+using System.Text;
 
 namespace pro.backend.Controllers
 {
@@ -17,11 +22,13 @@ namespace pro.backend.Controllers
     {
         private readonly IMapper _mapper;
         public readonly iShoppingRepo _repo;
+        private static readonly HttpClient Client = new HttpClient();
 
         public DeliveryController(IMapper mapper, iShoppingRepo repo)
         {
             _repo = repo;
             _mapper = mapper;
+
         }
 
         [HttpPost]
@@ -46,7 +53,7 @@ namespace pro.backend.Controllers
 
         [HttpPut]
         [AllowAnonymous]
-        public IActionResult UpdateDeliveryInfo(DeliveryInfoDto DeliveryUpdateInfoDto)
+        public async Task<IActionResult> UpdateDeliveryInfo(DeliveryInfoDto DeliveryUpdateInfoDto)
         {
             var prod = _mapper.Map<DeliveryInfo>(DeliveryUpdateInfoDto);
             prod.Id = DeliveryUpdateInfoDto.Id;
@@ -54,7 +61,7 @@ namespace pro.backend.Controllers
             try
             {
                 // save 
-                _repo.UpdateDeliveryInfo(prod);
+                await _repo.UpdateDeliveryInfo(prod);
                 return Ok();
             }
             catch (AppException ex)
@@ -80,7 +87,8 @@ namespace pro.backend.Controllers
 
             var info = await _repo.GetDeliveryInfo(Id);
             var list = await _repo.GetDeliveryInfosOfUser(info.UserId);
-            if(list.Count != 1){
+            if (list.Count != 1)
+            {
                 var data = await _repo.SetAlternateDefault(info.UserId);
                 data.isDefault = true;
             }
@@ -105,7 +113,119 @@ namespace pro.backend.Controllers
             if (await _repo.SaveAll())
                 return Ok();
             return BadRequest();
-        
+
+        }
+
+        [HttpPost("billing")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AddBillingInfo(DeliveryInfoDto DeliveryInfoDto)
+        {
+            var BillingInfo = _mapper.Map<BillingInfo>(DeliveryInfoDto);
+            var info = await _repo.GetBillingInfosOfUser(BillingInfo.UserId);
+            BillingInfo.isDefault = false;
+            if (info.Count == 0)
+                BillingInfo.isDefault = true;
+
+            string code = OTPGenerate.OTPGenerator(DeliveryInfoDto.MobileNumber, DeliveryInfoDto.UserId);
+            string massege_body = "Your OPT is" + code;
+            BillingInfo.OTP = code;
+
+            // HttpContent content = null;
+
+            // await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{DeliveryInfoDto.MobileNumber}/{massege_body}/winkel/password", content);
+
+            _repo.Add(BillingInfo);
+
+            if (await _repo.SaveAll())
+            {
+                return Ok(BillingInfo.OTP);
+            }
+            return BadRequest();
+        }
+
+        [HttpPut]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateBillingInfo(DeliveryInfoDto BillingUpdate)
+        {
+            var info = _mapper.Map<BillingInfo>(BillingUpdate);
+            info.Id = BillingUpdate.Id;
+
+            try
+            {
+                await _repo.UpdateBillingInfo(info);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("Authenticate/{user_Id}/{OTP}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AuthenticatePhoneNumber(string user_Id, string OTP)
+        {
+            var info = await _repo.GetBillingInfobyOtp(user_Id, OTP);
+
+            if (info == null)
+            {
+                return BadRequest();
+
+            }
+            else
+            {
+
+                info.OTP = null;
+                info.isMobileVerfied = true;
+                await _repo.SaveAll();
+
+                return Ok();
+            }
+        }
+
+        [HttpGet("BillingInfo/{UserId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetBillingInfo(string UserId)
+        {
+            var info = await _repo.GetBillingInfosOfUser(UserId);
+            var BillingInfo = _mapper.Map<IEnumerable<BillingInfo>>(info);
+            return Ok(BillingInfo);
+        }
+
+        [HttpDelete("BillingInfo/{Id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeleteBillingInfo(int Id)
+        {
+
+            var info = await _repo.GetBillingInfo(Id);
+            var list = await _repo.GetBillingInfosOfUser(info.UserId);
+            if (list.Count != 1)
+            {
+                var data = await _repo.AlternateDefault(info.UserId);
+                data.isDefault = true;
+            }
+            _repo.Delete(info);
+
+            if (await _repo.SaveAll())
+                return Ok();
+            return BadRequest();
+
+        }
+
+        [HttpPost("BillingInfo/{Id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SetTheDefault(int Id)
+        {
+            var info = await _repo.GetBillingInfo(Id);
+            var userId = info.UserId;
+            info.isDefault = true;
+            var prevDefaultRecord = await _repo.GetBillingInfoOfDefault(userId);
+            prevDefaultRecord.isDefault = false;
+
+            if (await _repo.SaveAll())
+                return Ok();
+            return BadRequest();
+
         }
     }
 }

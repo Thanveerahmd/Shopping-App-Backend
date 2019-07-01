@@ -17,7 +17,7 @@ namespace pro.backend.iServices
         Task<Cart> GetCart(string id);
         Task<Photo> GetPhoto(int id);
         Task<Photo> GetMainPhotoForUserAsync(int ProductId);
-        void UpdateDeliveryInfo(DeliveryInfo DeliveryInfo);
+        Task UpdateDeliveryInfo(DeliveryInfo DeliveryInfo);
         Task<IEnumerable<Product>> GetProductsBySearchQuery(string searchQuery, string paramter);
         Task<ICollection<DeliveryInfo>> GetDeliveryInfosOfUser(string userId);
         Task<DeliveryInfo> GetDeliveryInfo(int id);
@@ -26,13 +26,15 @@ namespace pro.backend.iServices
         Task<CartProduct> GetCartProduct(int CartproductId);
         Task<ICollection<CartProduct>> GetAllCartProduct(int CartId);
         Task UpdateCartDetails(CartProduct CartProduct);
-
         Task<CartProduct> FindProductMatchInCart(int productId, int cartId);
-
-        Task UpdateRating (Rating rating);
-
+        Task UpdateRating(Rating rating);
         Task<Rating> GetRatingById(Rating rating);
-
         Task<PhotoForUser> GetPhotoOfUser(string UserId);
+        Task<ICollection<BillingInfo>> GetBillingInfosOfUser(string userId);
+        Task<BillingInfo> GetBillingInfo(int id);
+        Task<BillingInfo> GetBillingInfobyOtp(string userId,string otp);
+        Task<BillingInfo> GetBillingInfoOfDefault(string userId);
+        Task<BillingInfo> AlternateDefault(string userId);
+        Task UpdateBillingInfo(BillingInfo BillingInfo);
     }
 }

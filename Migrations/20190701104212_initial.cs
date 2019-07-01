@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace WebApi.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -72,6 +72,27 @@ namespace WebApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BillingInfo",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<string>(nullable: true),
+                    FName = table.Column<string>(nullable: true),
+                    Address = table.Column<string>(nullable: true),
+                    District = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    MobileNumber = table.Column<string>(nullable: true),
+                    isMobileVerfied = table.Column<bool>(nullable: false),
+                    OTP = table.Column<string>(nullable: true),
+                    isDefault = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BillingInfo", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -226,6 +247,7 @@ namespace WebApi.Migrations
                     District = table.Column<string>(nullable: true),
                     City = table.Column<string>(nullable: true),
                     MobileNumber = table.Column<string>(nullable: true),
+                    isMobileVerified = table.Column<bool>(nullable: false),
                     isDefault = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
@@ -240,11 +262,35 @@ namespace WebApi.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "PhotoForUsers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    Url = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
+                    DateAdded = table.Column<DateTime>(nullable: false),
+                    PublicID = table.Column<string>(nullable: true),
+                    UserId = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PhotoForUsers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PhotoForUsers_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "CartProduct",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    ProductId = table.Column<int>(nullable: false),
                     product_Name = table.Column<string>(nullable: true),
                     MainPhotoUrl = table.Column<string>(nullable: true),
                     Price = table.Column<float>(nullable: false),
@@ -280,6 +326,29 @@ namespace WebApi.Migrations
                     table.PrimaryKey("PK_Photos", x => x.Id);
                     table.ForeignKey(
                         name: "FK_Photos_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Ratings",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    UserId = table.Column<string>(nullable: true),
+                    UserFullName = table.Column<string>(nullable: true),
+                    ProductId = table.Column<int>(nullable: false),
+                    RatingValue = table.Column<int>(nullable: false),
+                    Comment = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ratings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Ratings_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -336,8 +405,20 @@ namespace WebApi.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_PhotoForUsers_UserId",
+                table: "PhotoForUsers",
+                column: "UserId",
+                unique: true,
+                filter: "[UserId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Photos_ProductId",
                 table: "Photos",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ratings_ProductId",
+                table: "Ratings",
                 column: "ProductId");
         }
 
@@ -362,13 +443,22 @@ namespace WebApi.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "BillingInfo");
+
+            migrationBuilder.DropTable(
                 name: "CartProduct");
 
             migrationBuilder.DropTable(
                 name: "DeliveryInfo");
 
             migrationBuilder.DropTable(
+                name: "PhotoForUsers");
+
+            migrationBuilder.DropTable(
                 name: "Photos");
+
+            migrationBuilder.DropTable(
+                name: "Ratings");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
