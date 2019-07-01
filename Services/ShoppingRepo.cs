@@ -130,7 +130,9 @@ namespace pro.backend.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task UpdateDeliveryInfo(DeliveryInfo DeliveryInfo)
+        
+
+        public async Task<bool> UpdateDeliveryInfo(DeliveryInfo DeliveryInfo)
         {
             var prod = await _context.DeliveryInfo.FindAsync(DeliveryInfo.Id);
             if (prod == null)
@@ -143,7 +145,7 @@ namespace pro.backend.Services
             prod.MobileNumber = DeliveryInfo.MobileNumber;
 
             _context.DeliveryInfo.Update(prod);
-            await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync()>0;
         }
 
         public async Task<DeliveryInfo> GetDeliveryInfo(int id)

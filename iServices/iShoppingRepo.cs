@@ -17,7 +17,7 @@ namespace pro.backend.iServices
         Task<Cart> GetCart(string id);
         Task<Photo> GetPhoto(int id);
         Task<Photo> GetMainPhotoForUserAsync(int ProductId);
-        Task UpdateDeliveryInfo(DeliveryInfo DeliveryInfo);
+        Task<bool> UpdateDeliveryInfo(DeliveryInfo DeliveryInfo);
         Task<IEnumerable<Product>> GetProductsBySearchQuery(string searchQuery, string paramter);
         Task<ICollection<DeliveryInfo>> GetDeliveryInfosOfUser(string userId);
         Task<DeliveryInfo> GetDeliveryInfo(int id);
