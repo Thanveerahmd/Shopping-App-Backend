@@ -245,6 +245,8 @@ namespace WebApi.Migrations
 
                     b.Property<bool>("isMobileVerfied");
 
+                    b.Property<bool>("isOTP");
+
                     b.HasKey("Id");
 
                     b.ToTable("BillingInfo");

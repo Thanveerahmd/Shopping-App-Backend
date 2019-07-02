@@ -1,6 +1,6 @@
-namespace pro.backend.Entities
+namespace pro.backend.Dtos
 {
-    public class BillingInfo
+    public class BillingInfoDto
     {
         public int Id { get; set; }
         public string UserId { get; set; }
@@ -9,9 +9,11 @@ namespace pro.backend.Entities
         public string District { get; set; }
         public string City { get; set; }
         public string MobileNumber { get; set; }
+
         public bool isMobileVerfied {get;set;}
-        public string OTP {get;set;}
+
         public bool isOTP {get;set;}
+
         public bool isDefault { get; set; }
     }
 }

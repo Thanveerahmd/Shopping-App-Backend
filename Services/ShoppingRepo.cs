@@ -258,17 +258,16 @@ namespace pro.backend.Services
         public async Task<BillingInfo> AlternateDefault(string userId)
         {
             var info = await _context.BillingInfo.Where(i => i.UserId == userId).FirstOrDefaultAsync(i => i.isDefault == false);
-
             return info;
         }
 
         public async Task<ICollection<BillingInfo>> GetBillingInfosOfUser(string userId)
         {
-             var info = await _context.BillingInfo.Where(i => i.UserId == userId).ToListAsync();
+            var info = await _context.BillingInfo.Where(i => i.UserId == userId).ToListAsync();
             return info;
         }
 
-        public async Task UpdateBillingInfo(BillingInfo BillingInfo)
+        public async Task<bool> UpdateBillingInfo(BillingInfo BillingInfo)
         {
              var billinginfo = await _context.BillingInfo.FindAsync(BillingInfo.Id);
             if (billinginfo == null)
@@ -279,11 +278,14 @@ namespace pro.backend.Services
            billinginfo.MobileNumber = BillingInfo.MobileNumber;
            billinginfo.Address=BillingInfo.Address;
            billinginfo.City=BillingInfo.City;
-
-           if(billinginfo.isMobileVerfied)
-                billinginfo.isMobileVerfied=false;
+           billinginfo.OTP = BillingInfo.OTP;
+           billinginfo.isOTP = BillingInfo.isOTP;
+           billinginfo.isMobileVerfied = BillingInfo.isMobileVerfied;
+        //    if(billinginfo.isMobileVerfied)
+        //         billinginfo.isMobileVerfied=false;
             
             _context.BillingInfo.Update(billinginfo);
+            return await _context.SaveChangesAsync()>0;
         }
 
         public async Task<BillingInfo> GetBillingInfobyOtp(string userId, string otp)

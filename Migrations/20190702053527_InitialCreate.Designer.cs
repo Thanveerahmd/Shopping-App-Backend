@@ -10,8 +10,8 @@ using Project.Helpers;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190701104212_initial")]
-    partial class initial
+    [Migration("20190702053527_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -246,6 +246,8 @@ namespace WebApi.Migrations
                     b.Property<bool>("isDefault");
 
                     b.Property<bool>("isMobileVerfied");
+
+                    b.Property<bool>("isOTP");
 
                     b.HasKey("Id");
 
