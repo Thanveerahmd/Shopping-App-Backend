@@ -374,7 +374,6 @@ namespace WebApi.Controllers
             });
         }
 
-
         [HttpGet("allBuyers")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllBuyers()
