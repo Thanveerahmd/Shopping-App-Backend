@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OtpNet;
 using pro.backend.Dtos;
 using pro.backend.Entities;
 using pro.backend.Helpers;
@@ -126,9 +125,14 @@ namespace pro.backend.Controllers
             if (info.Count == 0)
                 BillingInfo.isDefault = true;
 
-            string code = OTPGenerate.OTPGenerator(DeliveryInfoDto.MobileNumber, DeliveryInfoDto.UserId);
+            string code = OTPGenerate.OTPCharacters();
             string massege_body = "Your OPT is" + code;
             BillingInfo.OTP = code;
+            if (BillingInfo.OTP != null)
+            {
+                BillingInfo.isOTP = true;
+            }
+            else BillingInfo.isOTP = false;
 
             // HttpContent content = null;
 
@@ -143,17 +147,40 @@ namespace pro.backend.Controllers
             return BadRequest();
         }
 
-        [HttpPut]
+        [HttpPut("billing")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateBillingInfo(DeliveryInfoDto BillingUpdate)
         {
             var info = _mapper.Map<BillingInfo>(BillingUpdate);
             info.Id = BillingUpdate.Id;
 
+            var prev = await _repo.GetBillingInfo(BillingUpdate.Id);
+            info.OTP = prev.OTP;
+            info.isDefault = prev.isDefault;
+            info.isMobileVerfied = prev.isMobileVerfied;
+            info.isOTP = prev.isOTP;
+            bool val = prev.MobileNumber != BillingUpdate.MobileNumber;
+            if (prev.MobileNumber != BillingUpdate.MobileNumber)
+            {
+                string code = OTPGenerate.OTPCharacters();
+                string massege_body = "Your OTP is " + code;
+                info.OTP = code;
+                if (info.OTP != null)
+                {
+                    info.isOTP = true;
+                }
+                else info.isOTP = false;
+                info.isMobileVerfied = false;
+                // HttpContent content = null;
+
+                // await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{DeliveryInfoDto.MobileNumber}/{massege_body}/winkel/password", content);
+
+            }
+
             try
             {
                 await _repo.UpdateBillingInfo(info);
-                return Ok();
+                return Ok(new {mobileChanged=val});
             }
             catch (AppException ex)
             {
@@ -161,7 +188,7 @@ namespace pro.backend.Controllers
             }
         }
 
-        [HttpPost("Authenticate/{user_Id}/{OTP}")]
+        [HttpPost("authenticate/{user_Id}/{OTP}")]
         [AllowAnonymous]
         public async Task<IActionResult> AuthenticatePhoneNumber(string user_Id, string OTP)
         {
@@ -176,6 +203,7 @@ namespace pro.backend.Controllers
             {
 
                 info.OTP = null;
+                info.isOTP = false;
                 info.isMobileVerfied = true;
                 await _repo.SaveAll();
 
@@ -183,16 +211,17 @@ namespace pro.backend.Controllers
             }
         }
 
-        [HttpGet("BillingInfo/{UserId}")]
+        [HttpGet("billing/{UserId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetBillingInfo(string UserId)
         {
             var info = await _repo.GetBillingInfosOfUser(UserId);
-            var BillingInfo = _mapper.Map<IEnumerable<BillingInfo>>(info);
+            var BillingInfo = _mapper.Map<IEnumerable<BillingInfoDto>>(info);
+
             return Ok(BillingInfo);
         }
 
-        [HttpDelete("BillingInfo/{Id}")]
+        [HttpDelete("billing/{Id}")]
         [AllowAnonymous]
         public async Task<IActionResult> DeleteBillingInfo(int Id)
         {
@@ -212,7 +241,7 @@ namespace pro.backend.Controllers
 
         }
 
-        [HttpPost("BillingInfo/{Id}")]
+        [HttpPost("billing/{Id}")]
         [AllowAnonymous]
         public async Task<IActionResult> SetTheDefault(int Id)
         {

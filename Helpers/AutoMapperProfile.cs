@@ -63,6 +63,14 @@ namespace Project.Helpers
 
             CreateMap<DeliveryInfoDto, BillingInfo>();
 
+            CreateMap<DeliveryInfoDto, DeliveryInfo>();
+            
+            CreateMap<DeliveryInfo,DeliveryInfoDto>();
+
+            CreateMap<BillingInfo, BillingInfoDto>();
+
+            CreateMap<BillingInfoDto, BillingInfo>();
+
         }
     }
 }

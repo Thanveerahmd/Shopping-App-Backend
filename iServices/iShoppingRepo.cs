@@ -35,6 +35,6 @@ namespace pro.backend.iServices
         Task<BillingInfo> GetBillingInfobyOtp(string userId,string otp);
         Task<BillingInfo> GetBillingInfoOfDefault(string userId);
         Task<BillingInfo> AlternateDefault(string userId);
-        Task UpdateBillingInfo(BillingInfo BillingInfo);
+        Task<bool> UpdateBillingInfo(BillingInfo BillingInfo);
     }
 }

@@ -374,13 +374,21 @@ namespace WebApi.Controllers
             });
         }
 
-        [HttpGet]
+
+        [HttpGet("allBuyers")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllUsers()
+        public async Task<IActionResult> GetAllBuyers()
         {
-         var users =await  _usermanger.Users.ToListAsync();
+         var users =await  _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Buyer'").ToListAsync();
          return Ok(users);
         }
         
+        [HttpGet("allSellers")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllSellers()
+        {
+         var users =await  _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Seller'").ToListAsync();
+         return Ok(users);
+        }
     }
 }
