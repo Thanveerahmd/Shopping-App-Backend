@@ -118,8 +118,6 @@ namespace WebApi.Controllers
 
         }
 
-
-
         [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody]UserDto userDto)
@@ -180,7 +178,6 @@ namespace WebApi.Controllers
 
         }
 
-
         [AllowAnonymous]
         [HttpPost("activate")]
         public async Task<IActionResult> ActivateAsync([FromBody]UserDto userDto)
@@ -226,7 +223,6 @@ namespace WebApi.Controllers
                 return StatusCode(200, "Email Confirmed");
             else return StatusCode(400);
         }
-
 
         [AllowAnonymous]
         [HttpPost("ForgetPassword")]
@@ -291,7 +287,6 @@ namespace WebApi.Controllers
                 return StatusCode(400, "Error while resetting the password!");
             }
         }
-
 
         [AllowAnonymous]
         [HttpPut]
@@ -358,8 +353,7 @@ namespace WebApi.Controllers
                 return StatusCode(400, "Error while Update!");
             }
         }
-
-        
+   
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUserDetailsById(string userId)
         {
@@ -379,7 +373,6 @@ namespace WebApi.Controllers
                 imageurl = imageUrl,
             });
         }
-
 
         [HttpGet]
         [AllowAnonymous]

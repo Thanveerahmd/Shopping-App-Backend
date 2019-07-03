@@ -19,9 +19,7 @@ namespace pro.backend.Controllers
     {
         private readonly iProductService _productService;
         private readonly IMapper _mapper;
-
         public readonly iShoppingRepo _repo;
-
         public ProductController(iProductService productService,
         IMapper mapper, iShoppingRepo repo)
         {

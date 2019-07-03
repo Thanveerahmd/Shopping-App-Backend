@@ -105,7 +105,6 @@ namespace pro.backend.Controllers
             });
         }
 
-
         [AllowAnonymous]
         [HttpPost("google")]
         public async Task<IActionResult> Google([FromBody]SocialAuthDto model)
