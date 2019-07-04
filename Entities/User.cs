@@ -14,5 +14,8 @@ namespace Project.Entities
         public string imageUrl { get; set; }
         public ICollection<DeliveryInfo> DeliveryDetails { get; set; }
         public PhotoForUser Photo { get; set; }
+        public ICollection<Store> StoreInfo { get; set; }
+        public ICollection<BillingInfo> BillingInfo { get; set; }
+
     }
 }

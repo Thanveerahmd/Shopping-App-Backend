@@ -50,6 +50,7 @@ namespace WebApi
             services.AddScoped<iProductService, ProductService>();
             services.AddScoped<Token>();
             services.AddScoped<iShoppingRepo, ShoppingRepo>();
+            services.AddScoped<iMapService,MapService>();
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
 

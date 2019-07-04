@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using pro.backend.Entities;
 
 namespace pro.backend.iServices
-{
+{ 
     public interface iShoppingRepo
     {
         void Add<T>(T entity) where T : class;

@@ -9,7 +9,6 @@ namespace pro.backend.Entities
         public string District { get; set; }
         public string City { get; set; }
         public string MobileNumber { get; set; }
-
         public bool isMobileVerified {get;set;}
         public bool isDefault { get; set; }
     }

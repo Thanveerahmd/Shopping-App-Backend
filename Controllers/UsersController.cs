@@ -76,13 +76,6 @@ namespace WebApi.Controllers
 
                     var appuser = await _usermanger.Users.FirstOrDefaultAsync(u =>
                        u.NormalizedUserName == userDto.Username.ToUpper());
-                    // string image = null;
-                    // if (user.imageUrl != null)
-                    // {
-                    //     string path = user.imageUrl;
-                    //     byte[] b = System.IO.File.ReadAllBytes(path);
-                    //     image = "data:image/jpg;base64," + Convert.ToBase64String(b);
-                    // }
 
                     var token = _token.GenrateJwtToken(appuser);
                     var cart = _repo.GetCart(user.Id).Result;
@@ -94,7 +87,6 @@ namespace WebApi.Controllers
                     return Ok(new
                     {
                         Id = user.Id,
-                        // Imageurl = user.imageUrl, // newly added
                         Username = user.UserName,
                         FirstName = user.FirstName,
                         LastName = user.LastName,
