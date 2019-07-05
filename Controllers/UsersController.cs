@@ -345,7 +345,7 @@ namespace WebApi.Controllers
                 return StatusCode(400, "Error while Update!");
             }
         }
-        [AllowAnonymous]
+        
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUserDetailsById(string userId)
         {
