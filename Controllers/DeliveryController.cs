@@ -126,7 +126,7 @@ namespace pro.backend.Controllers
                 BillingInfo.isDefault = true;
 
             string code = OTPGenerate.OTPCharacters();
-            string massege_body = "Your OPT is" + code;
+                string massege_body = "Your OTP is " + code +"%0a http://bit.do/eYdZE?otp="+code;
             BillingInfo.OTP = code;
             if (BillingInfo.OTP != null)
             {
@@ -163,7 +163,7 @@ namespace pro.backend.Controllers
             if (prev.MobileNumber != BillingUpdate.MobileNumber)
             {
                 string code = OTPGenerate.OTPCharacters();
-                string massege_body = "Your OTP is " + code;
+                string massege_body = "Your OTP is " + code +"%0a http://bit.do/eYdZE?otp="+code;
                 info.OTP = code;
                 if (info.OTP != null)
                 {

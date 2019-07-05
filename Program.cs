@@ -38,7 +38,10 @@ namespace WebApi
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .UseUrls("http://localhost:4009")
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseIISIntegration()
+                .UseKestrel() 
+                .UseUrls("http://*:4009")
                 .Build();
     }
 }
