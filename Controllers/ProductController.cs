@@ -105,59 +105,64 @@ namespace pro.backend.Controllers
 
         [HttpGet("{parameter}/{searchQuery}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetProductsByQuery(string searchQuery, string parameter){
+        public async Task<IActionResult> GetProductsByQuery(string searchQuery, string parameter)
+        {
 
-            var products = await _repo.GetProductsBySearchQuery(searchQuery,parameter);
+            var products = await _repo.GetProductsBySearchQuery(searchQuery, parameter);
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
         }
 
         [HttpPost("rating")]
         [AllowAnonymous]
-        public async Task<IActionResult> AddProductRating(RatingDto rating){
+        public async Task<IActionResult> AddProductRating(RatingDto rating)
+        {
 
             var rate = _mapper.Map<Rating>(rating);
-            
+
             _repo.Add(rate);
 
             if (await _repo.SaveAll())
-                return Ok();
+                return Ok(rate.Id);
             return BadRequest();
         }
 
         [HttpPut("rating")]
         [AllowAnonymous]
-        public async Task<IActionResult> UpdateProductRating(RatingDto rating){
+        public async Task<IActionResult> UpdateProductRating(RatingDto rating)
+        {
 
             var rate = _mapper.Map<Rating>(rating);
-            try{
+            try
+            {
                 var prevRate = await _repo.GetRatingById(rate);
-                if(rating.UserId != prevRate.UserId){
-                return Unauthorized();
-            }
-            }catch{
-                return BadRequest();
-            }
-            await _repo.UpdateRating(rate);
-
-            if (await _repo.SaveAll())
+                if (rating.UserId != prevRate.UserId)
                 {
-                    return Ok();
+                    return Unauthorized();
                 }
-            return BadRequest();
+                await _repo.UpdateRating(rate);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+
+
         }
 
         [HttpDelete("rating")]
         [AllowAnonymous]
-        public async Task<IActionResult> DeleteProductRating(RatingDto rating){
+        public async Task<IActionResult> DeleteProductRating(RatingDto rating)
+        {
 
             var rate = _mapper.Map<Rating>(rating);
-            
+
             _repo.Delete(rate);
             if (await _repo.SaveAll())
-                {
-                    return Ok();
-                }
+            {
+                return Ok();
+            }
             return BadRequest();
         }
     }

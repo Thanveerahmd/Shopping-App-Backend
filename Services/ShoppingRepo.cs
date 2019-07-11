@@ -212,7 +212,7 @@ namespace pro.backend.Services
             return prod;
         }
 
-        public async Task UpdateRating (Rating rating){
+        public async Task<bool> UpdateRating (Rating rating){
             var rate = await _context.Ratings.FindAsync(rating.Id);
             if(rating == null)
                 throw new AppException("rating not available");
@@ -222,6 +222,7 @@ namespace pro.backend.Services
             rate.Comment = rating.Comment;
 
             _context.Ratings.Update(rate);
+            return await _context.SaveChangesAsync()>0;
         }
 
         public async Task<Rating> GetRatingById(Rating rating){

@@ -27,7 +27,7 @@ namespace pro.backend.iServices
         Task<ICollection<CartProduct>> GetAllCartProduct(int CartId);
         Task UpdateCartDetails(CartProduct CartProduct);
         Task<CartProduct> FindProductMatchInCart(int productId, int cartId);
-        Task UpdateRating(Rating rating);
+        Task<bool> UpdateRating(Rating rating);
         Task<Rating> GetRatingById(Rating rating);
         Task<PhotoForUser> GetPhotoOfUser(string UserId);
         Task<ICollection<BillingInfo>> GetBillingInfosOfUser(string userId);

@@ -99,5 +99,15 @@ namespace pro.backend.Controllers
                 return Ok();
             return BadRequest();
         }
+
+
+        [HttpPost("map/{UserId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Check(string UserId,[FromBody]GPSDto[] value)
+        {
+            var lang = value;
+
+            return Ok();
+        }
     }
 }
