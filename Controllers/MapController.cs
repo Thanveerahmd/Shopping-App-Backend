@@ -100,15 +100,14 @@ namespace pro.backend.Controllers
             return BadRequest();
         }
 
-        [HttpPost("realtimeMap")]
-        [AllowAnonymous]
-        public  Task<IActionResult> LocationChecker(StoreDto Store)
-        {
-            var locationData = _mapper.Map<Store>(Store);
 
-            return null;
-           
-            
+        [HttpPost("map/{UserId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Check(string UserId,[FromBody]GPSDto[] value)
+        {
+            var lang = value;
+
+            return Ok();
         }
     }
 }

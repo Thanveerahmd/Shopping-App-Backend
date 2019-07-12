@@ -142,7 +142,7 @@ namespace pro.backend.Controllers
 
             if (await _repo.SaveAll())
             {
-                return Ok(BillingInfo.OTP);
+                return Ok();
             }
             return BadRequest();
         }
@@ -255,6 +255,16 @@ namespace pro.backend.Controllers
                 return Ok();
             return BadRequest();
 
+        }
+
+        [HttpGet("billing/default/{UserId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetDefaultBillingInfo(string UserId)
+        {
+            var info = await _repo.GetBillingInfoOfDefault(UserId);
+            var BillingInfo = _mapper.Map<BillingInfoDto>(info);
+
+            return Ok(BillingInfo);
         }
     }
 }
