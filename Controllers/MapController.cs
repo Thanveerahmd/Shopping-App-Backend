@@ -99,5 +99,16 @@ namespace pro.backend.Controllers
                 return Ok();
             return BadRequest();
         }
+
+        [HttpPost("realtimeMap")]
+        [AllowAnonymous]
+        public  Task<IActionResult> LocationChecker(StoreDto Store)
+        {
+            var locationData = _mapper.Map<Store>(Store);
+
+            return null;
+           
+            
+        }
     }
 }
