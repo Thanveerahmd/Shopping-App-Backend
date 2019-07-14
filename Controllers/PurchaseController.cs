@@ -65,13 +65,21 @@ namespace pro.backend.Controllers
                     return BadRequest(BuyNowProduct.product_Name);
 
                 _repo.Add(order);
-                order.orderDetails.Add(BuyNowProduct);
+               
 
                 if (await _repo.SaveAll())
                 {
-                    return Ok(order.Id);
+                     order.orderDetails.Add(BuyNowProduct);
+
+                    if (await _repo.SaveAll())
+                    {
+                        return Ok(order.Id);
+                    }
+                    return BadRequest("OrderDetail is not added");
                 }
-                return BadRequest("OrderDetail is not added");
+                return BadRequest("Order is not added");
+
+
 
 
             }
@@ -102,19 +110,24 @@ namespace pro.backend.Controllers
 
                 _repo.Add(order);
 
-                foreach (var el in orderDetails)
+                
+
+                if (await _repo.SaveAll())
+                {
+                    foreach (var el in orderDetails)
                 {
                     var CartProduct = _mapper.Map<CartProductToReturn>(el);
                     var OrderProduct = _mapper.Map<orderDetails>(el);
                     order.orderDetails.Add(OrderProduct);
                 }
-
-                if (await _repo.SaveAll())
-                {
-                    return Ok(order.Id);
+                    if (await _repo.SaveAll())
+                    {
+                        return Ok(order.Id);
+                    }
+                    return BadRequest("OrderDetail is not added");
                 }
 
-                return BadRequest("Checkout is not Completed");
+                return BadRequest("Order is not Completed");
 
 
             }
