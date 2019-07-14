@@ -32,6 +32,12 @@ namespace pro.backend.Services
             _context.RemoveRange(entity);
             
         }
+        
+         public void AddAll<T>(ICollection<T> entity) where T : class
+        {
+            _context.AddRange(entity);
+            
+        }
 
         public async Task<IEnumerable<Product>> GetAllProducts()
         {
@@ -129,8 +135,6 @@ namespace pro.backend.Services
         {
             return await _context.SaveChangesAsync() > 0;
         }
-
-        
 
         public async Task<bool> UpdateDeliveryInfo(DeliveryInfo DeliveryInfo)
         {
@@ -294,5 +298,7 @@ namespace pro.backend.Services
              var info = await _context.BillingInfo.Where(i => i.UserId == userId).FirstOrDefaultAsync(q => q.OTP == otp);
             return info;
         }
+
+    
     }
 }

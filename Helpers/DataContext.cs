@@ -21,7 +21,11 @@ namespace Project.Helpers
         public DbSet<PhotoForUser> PhotoForUsers { get; set; }
         public DbSet<BillingInfo> BillingInfo { get; set; }
         public DbSet<Store> Store { get; set; }
-
+        public DbSet<SellerPaymentInfo> SellerPaymentInfo { get; set; }
+        public DbSet<BuyerPaymentInfo> BuyerPaymentInfo { get; set; }
+        public DbSet<orderDetails> orderDetails { get; set; }
+        public DbSet<Order> order { get; set; }
+        public DbSet<Advertisement> Advertisement { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

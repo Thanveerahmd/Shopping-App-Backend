@@ -191,7 +191,7 @@ namespace pro.backend.Controllers
             }
             else
             {
-                return BadRequest(new{message ="Your file is corrupted"});
+                return BadRequest(new { message = "Your file is corrupted" });
             }
 
             PhotoUploadDto.Url = Upload_result.Uri.ToString();
@@ -199,8 +199,8 @@ namespace pro.backend.Controllers
             PhotoUploadDto.PublicID = Upload_result.PublicId;
 
             var photo = _mapper.Map<PhotoForUser>(PhotoUploadDto);
-           
-            photo.UserId= user.Id;
+
+            photo.UserId = user.Id;
 
             user.Photo = photo;
 
@@ -213,11 +213,11 @@ namespace pro.backend.Controllers
             if (result.Succeeded)
             {
                 var photoToReturn = _mapper.Map<PhotoForReturnDto>(photo);
-                return Ok(new{imageUrl = photoToReturn.Url});
+                return Ok(new { imageUrl = photoToReturn.Url });
             }
             else
             {
-                return BadRequest(new{message = "Coudn't add the Photo"});
+                return BadRequest(new { message = "Coudn't add the Photo" });
             }
 
         }
@@ -227,8 +227,8 @@ namespace pro.backend.Controllers
         public async Task<IActionResult> DeleteUserPhoto(string UserId)
         {
 
-           var user = await _usermanger.FindByIdAsync(UserId);
-            
+            var user = await _usermanger.FindByIdAsync(UserId);
+
 
             var photoFromRepo = await _repo.GetPhotoOfUser(UserId);
 
@@ -246,7 +246,7 @@ namespace pro.backend.Controllers
                     user.imageUrl = null;
                     await _usermanger.UpdateAsync(user);
                     _repo.Delete(photoFromRepo);
-                    
+
                 }
             }
 
@@ -255,9 +255,9 @@ namespace pro.backend.Controllers
                 _repo.Delete(photoFromRepo);
             }
 
-            if ( await _repo.SaveAll())
+            if (await _repo.SaveAll())
                 return Ok();
-            return BadRequest(new{message = "Failed to delete photo"});
+            return BadRequest(new { message = "Failed to delete photo" });
         }
 
         [HttpGet("UserImage/{id}")]
@@ -271,5 +271,61 @@ namespace pro.backend.Controllers
             return Ok(photo);
         }
 
+        // CREATE PROCEDURE dbo.DeleteOnSchedule
+        //  AS
+        // BEGIN
+        //  DELETE[dbo].[Table]
+        // WHERE[DateTimeToDelete] <= CURRENT_TIMESTAMP;
+        //  END
+        // automatic delete
+
+
+        [HttpPost("Advertisement/{SellerId}")]
+        [AllowAnonymous]
+          public async Task<IActionResult> AddAdvertisement(string SellerId, [FromForm]PhotoUploadDto PhotoUploadDto)
+        {
+            // var user = await _usermanger.FindByIdAsync(SellerId);
+
+            var file = PhotoUploadDto.file;
+
+            var Upload_result = new ImageUploadResult();
+
+            if (file != null && file.Length > 0)
+            {
+                using (var stream = file.OpenReadStream())
+                {
+                    var UploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(file.Name, stream),
+                        Transformation = new Transformation()
+                         .Width(500).Height(500).Crop("fill").Gravity("face")
+                    };
+
+                    Upload_result = _cloudinary.Upload(UploadParams);
+                }
+            }
+            else
+            {
+                return BadRequest(new { message = "Your file is corrupted" });
+            }
+
+            PhotoUploadDto.Url = Upload_result.Uri.ToString();
+
+            PhotoUploadDto.PublicID = Upload_result.PublicId;
+
+            var photo = _mapper.Map<Advertisement>(PhotoUploadDto);
+
+            photo.UserId = SellerId;
+
+            photo.PaymentStatus = "Pending";
+
+            _repo.Add(photo);
+
+            if (await _repo.SaveAll())
+            {
+                return Ok(photo.Id);
+            }
+            return BadRequest("Coudn't add the Photo");
+        }
     }
 }

@@ -80,10 +80,10 @@ namespace WebApi.Controllers
                     var token = _token.GenrateJwtToken(appuser);
                     var cart = _repo.GetCart(user.Id).Result;
                     var cartToReturn = _mapper.Map<CartDto>(cart);
-                    var image =await _repo.GetPhotoOfUser(user.Id);
-                    string imageUrl=null;
-                    if(image != null)
-                    imageUrl = image.Url;
+                    var image = await _repo.GetPhotoOfUser(user.Id);
+                    string imageUrl = null;
+                    if (image != null)
+                        imageUrl = image.Url;
                     return Ok(new
                     {
                         Id = user.Id,
@@ -114,7 +114,7 @@ namespace WebApi.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody]UserDto userDto)
         {
-            // map dto to entity
+
             var createuser = _mapper.Map<User>(userDto);
             var result = await _usermanger.CreateAsync(createuser, userDto.Password);
             var getuser = _mapper.Map<UserDto>(createuser);
@@ -122,20 +122,6 @@ namespace WebApi.Controllers
             if (result != null && result.Succeeded)
             {
                 var user = await _usermanger.FindByNameAsync(getuser.Username);
-                // if (userDto.imageUrl != null)
-                // {
-                //     var file = Convert.FromBase64String(userDto.imageUrl);
-                //     var filename = user.Id;
-                //     var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
-                //     using (var imageFile = new FileStream(path, FileMode.Create))
-                //     {
-                //         imageFile.Write(file, 0, file.Length);
-                //         imageFile.Flush();
-                //     }
-                //     var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
-                //     user.imageUrl = pic + "//" + filename + ".jpg";
-                //     var result2 = await _usermanger.UpdateAsync(user);
-                // }
 
                 var cart = new Cart();
                 cart.BuyerId = getuser.Id;
@@ -144,7 +130,7 @@ namespace WebApi.Controllers
                     _repo.Add(cart);
 
                     if (!(await _repo.SaveAll()))
-                        return BadRequest(new{message = "Could not create Cart"});
+                        return BadRequest(new { message = "Could not create Cart" });
 
                 }
                 catch (AppException ex)
@@ -163,7 +149,7 @@ namespace WebApi.Controllers
                 await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
              $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
 
-                return Ok(new{Id = user.Id});
+                return Ok(new { Id = user.Id });
             }
 
             return BadRequest(result.Errors);
@@ -345,16 +331,16 @@ namespace WebApi.Controllers
                 return StatusCode(400, "Error while Update!");
             }
         }
-        
+
         [HttpGet("{userId}")]
         public async Task<IActionResult> GetUserDetailsById(string userId)
         {
 
             var user = await _usermanger.FindByIdAsync(userId);
-            var image =await _repo.GetPhotoOfUser(user.Id);
-            string imageUrl=null;
-                    if(image != null)
-                    imageUrl = image.Url;
+            var image = await _repo.GetPhotoOfUser(user.Id);
+            string imageUrl = null;
+            if (image != null)
+                imageUrl = image.Url;
             return Ok(new
             {
                 Id = user.Id,
@@ -370,16 +356,16 @@ namespace WebApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllBuyers()
         {
-         var users =await  _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Buyer'").ToListAsync();
-         return Ok(users);
+            var users = await _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Buyer'").ToListAsync();
+            return Ok(users);
         }
-        
+
         [HttpGet("allSellers")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllSellers()
         {
-         var users =await  _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Seller'").ToListAsync();
-         return Ok(users);
+            var users = await _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Seller'").ToListAsync();
+            return Ok(users);
         }
     }
 }

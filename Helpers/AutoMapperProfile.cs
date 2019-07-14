@@ -75,6 +75,17 @@ namespace Project.Helpers
 
             CreateMap<Store, StoreDto>();
 
+            CreateMap<CartProductToReturn, orderDetails>();
+
+            CreateMap<orderDetails, CartProductToReturn>();
+
+            CreateMap<orderDetails, checkoutDto>();
+
+            CreateMap<checkoutDto, orderDetails>();
+
+            CreateMap<PhotoUploadDto, Advertisement>();
+
+
         }
     }
 }

@@ -103,11 +103,11 @@ namespace pro.backend.Controllers
 
         [HttpPost("map/{UserId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> Check(string UserId,[FromBody]GPSDto[] value)
+        public  Task<IActionResult> Check(string UserId,[FromBody]GPSDto[] value)
         {
             var lang = value;
 
-            return Ok();
+            return null;
         }
     }
 }
