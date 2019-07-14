@@ -266,5 +266,15 @@ namespace pro.backend.Controllers
 
             return Ok(BillingInfo);
         }
+
+        [HttpGet("default/{UserId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetDefaultDeliveryInfo(string UserId)
+        {
+            var info = await _repo.GetDeliveryInfoOfDefault(UserId);
+            var BillingInfo = _mapper.Map<DeliveryInfoDto>(info);
+
+            return Ok(BillingInfo);
+        }
     }
 }

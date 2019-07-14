@@ -256,6 +256,7 @@ namespace pro.backend.Services
             return info;
         }
 
+
         public async Task<BillingInfo> AlternateDefault(string userId)
         {
             var info = await _context.BillingInfo.Where(i => i.UserId == userId).FirstOrDefaultAsync(i => i.isDefault == false);
