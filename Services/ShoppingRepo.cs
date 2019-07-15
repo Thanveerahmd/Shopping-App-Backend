@@ -136,6 +136,11 @@ namespace pro.backend.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
+          public  bool Save()
+        {
+            return  _context.SaveChanges() > 0;
+        }
+
         public async Task<bool> UpdateDeliveryInfo(DeliveryInfo DeliveryInfo)
         {
             var prod = await _context.DeliveryInfo.FindAsync(DeliveryInfo.Id);
@@ -300,6 +305,18 @@ namespace pro.backend.Services
             return info;
         }
 
-    
+        public async Task<Order> GetOrder(int id)
+        {
+              var cart = await _context.Orders.Include(p => p.orderDetails)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+            return cart;
+        }
+
+        public void AddOrder(Order Order)
+        {
+            _context.Orders.Add(Order);
+            _context.SaveChanges();    
+        }
     }
 }

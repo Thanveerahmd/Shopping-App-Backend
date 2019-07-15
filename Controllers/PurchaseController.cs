@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using pro.backend.Dtos;
 using pro.backend.Entities;
 using pro.backend.iServices;
+using Project.Helpers;
 
 namespace pro.backend.Controllers
 {
@@ -65,11 +66,12 @@ namespace pro.backend.Controllers
                     return BadRequest(BuyNowProduct.product_Name);
 
                 _repo.Add(order);
-               
+
 
                 if (await _repo.SaveAll())
                 {
-                     order.orderDetails.Add(BuyNowProduct);
+                    var ordertab = _repo.GetOrder(order.Id).Result;
+                    ordertab.orderDetails.Add(BuyNowProduct);
 
                     if (await _repo.SaveAll())
                     {
@@ -77,7 +79,7 @@ namespace pro.backend.Controllers
                     }
                     return BadRequest("OrderDetail is not added");
                 }
-                return BadRequest("Order is not added");
+                return BadRequest("OrderDetail is not added");
 
 
 
@@ -92,8 +94,8 @@ namespace pro.backend.Controllers
 
                 foreach (var el in orderDetails)
                 {
-                    var CartProduct = _mapper.Map<CartProductToReturn>(el);
-                    var OrderProduct = _mapper.Map<orderDetails>(el);
+                    var CartProduct = _mapper.Map<OrderProductDto>(el);
+                    var OrderProduct = _mapper.Map<orderDetails>(CartProduct);
                     var product = _repo.GetProduct(CartProduct.ProductId).Result;
 
                     if (product.Quantity < CartProduct.Count)
@@ -108,33 +110,32 @@ namespace pro.backend.Controllers
                     return BadRequest(OutOfStockProducts);
                 }
 
-                _repo.Add(order);
 
-                
-
-                if (await _repo.SaveAll())
+                try
                 {
+                    _repo.AddOrder(order);
+                    var ordertab = _repo.GetOrder(order.Id).Result;
                     foreach (var el in orderDetails)
-                {
-                    var CartProduct = _mapper.Map<CartProductToReturn>(el);
-                    var OrderProduct = _mapper.Map<orderDetails>(el);
-                    order.orderDetails.Add(OrderProduct);
-                }
+                    {
+                        var CartProduct = _mapper.Map<OrderProductDto>(el);
+                        var OrderProduct = _mapper.Map<orderDetails>(CartProduct);
+                        ordertab.orderDetails.Add(OrderProduct);
+                    }
+                      _repo.DeleteAll(orderDetails);
+
                     if (await _repo.SaveAll())
                     {
                         return Ok(order.Id);
                     }
-                    return BadRequest("OrderDetail is not added");
+                    return BadRequest();
                 }
-
-                return BadRequest("Order is not Completed");
-
+                catch (AppException ex)
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
 
             }
         }
-
-
-
 
     }
 }

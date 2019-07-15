@@ -6,6 +6,7 @@ namespace pro.backend.iServices
 {
     public interface iShoppingRepo
     {
+        void  AddOrder(Order Order);
         void Add<T>(T entity) where T : class;
         void Delete<T>(T entity) where T : class;
         void AddAll<T>(ICollection<T> entity) where T : class;
@@ -14,6 +15,7 @@ namespace pro.backend.iServices
         Task<IEnumerable<Product>> GetAllProducts();
         Task<IEnumerable<Product>> GetAllProductsOfSeller(string sellerID);
         Task<Product> GetProduct(int id);
+        Task<Order> GetOrder(int id);
         Task<Cart> GetCart(string id);
         Task<Photo> GetPhoto(int id);
         Task<Photo> GetMainPhotoForUserAsync(int ProductId);
