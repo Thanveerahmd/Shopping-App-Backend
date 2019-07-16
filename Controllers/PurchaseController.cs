@@ -24,27 +24,19 @@ namespace pro.backend.Controllers
             _repo = repo;
         }
 
-        // [HttpPost]
+        // [HttpPost("PaymentForAdvertisement")]
         // [AllowAnonymous]
-        // public IActionResult AddPaymentDetails([FromBody]PaymentInfoDto PaymentInfoDto)
+        // public IActionResult PaymentDetails([FromBody]PaymentInfoDto PaymentInfoDto)
         // {
+        //  var paymentInfo = _mapper.Map<SellerPaymentInfo>(PaymentInfoDto);
 
-        //     // map dto to entity
-        //    // var PaymentInfo = _mapper.Map<>(PaymentInfoDto);
-        //     try
-        //     {
-        //         _productService.AddProduct(product);
-        //         return Ok(product.Id);
 
-        //     }
-        //     catch (AppException ex)
-        //     {
 
-        //         return BadRequest(new { message = ex.Message });
-        //     }
 
         // }
 
+
+        // need to do testing 
         [HttpPost("checkout/{BuyerId}")]
         [AllowAnonymous]
         public async Task<IActionResult> checkout(checkoutDto checkoutDto, string BuyerId)

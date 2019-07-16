@@ -6,10 +6,13 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using pro.backend.Dtos;
+using pro.backend.Entities;
+using pro.backend.iServices;
 using Project.Dtos;
 using Project.Entities;
 using Project.Helpers;
@@ -26,9 +29,11 @@ namespace Project.Controllers
         private iAdminServices _adminService;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
+        private readonly iAdvertisement _adService;
+        private readonly UserManager<User> _usermanger;
         private IUserService _userService;
         private readonly IEmailSender _emailSender;
-      
+
 
 
         public AdminControllers(
@@ -36,7 +41,9 @@ namespace Project.Controllers
             IUserService userService,
             IMapper mapper,
             IOptions<AppSettings> appSettings,
-              IEmailSender EmailSender
+            IEmailSender EmailSender,
+            iAdvertisement AdService,
+              UserManager<User> usermanger
             )
         {
             _userService = userService;
@@ -44,16 +51,17 @@ namespace Project.Controllers
             _mapper = mapper;
             _emailSender = EmailSender;
             _appSettings = appSettings.Value;
-
+            _adService = AdService;
+            _usermanger = usermanger;
         }
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
         public IActionResult Authenticate([FromBody]AdminDto userDto)
         {
-            
+
             var user = _adminService.AuthenticateUser(userDto.Username, userDto.Password);
-            
+
             if (user == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
 
@@ -121,16 +129,15 @@ namespace Project.Controllers
             return Ok(userDto);
         }
 
-        
+
         [HttpPost("register")]
         public IActionResult Register([FromBody]AdminDto userDto)
         {
-            // map dto to entity
+
             var user = _mapper.Map<Admin>(userDto);
 
             try
             {
-                // save 
                 _adminService.AddAdmin(user, userDto.Password);
 
                 var useridentity = _adminService.GetByEmail(userDto.Username);
@@ -143,18 +150,14 @@ namespace Project.Controllers
 
                 var callbackUrl = Url.Action(nameof(ConfirmEmail), "Admin",
                 new { userId = useridentity.Username, code = code }, protocol: HttpContext.Request.Scheme);
-                // var mobileCode = System.Net.WebUtility.UrlEncode(code);
-                // var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
-                //  Uri uri = new Uri(mobileCallbackUrl);
+
                 _emailSender.SendEmailAsync(useridentity.Username, "Confirm your account",
             $"Please confirm your account by clicking this link: <a href='{url}'>link</a>");
 
-                //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
                 return Ok();
             }
             catch (AppException ex)
             {
-                // return error message if there was an exception
                 return BadRequest(new { message = ex.Message });
             }
         }
@@ -198,13 +201,13 @@ namespace Project.Controllers
             var user = _mapper.Map<Admin>(userDto);
             user.Id = userDto.Id;
             user.IsEmailConfirmed = true;
-            
+
 
 
             try
             {
                 // save 
-                _adminService.UpdateAdmin(user,userDto.Password);
+                _adminService.UpdateAdmin(user, userDto.Password);
                 return Ok();
             }
             catch (AppException ex)
@@ -283,7 +286,76 @@ namespace Project.Controllers
             }
         }
 
+        [HttpGet("PendingAdvertisements")]
+        [AllowAnonymous]
+        public IActionResult GetAllPendingAdvertisement()
+        {
+            var ad = _adService.GetPendingAdvertisement().Result;
+            return Ok(ad);
+        }
 
+        [HttpGet("AcceptedAdvertisements")]
+        [AllowAnonymous]
+        public IActionResult GetAllAcceptedAdvertisement()
+        {
+            var ad = _adService.GetAcceptedAdvertisement().Result;
+            return Ok(ad);
+        }
+
+        [HttpGet("PendingAdvertisements")]
+        [AllowAnonymous]
+        public IActionResult GetAllRejectedAdvertisement()
+        {
+            var ad = _adService.GetRejectedAdvertisement().Result;
+            return Ok(ad);
+        }
+
+        [HttpGet("PendingAdvertisements")]
+        [AllowAnonymous]
+        public IActionResult GetAllAdvertisementOfaSeller(string userId)
+        {
+            var ad = _adService.GetAllAdvertisementOfSeller(userId).Result;
+            return Ok(ad);
+        }
+
+         [HttpPut("approval")]
+        public IActionResult approval([FromBody]AdvertismentUploadDto adDto)
+        {
+            // status UserId is need
+          var ad = _mapper.Map<Advertisement>(adDto);
+          var sellerId = ad.UserId;
+          var seller = _usermanger.FindByIdAsync(sellerId).Result;
+
+          try
+          {
+              _adService.UpdateAdvertisementStatus(ad);
+          }
+          catch ( AppException ex)
+          {
+               return BadRequest(new { message = ex.Message });
+          }
+          
+          if (ad.Status.Equals("Accepted"))
+          {
+               var url = $"http://localhost:4200/emailVerification/";
+
+             _emailSender.SendEmailAsync(seller.UserName, "About ",
+            $"Please confirm your  account by clicking this link: <a href='{url}'>link</a>");
+
+             return Ok();
+
+          }else if(ad.Status.Equals("Rejected"))
+          {
+              _emailSender.SendEmailAsync(seller.UserName, "About ",
+            $"Please confirm your account ");
+
+             return Ok();
+          }else
+          {
+            return BadRequest("Status is Required");
+          }
+
+        }
     }
 
 

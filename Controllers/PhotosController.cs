@@ -279,10 +279,10 @@ namespace pro.backend.Controllers
         //  END
         // automatic delete
 
-
+        // neee to do testing
         [HttpPost("Advertisement/{SellerId}")]
         [AllowAnonymous]
-          public async Task<IActionResult> AddAdvertisement(string SellerId, [FromForm]PhotoUploadDto PhotoUploadDto)
+          public async Task<IActionResult> AddAdvertisement(string SellerId, [FromForm]AdvertismentUploadDto PhotoUploadDto)
         {
             // var user = await _usermanger.FindByIdAsync(SellerId);
 
@@ -328,4 +328,5 @@ namespace pro.backend.Controllers
             return BadRequest("Coudn't add the Photo");
         }
     }
+    
 }
