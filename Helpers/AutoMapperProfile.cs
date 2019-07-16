@@ -87,6 +87,10 @@ namespace Project.Helpers
 
             CreateMap<PhotoUploadDto, Advertisement>();
 
+            CreateMap<ProductAddingDto,Product>();
+
+            CreateMap<Product,ProductAddingDto>();
+
 
         }
     }
