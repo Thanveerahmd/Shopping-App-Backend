@@ -12,6 +12,7 @@ namespace pro.backend.iServices
         Task<ICollection<Advertisement>> GetRejectedAdvertisement();
         string GetPaymentStatusOfAdvertisement(int id);
         Task<bool> UpdateAdvertisementStatus(Advertisement ad);
+         Task<Advertisement> GetAdvertisement(int Id);
 
 
     }

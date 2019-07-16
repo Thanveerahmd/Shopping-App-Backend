@@ -25,6 +25,14 @@ namespace pro.backend.Services
 
         }
 
+        public async Task<Advertisement> GetAdvertisement(int Id)
+        {
+            var ad =await _context.Advertisement.FirstOrDefaultAsync(p => p.Id ==Id);
+
+            return ad;
+
+        }
+
         public async Task<ICollection<Advertisement>> GetAllAdvertisementOfSeller(string userId)
         {
            var ad =await _context.Advertisement.Where(p =>p.UserId == userId).ToListAsync();
