@@ -336,43 +336,49 @@ namespace pro.backend.Controllers
         }
 
 
-    //     [HttpDelete("deleteAd/{AdId}")]
-    //     [AllowAnonymous]
-    //     public async Task<IActionResult> DeleteAdPhoto(int AdId)
-    //     {
+        [HttpDelete("deleteAd/{sellerId}/{AdId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeleteAdPhoto(int AdId,string sellerId)
+        {
 
 
-    //         var Ad = await _adService.GetAdvertisement(AdId);
+            var Ad = await _adService.GetAdvertisement(AdId);
 
-    //         var photoFromRepo = await _adService.GetPhotoOfAd(AdId);
-    //         ;
-    //         if (photoFromRepo.PublicID != null)
-    //         {
-    //             var delParams = new DelResParams()
-    //             {
-    //                 PublicIds = new List<string>() { photoFromRepo.PublicID },
-    //                 Invalidate = true
-    //             };
-    //             var delResult = _cloudinary.DeleteResources(delParams);
+            var photoFromRepo = await _adService.GetPhotoOfad(AdId);
+         
+            if(photoFromRepo.UserId != sellerId)
+            {
+                return BadRequest();
+            }
 
-    //             if (!delResult.Partial)
-    //             {
-    //                 Ad.Url = null;
-    //                 await _adService.UpdateAdvertisement(Ad);
-    //                 _repo.Delete(photoFromRepo);
+        
+            if (photoFromRepo.PublicID != null)
+            {
+                var delParams = new DelResParams()
+                {
+                    PublicIds = new List<string>() { photoFromRepo.PublicID },
+                    Invalidate = true
+                };
+                var delResult = _cloudinary.DeleteResources(delParams);
 
-    //             }
-    //         }
+                if (!delResult.Partial)
+                {
+                    Ad.Url = null;
+                    await _adService.UpdateAdvertisement(Ad);
+                    _repo.Delete(photoFromRepo);
 
-    //         if (photoFromRepo.PublicID == null)
-    //         {
-    //             _repo.Delete(photoFromRepo);
-    //         }
+                }
+            }
 
-    //         if (await _repo.SaveAll())
-    //             return Ok();
-    //         return BadRequest(new { message = "Failed to delete photo" });
-    //     }
+            if (photoFromRepo.PublicID == null)
+            {
+                _repo.Delete(photoFromRepo);
+            }
+
+            if (await _repo.SaveAll())
+                return Ok();
+            return BadRequest(new { message = "Failed to delete photo" });
+        }
 
     }
 
