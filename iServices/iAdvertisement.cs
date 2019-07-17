@@ -15,5 +15,6 @@ namespace pro.backend.iServices
         Task<Advertisement> GetAdvertisement(int Id);
         Task<Advertisement> GetAd(int Id);
         Task<ICollection<Advertisement>> ViewAdvertisement();
+         Task<PhotoForAd> GetPhotoOfAd(int  AdId);
     }
 }

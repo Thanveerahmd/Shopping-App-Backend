@@ -95,5 +95,12 @@ namespace pro.backend.Services
 
             return ad;
         }
+
+        public async Task<PhotoForAd> GetPhotoOfAd(int AdId)
+        {
+             var photo = await _context.PhotoForAd.FirstOrDefaultAsync(p => p.AdId == AdId);
+
+            return photo;
+        }
     }
 }
