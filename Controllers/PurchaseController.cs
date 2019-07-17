@@ -95,8 +95,21 @@ namespace pro.backend.Controllers
             else if (paymentInfo.status_code == -1 || paymentInfo.status_code == -2)
             {
                 var order = await _repo.GetOrder(paymentInfo.order_id);
-                order.PaymentStatus = "canceled Or Failed";
+
+                if (paymentInfo.status_code == -1)
+                {
+                    order.PaymentStatus = "canceled";
+                }
+                else
+                {
+                    order.PaymentStatus = "Failed";
+                    var Buyer = await _usermanger.FindByIdAsync(order.BuyerId);
+                    await _emailSender.SendEmailAsync(Buyer.UserName, "About Payment Done on your Order",
+                 $"Your payment status is failed  ");
+                }
+
                 order.Total_Price = 0;
+
                 try
                 {
                     await _repo.UpdateOrder(order);
@@ -175,7 +188,7 @@ namespace pro.backend.Controllers
                 // relation between product id and specification
 
                 var BuyNowProduct = _mapper.Map<orderDetails>(checkoutDto);
-                var product = _repo.GetProduct(BuyNowProduct.ProductId).Result;
+                var product = await _repo.GetProduct(BuyNowProduct.ProductId);
 
                 if (product.Quantity < BuyNowProduct.Count)
                     return BadRequest(BuyNowProduct.product_Name);
@@ -185,7 +198,7 @@ namespace pro.backend.Controllers
 
                 if (await _repo.SaveAll())
                 {
-                    var ordertab = _repo.GetOrder(order.Id).Result;
+                    var ordertab = await _repo.GetOrder(order.Id);
                     ordertab.orderDetails.Add(BuyNowProduct);
 
                     if (await _repo.SaveAll())
@@ -202,7 +215,7 @@ namespace pro.backend.Controllers
             }
             else
             {
-                var orderDetails = _repo.GetAllCartProduct(checkoutDto.CartId).Result;
+                var orderDetails = await _repo.GetAllCartProduct(checkoutDto.CartId);
                 var counter = 0;
 
                 IList<string> OutOfStockProducts = new List<string>();
@@ -211,7 +224,7 @@ namespace pro.backend.Controllers
                 {
                     var CartProduct = _mapper.Map<OrderProductDto>(el);
                     var OrderProduct = _mapper.Map<orderDetails>(CartProduct);
-                    var product = _repo.GetProduct(CartProduct.ProductId).Result;
+                    var product = await _repo.GetProduct(CartProduct.ProductId);
 
                     if (product.Quantity < CartProduct.Count)
                     {
@@ -229,7 +242,7 @@ namespace pro.backend.Controllers
                 try
                 {
                     _repo.AddOrder(order);
-                    var ordertab = _repo.GetOrder(order.Id).Result;
+                    var ordertab = await _repo.GetOrder(order.Id);
                     foreach (var el in orderDetails)
                     {
                         var CartProduct = _mapper.Map<OrderProductDto>(el);
@@ -263,14 +276,54 @@ namespace pro.backend.Controllers
 
             if (paymentInfo.status_code == 2)
             {
-                ad.PaymentStatus = "";
+                ad.PaymentStatus = "success";
+                try
+                {
+                    await _adService.UpdateAdvertisement(ad);
+                }
+                catch (System.Exception)
+                {
+
+                    throw;
+                }
             }
             else if (paymentInfo.status_code == -1 || paymentInfo.status_code == -2)
             {
+                if (paymentInfo.status_code == -1)
+                {
+                    ad.PaymentStatus = "canceled";
+                }
+                else
+                {
+                    ad.PaymentStatus = "Failed";
+                    var seller = await _usermanger.FindByIdAsync(ad.UserId);
+                    await _emailSender.SendEmailAsync(seller.UserName, "About Payment Done on your Order",
+                 $"Your payment status is failed  ");
+                }
 
+                try
+                {
+                    await _adService.UpdateAdvertisement(ad);
+                }
+                catch (System.Exception)
+                {
+
+                    throw;
+                }
             }
             else if (paymentInfo.status_code == -3)
             {
+                ad.PaymentStatus = "chargedback";
+                try
+                {
+                    await _adService.UpdateAdvertisement(ad);
+
+                }
+                catch (System.Exception)
+                {
+
+                    throw;
+                }
 
             }
             else
@@ -281,6 +334,6 @@ namespace pro.backend.Controllers
         }
 
 
-       
+
     }
 }

@@ -33,7 +33,7 @@ namespace pro.backend.Controllers
             _emailSender = EmailSender;
             _adService = AdService;
         }
-        
+
         [HttpPost("Advertisement/{SellerId}")]
         [AllowAnonymous]
         public async Task<IActionResult> AddAdvertisements([FromBody]AdvertismentUploadDto adDto)
@@ -58,9 +58,9 @@ namespace pro.backend.Controllers
 
         [HttpGet("AcceptedAdvertisements")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetAllAcceptedAdvertisement()
+        public async Task<IActionResult> ViewAdvertisement()
         {
-            var ad = await _adService.GetAcceptedAdvertisement();
+            var ad = await _adService.ViewAdvertisement();
             return Ok(ad);
         }
 

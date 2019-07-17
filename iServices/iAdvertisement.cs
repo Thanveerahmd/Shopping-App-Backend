@@ -14,7 +14,6 @@ namespace pro.backend.iServices
         Task<bool> UpdateAdvertisement(Advertisement ad);
         Task<Advertisement> GetAdvertisement(int Id);
         Task<Advertisement> GetAd(int Id);
-
-
+        Task<ICollection<Advertisement>> ViewAdvertisement();
     }
 }
