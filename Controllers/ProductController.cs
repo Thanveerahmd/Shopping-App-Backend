@@ -75,21 +75,19 @@ namespace pro.backend.Controllers
 
         [HttpPut]
         [AllowAnonymous]
-        public IActionResult UpdateProduct([FromBody]ProductDto productDto)
+        public async Task<IActionResult> UpdateProduct([FromBody]ProductDto productDto)
         {
-            // map dto to entity and set id
             var prod = _mapper.Map<Product>(productDto);
             prod.Id = productDto.Id;
 
             try
             {
-                // save 
-                _productService.UpdateProduct(prod);
+              await  _productService.UpdateProduct(prod);
                 return Ok();
             }
             catch (AppException ex)
             {
-                // return error message if there was an exception
+                
                 return BadRequest(new { message = ex.Message });
             }
         }
@@ -112,7 +110,8 @@ namespace pro.backend.Controllers
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
         }
-
+        
+        //NEED TO CHANGE
         [HttpPost("rating")]
         [AllowAnonymous]
         public async Task<IActionResult> AddProductRating(RatingDto rating)

@@ -19,7 +19,7 @@ namespace pro.backend.Services
 
         public async Task<ICollection<Advertisement>> GetAcceptedAdvertisement()
         {
-            var ad =await _context.Advertisement.Where(p => p.Status.Equals("Accepted")).ToListAsync();
+            var ad = await _context.Advertisement.Where(p => p.Status.Equals("Accepted")).ToListAsync();
 
             return ad;
 
@@ -27,7 +27,7 @@ namespace pro.backend.Services
 
         public async Task<Advertisement> GetAdvertisement(int Id)
         {
-            var ad =await _context.Advertisement.FirstOrDefaultAsync(p => p.Id ==Id);
+            var ad = await _context.Advertisement.FirstOrDefaultAsync(p => p.Id == Id);
 
             return ad;
 
@@ -35,41 +35,56 @@ namespace pro.backend.Services
 
         public async Task<ICollection<Advertisement>> GetAllAdvertisementOfSeller(string userId)
         {
-           var ad =await _context.Advertisement.Where(p =>p.UserId == userId).ToListAsync();
+            var ad = await _context.Advertisement.Where(p => p.UserId == userId).ToListAsync();
 
             return ad;
         }
 
         public string GetPaymentStatusOfAdvertisement(int id)
         {
-            var ad = _context.Advertisement.FirstOrDefaultAsync(p=> p.Id == id);
+            var ad = _context.Advertisement.FirstOrDefaultAsync(p => p.Id == id);
             return ad.Result.PaymentStatus;
         }
 
         public async Task<ICollection<Advertisement>> GetPendingAdvertisement()
         {
-            var ad =await _context.Advertisement.Where(p => p.Status.Equals("Pending") ).ToListAsync();
+            var ad = await _context.Advertisement.Where(p => p.Status.Equals("Pending")).ToListAsync();
 
             return ad;
         }
 
         public async Task<ICollection<Advertisement>> GetRejectedAdvertisement()
         {
-             var ad =await _context.Advertisement.Where(p => p.Status.Equals("Rejected") ).ToListAsync();
+            var ad = await _context.Advertisement.Where(p => p.Status.Equals("Rejected")).ToListAsync();
 
             return ad;
         }
 
-        public async Task<bool> UpdateAdvertisementStatus(Advertisement ad)
+        public async Task<bool> UpdateAdvertisement(Advertisement ad)
         {
-            var  advertisement = await _context.Advertisement.FindAsync(ad.Id);
+            var advertisement = await _context.Advertisement.FindAsync(ad.Id);
             if (advertisement == null)
                 throw new AppException("advertisement not found");
 
             advertisement.Status = ad.Status;
+            advertisement.PaymentStatus = ad.PaymentStatus;
+            advertisement.PublicID = ad.PublicID;
+            advertisement.Url = ad.Url;
+            advertisement.PhotoForAd =ad.PhotoForAd;
 
             _context.Advertisement.Update(advertisement);
-            return await _context.SaveChangesAsync()>0;
+            return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<Advertisement> GetAd(int Id)
+        {
+            var ad = await _context.Advertisement.
+                    Where(p => (p.Status.Equals("Accepted") || p.Status.Equals("Pending"))
+                    && (p.PaymentStatus.Equals("success") || p.PaymentStatus.Equals("Pending")))
+                    .FirstOrDefaultAsync(p => p.ProductId == Id);
+
+            return ad;
+        }
+
     }
 }

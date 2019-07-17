@@ -15,7 +15,6 @@ namespace pro.backend.Dtos
         public string card_holder_name { get; set; }
         public int card_no { get; set; }
         public string card_expiry { get; set; }
-        public string UserId { get; set; }
         public DateTime DateOfPayment { get; set; }
 
         public PaymentInfoDto()

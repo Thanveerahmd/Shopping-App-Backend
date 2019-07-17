@@ -43,7 +43,7 @@ namespace Project.Controllers
             IOptions<AppSettings> appSettings,
             IEmailSender EmailSender,
             iAdvertisement AdService,
-              UserManager<User> usermanger
+            UserManager<User> usermanger
             )
         {
             _userService = userService;
@@ -310,7 +310,7 @@ namespace Project.Controllers
             return Ok(ad);
         }
 
-        [HttpGet("PendingAdvertisements")]
+        [HttpGet("Advertisements/{userId}")]
         [AllowAnonymous]
         public IActionResult GetAllAdvertisementOfaSeller(string userId)
         {
@@ -328,7 +328,7 @@ namespace Project.Controllers
 
           try
           {
-              _adService.UpdateAdvertisementStatus(ad);
+              _adService.UpdateAdvertisement(ad);
           }
           catch ( AppException ex)
           {

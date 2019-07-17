@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Project.Helpers;
 
 namespace WebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20190716174457_AdUpdate")]
+    partial class AdUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,8 +229,6 @@ namespace WebApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ActivationStatus");
-
                     b.Property<DateTime>("DateAdded");
 
                     b.Property<string>("Description");
@@ -437,32 +437,6 @@ namespace WebApi.Migrations
                     b.ToTable("Photos");
                 });
 
-            modelBuilder.Entity("pro.backend.Entities.PhotoForAd", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("AdId");
-
-                    b.Property<DateTime>("DateAdded");
-
-                    b.Property<string>("Description");
-
-                    b.Property<string>("PublicID");
-
-                    b.Property<string>("Url");
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AdId")
-                        .IsUnique();
-
-                    b.ToTable("PhotoForAd");
-                });
-
             modelBuilder.Entity("pro.backend.Entities.PhotoForUser", b =>
                 {
                     b.Property<int>("Id")
@@ -478,6 +452,8 @@ namespace WebApi.Migrations
                     b.Property<string>("Url");
 
                     b.Property<string>("UserId");
+
+                    b.Property<int>("timestamp");
 
                     b.HasKey("Id");
 
@@ -707,14 +683,6 @@ namespace WebApi.Migrations
                     b.HasOne("pro.backend.Entities.Product", "Product")
                         .WithMany("Photos")
                         .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
-            modelBuilder.Entity("pro.backend.Entities.PhotoForAd", b =>
-                {
-                    b.HasOne("pro.backend.Entities.Advertisement", "Advertisement")
-                        .WithOne("PhotoForAd")
-                        .HasForeignKey("pro.backend.Entities.PhotoForAd", "AdId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

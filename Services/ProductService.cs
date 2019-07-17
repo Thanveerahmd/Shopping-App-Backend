@@ -1,6 +1,7 @@
 using pro.backend.Entities;
 using Project.Helpers;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace pro.backend.Services
 {
@@ -44,21 +45,9 @@ namespace pro.backend.Services
         }
 
         
-        // public IEnumerable<ProductViewModel2> getProduct() => 
-        //     _context.Products.ToList().Select(x => new ProductViewModel2{
-        //         id = x.id,
-        //         name = x.name,
-        //         quantity = x.quantity,
-        //         reorderLevel = x.reorderLevel,
-        //         price = x.price.ToString("N2"), // 1100.50 => 1,100.50
-        //         description = x.description,
-        //         category = x.category,
-        //         sub_category = x.sub_category
-        //     });
-        
-        public void UpdateProduct(Product product){
+        public async Task<bool> UpdateProduct(Product product){
 
-            var prod = _context.Products.Find(product.Id);
+            var prod =await _context.Products.FindAsync(product.Id);
 
             if (prod == null)
                 throw new AppException("Product not found");
@@ -73,7 +62,7 @@ namespace pro.backend.Services
             prod.Sub_category = product.Sub_category;
 
             _context.Products.Update(prod);
-            _context.SaveChanges();
+             return await _context.SaveChangesAsync()>0;
         }
     }
 }

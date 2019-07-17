@@ -318,5 +318,19 @@ namespace pro.backend.Services
             _context.Orders.Add(Order);
             _context.SaveChanges();    
         }
+
+        public async Task<bool> UpdateOrder(Order Order)
+        {
+             var Orderinfo = await _context.Orders.FindAsync(Order.Id);
+
+            if (Orderinfo == null)
+                throw new AppException("Orderinfo is not avilable ");
+
+            Orderinfo.PaymentStatus = Order.PaymentStatus;
+             Orderinfo.Total_Price = Order.Total_Price;
+            
+            _context.Orders.Update(Orderinfo);
+            return await _context.SaveChangesAsync()>0;
+        }
     }
 }

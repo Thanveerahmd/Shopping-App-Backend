@@ -13,7 +13,10 @@ namespace pro.backend.Entities
         public string UserId { get; set; }
         public string PaymentStatus { get; set; }
         public int ProductId { get; set; }
+        public int timestamp { get; set; }
+        public string ActivationStatus { get; set; }
         public string Status { get; set; }
         public User user { get; set; }
+        public PhotoForAd PhotoForAd { get; set; }
     }
 }

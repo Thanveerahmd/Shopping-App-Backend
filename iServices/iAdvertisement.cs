@@ -8,11 +8,12 @@ namespace pro.backend.iServices
     {
         Task<ICollection<Advertisement>> GetPendingAdvertisement();
         Task<ICollection<Advertisement>> GetAcceptedAdvertisement();
-         Task<ICollection<Advertisement>> GetAllAdvertisementOfSeller(string userId);
+        Task<ICollection<Advertisement>> GetAllAdvertisementOfSeller(string userId);
         Task<ICollection<Advertisement>> GetRejectedAdvertisement();
         string GetPaymentStatusOfAdvertisement(int id);
-        Task<bool> UpdateAdvertisementStatus(Advertisement ad);
-         Task<Advertisement> GetAdvertisement(int Id);
+        Task<bool> UpdateAdvertisement(Advertisement ad);
+        Task<Advertisement> GetAdvertisement(int Id);
+        Task<Advertisement> GetAd(int Id);
 
 
     }

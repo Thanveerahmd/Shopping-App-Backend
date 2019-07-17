@@ -23,12 +23,17 @@ namespace pro.backend.Controllers
         public readonly iShoppingRepo _repo;
         private readonly UserManager<User> _usermanger;
         private Cloudinary _cloudinary;
+        private readonly iAdvertisement _adService;
 
-        public PhotosController(IMapper mapper, iShoppingRepo repo, UserManager<User> usermanger)
+        public PhotosController(IMapper mapper,
+         iShoppingRepo repo,
+         UserManager<User> usermanger,
+         iAdvertisement adService)
         {
             _repo = repo;
             _mapper = mapper;
             _usermanger = usermanger;
+            _adService = adService;
 
             Account acc = new Account(
             Keys.Cloudinary_cloud_name,
@@ -280,11 +285,11 @@ namespace pro.backend.Controllers
         // automatic delete
 
         // neee to do testing
-        [HttpPost("Advertisement/{SellerId}")]
+
+        [HttpPost("Advertisement/{AdId}")]
         [AllowAnonymous]
-          public async Task<IActionResult> AddAdvertisement(string SellerId, [FromForm]AdvertismentUploadDto PhotoUploadDto)
+        public async Task<IActionResult> AddAdvertisementPhoto(int AdId, [FromForm]PhotoUploadDto PhotoUploadDto)
         {
-            // var user = await _usermanger.FindByIdAsync(SellerId);
 
             var file = PhotoUploadDto.file;
 
@@ -313,20 +318,20 @@ namespace pro.backend.Controllers
 
             PhotoUploadDto.PublicID = Upload_result.PublicId;
 
-            var photo = _mapper.Map<Advertisement>(PhotoUploadDto);
+            var photo = _mapper.Map<PhotoForAd>(PhotoUploadDto);
 
-            photo.UserId = SellerId;
+            var ad = await _adService.GetAdvertisement(AdId);
 
-            photo.PaymentStatus = "Pending";
+            ad.PublicID = photo.PublicID;
+            ad.Url = photo.Url;
+            ad.PhotoForAd = photo;
 
-            _repo.Add(photo);
-
-            if (await _repo.SaveAll())
+            if (await _adService.UpdateAdvertisement(ad))
             {
-                return Ok(photo.Id);
+                return Ok();
             }
-            return BadRequest("Coudn't add the Photo");
+            return BadRequest();
         }
     }
-    
+
 }

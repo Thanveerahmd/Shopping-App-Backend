@@ -1,5 +1,6 @@
 using pro.backend.Entities;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace pro.backend.Services
 {
@@ -9,7 +10,7 @@ namespace pro.backend.Services
         IEnumerable<Product> GetAllProducts();
         Product GetById(int id);
         void DeleteProduct(int id);
-        void UpdateProduct(Product product);
+        Task<bool> UpdateProduct(Product product);
 
     }
 }
