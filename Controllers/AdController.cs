@@ -49,10 +49,10 @@ namespace pro.backend.Controllers
                 {
                     return Ok(ad.Id);
                 }
-                return BadRequest("");
+                return BadRequest(new {message ="Advertisement not saved"});
             }
 
-            return BadRequest("This product alread have a Advertisement");
+            return BadRequest( new {message = "This product already have a Advertisement"});
         }
 
 
