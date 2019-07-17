@@ -332,6 +332,46 @@ namespace pro.backend.Controllers
             }
             return BadRequest();
         }
+
+
+        //  [HttpDelete("deleteAd/{AdId}")]
+        // [AllowAnonymous]
+        // public async Task<IActionResult> DeleteAdPhoto(int AdId)
+        // {
+
+         
+        //    var Ad =await _adService.GetAdvertisement(AdId);
+
+        //     var photoFromRepo = await _repo.GetPhotoOfUser(UserId);
+
+        //     if (photoFromRepo.PublicID != null)
+        //     {
+        //         var delParams = new DelResParams()
+        //         {
+        //             PublicIds = new List<string>() { photoFromRepo.PublicID },
+        //             Invalidate = true
+        //         };
+        //         var delResult = _cloudinary.DeleteResources(delParams);
+
+        //         if (!delResult.Partial)
+        //         {
+        //             user.imageUrl = null;
+        //             await _usermanger.UpdateAsync(user);
+        //             _repo.Delete(photoFromRepo);
+
+        //         }
+        //     }
+
+        //     if (photoFromRepo.PublicID == null)
+        //     {
+        //         _repo.Delete(photoFromRepo);
+        //     }
+
+        //     if (await _repo.SaveAll())
+        //         return Ok();
+        //     return BadRequest(new { message = "Failed to delete photo" });
+        // }
+
     }
 
 }
