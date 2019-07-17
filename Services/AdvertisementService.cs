@@ -69,6 +69,8 @@ namespace pro.backend.Services
             advertisement.Status = ad.Status.ToLower();
             if(advertisement.PaymentStatus !=null)
             advertisement.PaymentStatus = ad.PaymentStatus.ToLower();
+            advertisement.ActivationStatus = "not expired";
+            advertisement.DateAdded = ad.DateAdded;
             advertisement.PublicID = ad.PublicID;
             advertisement.Url = ad.Url;
             advertisement.PhotoForAd = ad.PhotoForAd;
@@ -149,7 +151,7 @@ namespace pro.backend.Services
         public async Task<PhotoForAd> GetPhotoOfad(int id)
         {
              var PhotoForAd = await _context.PhotoForAd
-            .FirstOrDefaultAsync(i => i.Id == id);
+            .FirstOrDefaultAsync(i => i.AdId == id);
 
             return PhotoForAd;
         }

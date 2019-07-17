@@ -338,7 +338,7 @@ namespace pro.backend.Controllers
 
         [HttpDelete("deleteAd/{sellerId}/{AdId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> DeleteAdPhoto(int AdId,string sellerId)
+        public async Task<IActionResult> DeleteAdPhoto(string sellerId,int AdId)
         {
 
 

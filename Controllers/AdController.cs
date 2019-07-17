@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using pro.backend.Dtos;
@@ -92,7 +93,7 @@ namespace pro.backend.Controllers
 
             if (await _repo.SaveAll())
                 return Ok();
-            return BadRequest();
+            return BadRequest(new{message = "Could Not Delete Ad"});
 
         }
 
@@ -174,10 +175,12 @@ namespace pro.backend.Controllers
 
         [HttpPut]
         [AllowAnonymous]
-        public async Task<IActionResult> UpdateAd(AdvertismentUploadDto adDto)
+        public async Task<IActionResult> UpdateAd(AdvertisementToReturnDto adDto)
         {
             var ad = _mapper.Map<Advertisement>(adDto);
+            
             ad.Id = adDto.Id;
+            ad.DateAdded = DateTime.Now;
 
             try
             {

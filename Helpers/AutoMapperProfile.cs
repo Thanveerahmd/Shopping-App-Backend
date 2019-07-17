@@ -97,6 +97,8 @@ namespace Project.Helpers
 
             CreateMap<Advertisement, AdvertisementToReturnDto>();
 
+            CreateMap<AdvertisementToReturnDto,Advertisement>();
+
         }
     }
 }
