@@ -52,7 +52,7 @@ namespace pro.backend.Controllers
                 return BadRequest(new {message ="Advertisement not saved"});
             }
 
-            return BadRequest( new {message = "This product already have a Advertisement"});
+            return BadRequest( new {message = "This product already has an Advertisement"});
         }
 
 

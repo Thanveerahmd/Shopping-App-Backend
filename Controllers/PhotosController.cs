@@ -286,7 +286,7 @@ namespace pro.backend.Controllers
 
         // neee to do testing
 
-        [HttpPost("Advertisement/{AdId}")]
+        [HttpPost("advertisement/{AdId}")]
         [AllowAnonymous]
         public async Task<IActionResult> AddAdvertisementPhoto(int AdId, [FromForm]PhotoUploadDto PhotoUploadDto)
         {
