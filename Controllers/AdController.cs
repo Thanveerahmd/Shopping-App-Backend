@@ -45,7 +45,8 @@ namespace pro.backend.Controllers
             if (prevAd == null)
             {
                 ad.PaymentStatus = "pending";
-                ad.Status = "pending";
+                ad.Status ="pending";
+                ad.ActivationStatus = "not expired";
                 ad.UserId = SellerId;
                 _repo.Add(ad);
 
