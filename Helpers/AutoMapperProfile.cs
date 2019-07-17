@@ -41,7 +41,7 @@ namespace Project.Helpers
 
             CreateMap<PhotoUploadDto, PhotoForUser>();
 
-             CreateMap<PhotoUploadDto, PhotoForAd>();
+            CreateMap<PhotoUploadDto, PhotoForAd>();
 
             CreateMap<Cart, CartDto>();
 
@@ -91,11 +91,11 @@ namespace Project.Helpers
 
             CreateMap<Advertisement, AdvertismentUploadDto>();
 
+            CreateMap<ProductAddingDto, Product>();
 
-            CreateMap<ProductAddingDto,Product>();
+            CreateMap<Product, ProductAddingDto>();
 
-            CreateMap<Product,ProductAddingDto>();
-
+            CreateMap<Advertisement, AdvertisementToReturnDto>();
 
         }
     }
