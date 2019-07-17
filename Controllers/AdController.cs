@@ -11,7 +11,7 @@ using Project.Services;
 namespace pro.backend.Controllers
 {
     [ApiController]
-    [Route("Ad")]
+    [Route("adverts")]
     public class AdController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -34,7 +34,7 @@ namespace pro.backend.Controllers
             _adService = AdService;
         }
 
-        [HttpPost("Advertisement/{SellerId}")]
+        [HttpPost("{SellerId}")]
         [AllowAnonymous]
         public async Task<IActionResult> AddAdvertisements([FromBody]AdvertismentUploadDto adDto)
         {
@@ -56,7 +56,7 @@ namespace pro.backend.Controllers
         }
 
 
-        [HttpGet("AcceptedAdvertisements")]
+        [HttpGet("acceptedAdvertisements")]
         [AllowAnonymous]
         public async Task<IActionResult> ViewAdvertisement()
         {
