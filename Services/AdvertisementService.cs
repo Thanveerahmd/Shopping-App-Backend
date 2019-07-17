@@ -101,7 +101,7 @@ namespace pro.backend.Services
         {
             var ad = await _context.Advertisement
                 .Where(p => p.UserId == sellerId)
-                .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success"))
+                .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success") &&p.ActivationStatus.ToLower().Equals("not expired"))
                 .ToListAsync();
 
             return ad;
@@ -120,7 +120,7 @@ namespace pro.backend.Services
         {
             var ad = await _context.Advertisement
                 .Where(p => p.UserId == sellerId)
-                .Where(p => p.Status.ToLower().Equals("pending"))
+                .Where(p => p.Status.ToLower().Equals("pending") && p.ActivationStatus.ToLower().Equals("not expired"))
                 .ToListAsync();
 
             return ad;
