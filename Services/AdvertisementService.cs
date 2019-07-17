@@ -86,5 +86,14 @@ namespace pro.backend.Services
             return ad;
         }
 
+        public async Task<ICollection<Advertisement>> ViewAdvertisement()
+        {
+            // YOU Have add timestamp Logic 
+            var ad = await _context.Advertisement
+                .Where(p => p.Status.Equals("Accepted") && p.PaymentStatus.Equals("success"))
+                .ToListAsync();
+
+            return ad;
+        }
     }
 }
