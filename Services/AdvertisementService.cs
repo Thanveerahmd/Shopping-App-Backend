@@ -65,8 +65,9 @@ namespace pro.backend.Services
             var advertisement = await _context.Advertisement.FindAsync(ad.Id);
             if (advertisement == null)
                 throw new AppException("advertisement not found");
-
+            if(advertisement.Status!=null)
             advertisement.Status = ad.Status.ToLower();
+            if(advertisement.PaymentStatus !=null)
             advertisement.PaymentStatus = ad.PaymentStatus.ToLower();
             advertisement.PublicID = ad.PublicID;
             advertisement.Url = ad.Url;

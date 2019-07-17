@@ -36,13 +36,15 @@ namespace pro.backend.Controllers
 
         [HttpPost("{SellerId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AddAdvertisements([FromBody]AdvertismentUploadDto adDto)
+        public async Task<IActionResult> AddAdvertisements([FromBody]AdvertismentUploadDto adDto,string SellerId)
         {
             var ad = _mapper.Map<Advertisement>(adDto);
-
-            if ((await _adService.GetAd(ad.ProductId)) == null)
+            var prevAd = await _adService.GetAd(ad.ProductId);
+            if ( prevAd == null)
             {
                 ad.PaymentStatus = "pending";
+                ad.Status ="pending";
+                ad.UserId = SellerId;
                 _repo.Add(ad);
 
                 if (await _repo.SaveAll())
