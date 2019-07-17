@@ -92,6 +92,10 @@ namespace Project.Helpers
             CreateMap<Advertisement, AdvertismentUploadDto>();
 
 
+            CreateMap<ProductAddingDto,Product>();
+
+            CreateMap<Product,ProductAddingDto>();
+
 
         }
     }
