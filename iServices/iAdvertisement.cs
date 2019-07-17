@@ -15,5 +15,10 @@ namespace pro.backend.iServices
         Task<Advertisement> GetAdvertisement(int Id);
         Task<Advertisement> GetAd(int Id);
         Task<ICollection<Advertisement>> ViewAdvertisement();
+        Task<ICollection<Advertisement>> GetActiveAdvertisementOfSeller(string sellerId);
+        Task<ICollection<Advertisement>> GetAcceptedAdvertisementOfSeller(string sellerId);
+        Task<ICollection<Advertisement>> GetPendingAdvertisementOfSeller(string sellerId);
+        Task<ICollection<Advertisement>> GetExpiredAdvertisementOfSeller(string sellerId);
+        Task<ICollection<Advertisement>> GetRejectedAdvertisementOfSeller(string sellerId);
     }
 }
