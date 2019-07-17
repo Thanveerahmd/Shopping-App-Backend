@@ -11,7 +11,7 @@ using Project.Services;
 namespace pro.backend.Controllers
 {
     [ApiController]
-    [Route("Ad")]
+    [Route("adverts")]
     public class AdController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -34,7 +34,7 @@ namespace pro.backend.Controllers
             _adService = AdService;
         }
 
-        [HttpPost("Advertisement/{SellerId}")]
+        [HttpPost("{SellerId}")]
         [AllowAnonymous]
         public async Task<IActionResult> AddAdvertisements([FromBody]AdvertismentUploadDto adDto)
         {
@@ -56,7 +56,7 @@ namespace pro.backend.Controllers
         }
 
 
-        [HttpGet("AcceptedAdvertisements")]
+        [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> ViewAdvertisement()
         {
@@ -79,6 +79,37 @@ namespace pro.backend.Controllers
 
         }
 
+        [HttpGet("acceptedBySeller/{SellerId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAcceptedAdvertisementOfSeller(string SellerId)
+        {
+            var ad = await _adService.GetAcceptedAdvertisementOfSeller(SellerId);
+            return Ok(ad);
+        }
+
+        [HttpGet("activeBySeller/{SellerId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetActiveAdvertisementOfSeller(string SellerId)
+        {
+            var ad = await _adService.GetActiveAdvertisementOfSeller(SellerId);
+            return Ok(ad);
+        }
+
+        [HttpGet("pendingBySeller/{SellerId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetPendingAdvertisementOfSeller(string SellerId)
+        {
+            var ad = await _adService.GetPendingAdvertisementOfSeller(SellerId);
+            return Ok(ad);
+        }
+
+        [HttpGet("expiredBySeller/{SellerId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetExpiredAdvertisementOfSeller(string SellerId)
+        {
+            var ad = await _adService.GetExpiredAdvertisementOfSeller(SellerId);
+            return Ok(ad);
+        }
 
     }
 }

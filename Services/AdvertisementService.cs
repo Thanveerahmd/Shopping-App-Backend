@@ -70,7 +70,7 @@ namespace pro.backend.Services
             advertisement.PaymentStatus = ad.PaymentStatus.ToLower();
             advertisement.PublicID = ad.PublicID;
             advertisement.Url = ad.Url;
-            advertisement.PhotoForAd =ad.PhotoForAd;
+            advertisement.PhotoForAd = ad.PhotoForAd;
 
             _context.Advertisement.Update(advertisement);
             return await _context.SaveChangesAsync() > 0;
@@ -96,11 +96,54 @@ namespace pro.backend.Services
             return ad;
         }
 
-        public async Task<PhotoForAd> GetPhotoOfAd(int AdId)
+        public async Task<ICollection<Advertisement>> GetActiveAdvertisementOfSeller(string sellerId)
         {
-             var photo = await _context.PhotoForAd.FirstOrDefaultAsync(p => p.AdId == AdId);
+            var ad = await _context.Advertisement
+                .Where(p => p.UserId == sellerId)
+                .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success"))
+                .ToListAsync();
 
-            return photo;
+            return ad;
         }
+        public async Task<ICollection<Advertisement>> GetAcceptedAdvertisementOfSeller(string sellerId)
+        {
+            var ad = await _context.Advertisement
+                .Where(p => p.UserId == sellerId)
+                .Where(p => p.Status.ToLower().Equals("accepted") && !p.PaymentStatus.ToLower().Equals("success"))
+                .ToListAsync();
+
+            return ad;
+        }
+
+        public async Task<ICollection<Advertisement>> GetPendingAdvertisementOfSeller(string sellerId)
+        {
+            var ad = await _context.Advertisement
+                .Where(p => p.UserId == sellerId)
+                .Where(p => p.Status.ToLower().Equals("pending"))
+                .ToListAsync();
+
+            return ad;
+        }
+
+        public async Task<ICollection<Advertisement>> GetExpiredAdvertisementOfSeller(string sellerId)
+        {
+            var ad = await _context.Advertisement
+                .Where(p => p.UserId == sellerId)
+                .Where(p => p.ActivationStatus.ToLower().Equals("expired"))
+                .ToListAsync();
+
+            return ad;
+        }
+
+        public async Task<ICollection<Advertisement>> GetRejectedAdvertisementOfSeller(string sellerId)
+        {
+            var ad = await _context.Advertisement
+                .Where(p => p.UserId == sellerId)
+                .Where(p => p.Status.ToLower().Equals("rejected"))
+                .ToListAsync();
+
+            return ad;
+        }
+
     }
 }
