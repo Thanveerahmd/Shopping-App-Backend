@@ -91,7 +91,7 @@ namespace pro.backend.Services
         {
             // YOU Have add timestamp Logic 
             var ad = await _context.Advertisement
-                .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success"))
+                .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success") && p.ActivationStatus.ToLower().Equals("not expired"))
                 .ToListAsync();
 
             return ad;

@@ -348,7 +348,7 @@ namespace pro.backend.Controllers
          
             if(photoFromRepo.UserId != sellerId)
             {
-                return BadRequest();
+                return BadRequest(new{message="Not Authorized to delete"});
             }
 
         
