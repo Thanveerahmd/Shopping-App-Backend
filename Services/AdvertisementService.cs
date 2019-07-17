@@ -129,7 +129,7 @@ namespace pro.backend.Services
         {
             var ad = await _context.Advertisement
                 .Where(p => p.UserId == sellerId)
-                .Where(p => p.Status.ToLower().Equals("expired"))
+                .Where(p => p.ActivationStatus.ToLower().Equals("expired"))
                 .ToListAsync();
 
             return ad;
