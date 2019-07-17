@@ -26,11 +26,14 @@ namespace Project.Helpers
         public DbSet<orderDetails> orderDetails { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<Advertisement> Advertisement { get; set; }
+        public DbSet<PhotoForAd> PhotoForAd { get; set; }
+       
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
             builder.Entity<Advertisement>()
+            
             .HasOne(p => p.PhotoForAd)
             .WithOne(i => i.Advertisement)
             .HasForeignKey<PhotoForAd>(b => b.AdId);

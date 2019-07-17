@@ -49,7 +49,7 @@ namespace pro.backend.Controllers
                 {
                     return Ok(ad.Id);
                 }
-                return BadRequest(new {message ="Advertisement not saved"});
+                return BadRequest(new { message = "Advertisement not saved" });
             }
 
             return BadRequest( new {message = "This product already has an Advertisement"});
@@ -64,6 +64,20 @@ namespace pro.backend.Controllers
             return Ok(ad);
         }
 
+        [HttpDelete("{Id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Deleteinfo(int Id)
+        {
+
+            var ad =await _adService.GetAdvertisement(Id);
+           
+            _repo.Delete(ad);
+
+            if (await _repo.SaveAll())
+                return Ok();
+            return BadRequest();
+
+        }
 
         [HttpGet("acceptedBySeller/{SellerId}")]
         [AllowAnonymous]
