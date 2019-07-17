@@ -19,7 +19,7 @@ namespace pro.backend.Services
 
         public async Task<ICollection<Advertisement>> GetAcceptedAdvertisement()
         {
-            var ad = await _context.Advertisement.Where(p => p.Status.Equals("Accepted")).ToListAsync();
+            var ad = await _context.Advertisement.Where(p => p.Status.ToLower().Equals("accepted")).ToListAsync();
 
             return ad;
 
@@ -48,14 +48,14 @@ namespace pro.backend.Services
 
         public async Task<ICollection<Advertisement>> GetPendingAdvertisement()
         {
-            var ad = await _context.Advertisement.Where(p => p.Status.Equals("Pending")).ToListAsync();
+            var ad = await _context.Advertisement.Where(p => p.Status.ToLower().Equals("pending")).ToListAsync();
 
             return ad;
         }
 
         public async Task<ICollection<Advertisement>> GetRejectedAdvertisement()
         {
-            var ad = await _context.Advertisement.Where(p => p.Status.Equals("Rejected")).ToListAsync();
+            var ad = await _context.Advertisement.Where(p => p.Status.ToLower().Equals("rejected")).ToListAsync();
 
             return ad;
         }
@@ -66,8 +66,8 @@ namespace pro.backend.Services
             if (advertisement == null)
                 throw new AppException("advertisement not found");
 
-            advertisement.Status = ad.Status;
-            advertisement.PaymentStatus = ad.PaymentStatus;
+            advertisement.Status = ad.Status.ToLower();
+            advertisement.PaymentStatus = ad.PaymentStatus.ToLower();
             advertisement.PublicID = ad.PublicID;
             advertisement.Url = ad.Url;
             advertisement.PhotoForAd =ad.PhotoForAd;
@@ -79,8 +79,8 @@ namespace pro.backend.Services
         public async Task<Advertisement> GetAd(int Id)
         {
             var ad = await _context.Advertisement.
-                    Where(p => (p.Status.Equals("Accepted") || p.Status.Equals("Pending"))
-                    && (p.PaymentStatus.Equals("success") || p.PaymentStatus.Equals("Pending")))
+                    Where(p => (p.Status.ToLower().Equals("accepted") || p.Status.ToLower().Equals("pending"))
+                    && (p.PaymentStatus.ToLower().Equals("success") || p.PaymentStatus.ToLower().Equals("pending")))
                     .FirstOrDefaultAsync(p => p.ProductId == Id);
 
             return ad;
@@ -90,7 +90,7 @@ namespace pro.backend.Services
         {
             // YOU Have add timestamp Logic 
             var ad = await _context.Advertisement
-                .Where(p => p.Status.Equals("Accepted") && p.PaymentStatus.Equals("success"))
+                .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success"))
                 .ToListAsync();
 
             return ad;

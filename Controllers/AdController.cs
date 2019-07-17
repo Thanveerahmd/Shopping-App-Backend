@@ -42,7 +42,7 @@ namespace pro.backend.Controllers
 
             if ((await _adService.GetAd(ad.ProductId)) == null)
             {
-                ad.PaymentStatus = "Pending";
+                ad.PaymentStatus = "pending";
                 _repo.Add(ad);
 
                 if (await _repo.SaveAll())
@@ -63,6 +63,8 @@ namespace pro.backend.Controllers
             var ad = await _adService.ViewAdvertisement();
             return Ok(ad);
         }
+
+
 
     }
 }

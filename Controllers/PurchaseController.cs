@@ -89,7 +89,7 @@ namespace pro.backend.Controllers
 
                 if (await _repo.SaveAll())
                 {
-                    Console.WriteLine("Success");
+                    Console.WriteLine("success");
                 }
             }
             else if (paymentInfo.status_code == -1 || paymentInfo.status_code == -2)
@@ -102,7 +102,7 @@ namespace pro.backend.Controllers
                 }
                 else
                 {
-                    order.PaymentStatus = "Failed";
+                    order.PaymentStatus = "failed";
                     var Buyer = await _usermanger.FindByIdAsync(order.BuyerId);
                     await _emailSender.SendEmailAsync(Buyer.UserName, "About Payment Done on your Order",
                  $"Your payment status is failed  ");
@@ -179,7 +179,7 @@ namespace pro.backend.Controllers
         {
             var order = new Order();
             order.BuyerId = BuyerId;
-            order.PaymentStatus = "Pending";
+            order.PaymentStatus = "pending";
             order.DateAdded = DateTime.Now;
 
             if (checkoutDto.CartId == 0)
@@ -295,7 +295,7 @@ namespace pro.backend.Controllers
                 }
                 else
                 {
-                    ad.PaymentStatus = "Failed";
+                    ad.PaymentStatus = "failed";
                     var seller = await _usermanger.FindByIdAsync(ad.UserId);
                     await _emailSender.SendEmailAsync(seller.UserName, "About Payment Done on your Order",
                  $"Your payment status is failed  ");
