@@ -7,6 +7,7 @@ using pro.backend.Dtos;
 using pro.backend.Entities;
 using pro.backend.iServices;
 using pro.backend.Services;
+using Project.Helpers;
 using Project.Services;
 
 namespace pro.backend.Controllers
@@ -123,6 +124,26 @@ namespace pro.backend.Controllers
         {
             var ad = await _adService.GetExpiredAdvertisementOfSeller(SellerId);
             return Ok(ad);
+        }
+
+        [HttpPut]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateAd(AdvertismentUploadDto adDto)
+        {
+            var ad = _mapper.Map<Advertisement>(adDto);
+            ad.Id = adDto.Id;
+
+            try
+            {
+                // save 
+                await _adService.UpdateAdvertisement(ad);
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
     }
