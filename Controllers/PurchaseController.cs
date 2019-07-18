@@ -318,7 +318,7 @@ namespace pro.backend.Controllers
                 ad.PaymentStatus = "chargedback";
                 try
                 {
-                    _repo.Add(paymentInfo);
+                    await _repo.UpdateSellerInfo(paymentInfo);
                     await _adService.UpdateAdvertisement(ad);
 
                 }
