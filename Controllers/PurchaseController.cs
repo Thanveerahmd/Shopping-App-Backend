@@ -44,7 +44,7 @@ namespace pro.backend.Controllers
 
         [HttpPost("paymentForOrders")]
         [AllowAnonymous]
-        public async void PaymentDetails([FromBody]PaymentInfoDto PaymentInfoDto)
+        public async Task PaymentDetails([FromBody]PaymentInfoDto PaymentInfoDto)
         {
             var paymentInfo = _mapper.Map<BuyerPaymentInfo>(PaymentInfoDto);
 
@@ -268,7 +268,7 @@ namespace pro.backend.Controllers
 
         [HttpPost("paymentForAdvertisement")]
         [AllowAnonymous]
-        public async Task<IActionResult> PaymentDetailsofAdvertisements([FromBody]PaymentInfoDto PaymentInfoDto)
+        public async  Task PaymentDetailsofAdvertisements([FromBody]PaymentInfoDto PaymentInfoDto)
         {
             
                 var paymentInfo = _mapper.Map<SellerPaymentInfo>(PaymentInfoDto);
@@ -286,12 +286,13 @@ namespace pro.backend.Controllers
                     {
                         _repo.Add(paymentInfo);
                         await _adService.UpdateAdvertisement(ad);
-                        return Ok();
+                      //  return Ok();
                     }
                     catch (AppException ex)
                     {
 
-                        return BadRequest(new{message = ex.Message.ToString()});
+                       // return BadRequest(ex.Message.ToString());
+                        Console.WriteLine(ex.Message);
                     }
                 }
                 else if (paymentInfo.status_code == -1 || paymentInfo.status_code == -2)
@@ -312,11 +313,12 @@ namespace pro.backend.Controllers
                     {
                         _repo.Add(paymentInfo);
                         await _adService.UpdateAdvertisement(ad);
-                        return Ok();
+                       // return Ok();
                     }
                     catch (AppException ex)
                     {
-                        return BadRequest(new{message = ex.Message.ToString()});
+                        //return BadRequest(ex.Message.ToString());
+                         Console.WriteLine(ex.Message);
                     }
                 }
                 else if (paymentInfo.status_code == -3)
@@ -328,19 +330,21 @@ namespace pro.backend.Controllers
                     {
                         await _repo.UpdateSellerInfo(paymentInfo);
                         await _adService.UpdateAdvertisement(ad);
-                         return Ok();
+                        // return Ok();
 
                     }
                     catch (AppException ex)
                     {
 
-                        return BadRequest(new{message = ex.Message.ToString()});
+                        // return BadRequest(ex.Message.ToString());
+                         Console.WriteLine(ex.Message);
                     }
 
                 }
                 else
                 {
-                    return Ok();
+                    //return Ok();
+                    Console.WriteLine("pending");
                 }
 
            
