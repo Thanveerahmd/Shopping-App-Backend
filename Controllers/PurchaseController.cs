@@ -16,7 +16,7 @@ using Project.Services;
 namespace pro.backend.Controllers
 {
     [ApiController]
-    [Route("Purchase")]
+    [Route("purchase")]
     public class PurchaseController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -42,7 +42,7 @@ namespace pro.backend.Controllers
             _adService = AdService;
         }
 
-        [HttpPost("PaymentForOrders")]
+        [HttpPost("paymentForOrders")]
         [AllowAnonymous]
         public async void PaymentDetails([FromBody]PaymentInfoDto PaymentInfoDto)
         {
@@ -266,17 +266,19 @@ namespace pro.backend.Controllers
         }
 
 
-        [HttpPost("PaymentForAdvertisement")]
+        [HttpPost("paymentForAdvertisement")]
         [AllowAnonymous]
         public async void PaymentDetailsofAdvertisements([FromBody]PaymentInfoDto PaymentInfoDto)
         {
 
             var paymentInfo = _mapper.Map<SellerPaymentInfo>(PaymentInfoDto);
             var ad = await _adService.GetAdvertisement(paymentInfo.order_id);
-
+            var seller = await _usermanger.FindByIdAsync(ad.UserId);
             if (paymentInfo.status_code == 2)
             {
                 ad.PaymentStatus = "success";
+                await _emailSender.SendEmailAsync(seller.UserName, $"Payment for Advert {paymentInfo.order_id}",
+                    $"Your payment has been successful. Your payment Id is {PaymentInfoDto.payment_id}. Your Ad will be live for {ad.timestamp} days");
                 try
                 {
                      _repo.Add(paymentInfo);
@@ -297,9 +299,9 @@ namespace pro.backend.Controllers
                 else
                 {
                     ad.PaymentStatus = "failed";
-                    var seller = await _usermanger.FindByIdAsync(ad.UserId);
-                    await _emailSender.SendEmailAsync(seller.UserName, "About Payment Done on your Order",
-                 $"Your payment status is failed  ");
+                    
+                    await _emailSender.SendEmailAsync(seller.UserName, $"Payment for Advert {paymentInfo.order_id}",
+                    $"Your payment has failed.");
                 }
 
                 try
@@ -316,6 +318,8 @@ namespace pro.backend.Controllers
             else if (paymentInfo.status_code == -3)
             {
                 ad.PaymentStatus = "chargedback";
+                await _emailSender.SendEmailAsync(seller.UserName, $"Payment ChargeBack for Advert {paymentInfo.order_id}",
+                    $"Your payment has been chargebacked.");
                 try
                 {
                     await _repo.UpdateSellerInfo(paymentInfo);
