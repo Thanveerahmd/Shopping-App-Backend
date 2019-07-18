@@ -99,6 +99,10 @@ namespace Project.Helpers
 
             CreateMap<AdvertisementToReturnDto,Advertisement>();
 
+            CreateMap<PaymentInfoDto,SellerPaymentInfo>();
+
+            CreateMap<SellerPaymentInfo,PaymentInfoDto>();
+
         }
     }
 }
