@@ -149,7 +149,7 @@ namespace pro.backend.Services
         public async Task<PhotoForAd> GetPhotoOfad(int id)
         {
              var PhotoForAd = await _context.PhotoForAd
-            .FirstOrDefaultAsync(i => i.Id == id);
+            .FirstOrDefaultAsync(i => i.AdId == id);
 
             return PhotoForAd;
         }
