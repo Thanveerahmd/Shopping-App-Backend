@@ -338,7 +338,7 @@ namespace pro.backend.Controllers
 
         [HttpDelete("deleteAd/{sellerId}/{AdId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> DeleteAdPhoto(int AdId,string sellerId)
+        public async Task<IActionResult> DeleteAdPhoto(string sellerId,int AdId)
         {
 
 
@@ -348,7 +348,7 @@ namespace pro.backend.Controllers
          
             if(photoFromRepo.UserId != sellerId)
             {
-                return BadRequest();
+                return BadRequest(new{message="Not Authorized to delete"});
             }
 
         

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using System;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using pro.backend.Dtos;
@@ -74,10 +75,11 @@ namespace pro.backend.Controllers
                 var adtoReturn = _mapper.Map<AdvertisementToReturnDto>(item);
                 var product = await _repo.GetProduct(item.ProductId);
                 adtoReturn.ProductName = product.Product_name;
+                adtoReturn.ProductPrice = product.Price;
                 adsToView.Add(adtoReturn);
             }
 
-            return Ok(ad);
+            return Ok(adsToView);
         }
 
         [HttpDelete("{Id}")]
@@ -91,7 +93,7 @@ namespace pro.backend.Controllers
 
             if (await _repo.SaveAll())
                 return Ok();
-            return BadRequest();
+            return BadRequest(new{message = "Could Not Delete Ad"});
 
         }
 
@@ -100,7 +102,18 @@ namespace pro.backend.Controllers
         public async Task<IActionResult> GetAcceptedAdvertisementOfSeller(string SellerId)
         {
             var ad = await _adService.GetAcceptedAdvertisementOfSeller(SellerId);
-            return Ok(ad);
+            IList<AdvertisementToReturnDto> adsToView = new List<AdvertisementToReturnDto>();
+
+            foreach (var item in ad)
+            {
+                var adtoReturn = _mapper.Map<AdvertisementToReturnDto>(item);
+                var product = await _repo.GetProduct(item.ProductId);
+                adtoReturn.ProductName = product.Product_name;
+                adtoReturn.ProductPrice = product.Price;
+                adsToView.Add(adtoReturn);
+            }
+
+            return Ok(adsToView);
         }
 
         [HttpGet("activeBySeller/{SellerId}")]
@@ -108,7 +121,18 @@ namespace pro.backend.Controllers
         public async Task<IActionResult> GetActiveAdvertisementOfSeller(string SellerId)
         {
             var ad = await _adService.GetActiveAdvertisementOfSeller(SellerId);
-            return Ok(ad);
+            IList<AdvertisementToReturnDto> adsToView = new List<AdvertisementToReturnDto>();
+
+            foreach (var item in ad)
+            {
+                var adtoReturn = _mapper.Map<AdvertisementToReturnDto>(item);
+                var product = await _repo.GetProduct(item.ProductId);
+                adtoReturn.ProductName = product.Product_name;
+                adtoReturn.ProductPrice = product.Price;
+                adsToView.Add(adtoReturn);
+            }
+
+            return Ok(adsToView);
         }
 
         [HttpGet("pendingBySeller/{SellerId}")]
@@ -116,7 +140,18 @@ namespace pro.backend.Controllers
         public async Task<IActionResult> GetPendingAdvertisementOfSeller(string SellerId)
         {
             var ad = await _adService.GetPendingAdvertisementOfSeller(SellerId);
-            return Ok(ad);
+            IList<AdvertisementToReturnDto> adsToView = new List<AdvertisementToReturnDto>();
+
+            foreach (var item in ad)
+            {
+                var adtoReturn = _mapper.Map<AdvertisementToReturnDto>(item);
+                var product = await _repo.GetProduct(item.ProductId);
+                adtoReturn.ProductName = product.Product_name;
+                adtoReturn.ProductPrice = product.Price;
+                adsToView.Add(adtoReturn);
+            }
+
+            return Ok(adsToView);
         }
 
         [HttpGet("expiredBySeller/{SellerId}")]
@@ -124,15 +159,28 @@ namespace pro.backend.Controllers
         public async Task<IActionResult> GetExpiredAdvertisementOfSeller(string SellerId)
         {
             var ad = await _adService.GetExpiredAdvertisementOfSeller(SellerId);
-            return Ok(ad);
+            IList<AdvertisementToReturnDto> adsToView = new List<AdvertisementToReturnDto>();
+
+            foreach (var item in ad)
+            {
+                var adtoReturn = _mapper.Map<AdvertisementToReturnDto>(item);
+                var product = await _repo.GetProduct(item.ProductId);
+                adtoReturn.ProductName = product.Product_name;
+                adtoReturn.ProductPrice = product.Price;
+                adsToView.Add(adtoReturn);
+            }
+
+            return Ok(adsToView);
         }
 
         [HttpPut]
         [AllowAnonymous]
-        public async Task<IActionResult> UpdateAd(AdvertismentUploadDto adDto)
+        public async Task<IActionResult> UpdateAd(AdvertisementToReturnDto adDto)
         {
             var ad = _mapper.Map<Advertisement>(adDto);
+            
             ad.Id = adDto.Id;
+            ad.DateAdded = DateTime.Now;
 
             try
             {

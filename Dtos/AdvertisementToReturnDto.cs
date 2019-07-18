@@ -17,5 +17,7 @@ namespace pro.backend.Dtos
         public string Status { get; set; }
         public string ProductName { get; set; }
 
+        public float ProductPrice {get;set;}
+
     }
 }

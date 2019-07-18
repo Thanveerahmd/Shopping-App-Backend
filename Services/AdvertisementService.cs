@@ -69,6 +69,8 @@ namespace pro.backend.Services
             advertisement.Status = ad.Status.ToLower();
             if(advertisement.PaymentStatus !=null)
             advertisement.PaymentStatus = ad.PaymentStatus.ToLower();
+            advertisement.ActivationStatus = "not expired";
+            advertisement.DateAdded = ad.DateAdded;
             advertisement.PublicID = ad.PublicID;
             advertisement.Url = ad.Url;
             advertisement.PhotoForAd = ad.PhotoForAd;
@@ -91,7 +93,7 @@ namespace pro.backend.Services
         {
             // YOU Have add timestamp Logic 
             var ad = await _context.Advertisement
-                .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success"))
+                .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success") && p.ActivationStatus.ToLower().Equals("not expired"))
                 .ToListAsync();
 
             return ad;
