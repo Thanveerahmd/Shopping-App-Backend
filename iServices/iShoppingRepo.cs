@@ -39,5 +39,6 @@ namespace pro.backend.iServices
         Task<BillingInfo> AlternateDefault(string userId);
         Task<bool> UpdateBillingInfo(BillingInfo BillingInfo);
         Task<bool> UpdateOrder(Order Order);
+        Task<bool> UpdateSellerInfo(SellerPaymentInfo SellerPaymentInfo);
     }
 }

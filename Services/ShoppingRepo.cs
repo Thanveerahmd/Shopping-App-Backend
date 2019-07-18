@@ -332,5 +332,17 @@ namespace pro.backend.Services
             _context.Orders.Update(Orderinfo);
             return await _context.SaveChangesAsync()>0;
         }
+
+        public async Task<bool> UpdateSellerInfo(SellerPaymentInfo SellerPaymentInfo)
+        {
+           
+             var sellerinfo = await _context.SellerPaymentInfo.FindAsync(SellerPaymentInfo.Id);
+
+            if (sellerinfo == null)
+                throw new AppException("sellerPaymentInfo is not avilable ");
+         
+            _context.SellerPaymentInfo.Update(sellerinfo);
+            return await _context.SaveChangesAsync()>0;
+        }
     }
 }

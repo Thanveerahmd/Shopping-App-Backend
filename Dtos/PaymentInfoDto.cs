@@ -4,7 +4,7 @@ namespace pro.backend.Dtos
 {
     public class PaymentInfoDto
     {
-         public int Id { get; set; }
+        public int Id { get; set; }
         public int order_id { get; set; }
         public int payment_id { get; set; }
         public float payhere_amount { get; set; }
@@ -19,7 +19,7 @@ namespace pro.backend.Dtos
 
         public PaymentInfoDto()
         {
-           DateOfPayment = DateTime.Now;
+            DateOfPayment = DateTime.Now;
         }
     }
 }
