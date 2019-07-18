@@ -268,75 +268,82 @@ namespace pro.backend.Controllers
 
         [HttpPost("paymentForAdvertisement")]
         [AllowAnonymous]
-        public async void PaymentDetailsofAdvertisements([FromBody]PaymentInfoDto PaymentInfoDto)
+        public async Task<IActionResult> PaymentDetailsofAdvertisements([FromBody]PaymentInfoDto PaymentInfoDto)
         {
+            
+                var paymentInfo = _mapper.Map<SellerPaymentInfo>(PaymentInfoDto);
+                var ad = await _adService.GetAdvertisement(paymentInfo.order_id);
+                var seller = await _usermanger.FindByIdAsync(ad.UserId);
 
-            var paymentInfo = _mapper.Map<SellerPaymentInfo>(PaymentInfoDto);
-            var ad = await _adService.GetAdvertisement(paymentInfo.order_id);
-            var seller = await _usermanger.FindByIdAsync(ad.UserId);
-            if (paymentInfo.status_code == 2)
-            {
-                ad.PaymentStatus = "success";
-                await _emailSender.SendEmailAsync(seller.UserName, $"Payment for Advert {paymentInfo.order_id}",
-                    $"Your payment has been successful. Your payment Id is {PaymentInfoDto.payment_id}. Your Ad will be live for {ad.timestamp} days");
-                try
-                {
-                     _repo.Add(paymentInfo);
-                    await _adService.UpdateAdvertisement(ad);
-                }
-                catch (System.Exception)
-                {
 
-                    throw;
-                }
-            }
-            else if (paymentInfo.status_code == -1 || paymentInfo.status_code == -2)
-            {
-                if (paymentInfo.status_code == -1)
+
+                if (paymentInfo.status_code == 2)
                 {
-                    ad.PaymentStatus = "canceled";
+                    ad.PaymentStatus = "success";
+                    await _emailSender.SendEmailAsync(seller.UserName, $"Payment for Advert {paymentInfo.order_id}",
+                        $"Your payment has been successful. Your payment Id is {PaymentInfoDto.payment_id}. Your Ad will be live for {ad.timestamp} days");
+                    try
+                    {
+                        _repo.Add(paymentInfo);
+                        await _adService.UpdateAdvertisement(ad);
+                        return Ok();
+                    }
+                    catch (AppException ex)
+                    {
+
+                        return BadRequest(ex.Message.ToString());
+                    }
+                }
+                else if (paymentInfo.status_code == -1 || paymentInfo.status_code == -2)
+                {
+                    if (paymentInfo.status_code == -1)
+                    {
+                        ad.PaymentStatus = "canceled";
+                    }
+                    else
+                    {
+                        ad.PaymentStatus = "failed";
+
+                        await _emailSender.SendEmailAsync(seller.UserName, $"Payment for Advert {paymentInfo.order_id}",
+                        $"Your payment has failed.");
+                    }
+
+                    try
+                    {
+                        _repo.Add(paymentInfo);
+                        await _adService.UpdateAdvertisement(ad);
+                        return Ok();
+                    }
+                    catch (AppException ex)
+                    {
+                        return BadRequest(ex.Message.ToString());
+                    }
+                }
+                else if (paymentInfo.status_code == -3)
+                {
+                    ad.PaymentStatus = "chargedback";
+                    await _emailSender.SendEmailAsync(seller.UserName, $"Payment ChargeBack for Advert {paymentInfo.order_id}",
+                        $"Your payment has been chargebacked.");
+                    try
+                    {
+                        await _repo.UpdateSellerInfo(paymentInfo);
+                        await _adService.UpdateAdvertisement(ad);
+                         return Ok();
+
+                    }
+                    catch (AppException ex)
+                    {
+
+                         return BadRequest(ex.Message.ToString());
+                    }
+
                 }
                 else
                 {
-                    ad.PaymentStatus = "failed";
-                    
-                    await _emailSender.SendEmailAsync(seller.UserName, $"Payment for Advert {paymentInfo.order_id}",
-                    $"Your payment has failed.");
+                    return Ok();
                 }
 
-                try
-                {
-                    _repo.Add(paymentInfo);
-                    await _adService.UpdateAdvertisement(ad);
-                }
-                catch (System.Exception)
-                {
-
-                    throw;
-                }
-            }
-            else if (paymentInfo.status_code == -3)
-            {
-                ad.PaymentStatus = "chargedback";
-                await _emailSender.SendEmailAsync(seller.UserName, $"Payment ChargeBack for Advert {paymentInfo.order_id}",
-                    $"Your payment has been chargebacked.");
-                try
-                {
-                    await _repo.UpdateSellerInfo(paymentInfo);
-                    await _adService.UpdateAdvertisement(ad);
-
-                }
-                catch (System.Exception)
-                {
-
-                    throw;
-                }
-
-            }
-            else
-            {
-                Console.WriteLine("pending");
-            }
+           
 
         }
 
