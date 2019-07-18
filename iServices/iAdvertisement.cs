@@ -21,5 +21,6 @@ namespace pro.backend.iServices
         Task<ICollection<Advertisement>> GetPendingAdvertisementOfSeller(string sellerId);
         Task<ICollection<Advertisement>> GetExpiredAdvertisementOfSeller(string sellerId);
         Task<ICollection<Advertisement>> GetRejectedAdvertisementOfSeller(string sellerId);
+        Task<ICollection<Advertisement>> GetExpiredAdvertisement();
     }
 }

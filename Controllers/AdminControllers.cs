@@ -286,7 +286,7 @@ namespace Project.Controllers
             }
         }
 
-        [HttpGet("PendingAdvertisements")]
+        [HttpGet("pendingAdvertisements")]
         [AllowAnonymous]
         public IActionResult GetAllPendingAdvertisement()
         {
@@ -294,7 +294,7 @@ namespace Project.Controllers
             return Ok(ad);
         }
 
-        [HttpGet("AcceptedAdvertisements")]
+        [HttpGet("acceptedAdvertisements")]
         [AllowAnonymous]
         public IActionResult GetAllAcceptedAdvertisement()
         {
@@ -302,7 +302,7 @@ namespace Project.Controllers
             return Ok(ad);
         }
 
-        [HttpGet("PendingAdvertisements")]
+        [HttpGet("rejectedAdvertisements")]
         [AllowAnonymous]
         public IActionResult GetAllRejectedAdvertisement()
         {
@@ -310,7 +310,7 @@ namespace Project.Controllers
             return Ok(ad);
         }
 
-        [HttpGet("Advertisements/{userId}")]
+        [HttpGet("advertisements/{userId}")]
         [AllowAnonymous]
         public IActionResult GetAllAdvertisementOfaSeller(string userId)
         {

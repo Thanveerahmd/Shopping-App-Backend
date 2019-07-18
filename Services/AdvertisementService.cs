@@ -19,7 +19,7 @@ namespace pro.backend.Services
 
         public async Task<ICollection<Advertisement>> GetAcceptedAdvertisement()
         {
-            var ad = await _context.Advertisement.Where(p => p.Status.ToLower().Equals("accepted")).ToListAsync();
+            var ad = await _context.Advertisement.Where(p => p.Status.ToLower().Equals("accepted") && p.ActivationStatus.ToLower().Equals("not expired")).ToListAsync();
 
             return ad;
 
@@ -48,7 +48,7 @@ namespace pro.backend.Services
 
         public async Task<ICollection<Advertisement>> GetPendingAdvertisement()
         {
-            var ad = await _context.Advertisement.Where(p => p.Status.ToLower().Equals("pending")).ToListAsync();
+            var ad = await _context.Advertisement.Where(p => p.Status.ToLower().Equals("pending") && p.ActivationStatus.ToLower().Equals("not expired")).ToListAsync();
 
             return ad;
         }
@@ -59,6 +59,14 @@ namespace pro.backend.Services
 
             return ad;
         }
+
+        public async Task<ICollection<Advertisement>> GetExpiredAdvertisement()
+        {
+            var ad = await _context.Advertisement.Where(p => p.ActivationStatus.ToLower().Equals("expired")).ToListAsync();
+
+            return ad;
+        }
+
 
         public async Task<bool> UpdateAdvertisement(Advertisement ad)
         {
