@@ -335,12 +335,16 @@ namespace pro.backend.Services
 
         public async Task<bool> UpdateSellerInfo(SellerPaymentInfo SellerPaymentInfo)
         {
-           
+            
              var sellerinfo = await _context.SellerPaymentInfo.FindAsync(SellerPaymentInfo.Id);
-
+             
             if (sellerinfo == null)
                 throw new AppException("sellerPaymentInfo is not avilable ");
          
+              var id = sellerinfo.Id;
+               sellerinfo = SellerPaymentInfo;
+               sellerinfo.Id = id;
+
             _context.SellerPaymentInfo.Update(sellerinfo);
             return await _context.SaveChangesAsync()>0;
         }
