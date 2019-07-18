@@ -317,37 +317,40 @@ namespace Project.Controllers
             var ad = _adService.GetAllAdvertisementOfSeller(userId).Result;
             return Ok(ad);
         }
-
-         [HttpPut("approval")]
-        public IActionResult approval([FromBody]AdvertismentUploadDto adDto)
+        [AllowAnonymous]
+        [HttpPut("approval/{reason}")]
+        public IActionResult approval([FromBody]AdvertismentUploadDto adDto,string reason)
         {
             // status UserId is need
           var ad = _mapper.Map<Advertisement>(adDto);
-          var sellerId = ad.UserId;
+          var prevAd = _adService.GetAdvertisement(adDto.Id).Result;
+          prevAd.Status = adDto.Status;
+          prevAd.DateAdded = DateTime.Now;
+          var sellerId = prevAd.UserId;
           var seller = _usermanger.FindByIdAsync(sellerId).Result;
 
           try
           {
-              _adService.UpdateAdvertisement(ad);
+              _adService.UpdateAdvertisement(prevAd);
           }
           catch ( AppException ex)
           {
                return BadRequest(new { message = ex.Message });
           }
           
-          if (ad.Status.Equals("Accepted"))
+          if (ad.Status.ToLower().Equals("accepted"))
           {
-               var url = $"http://localhost:4200/emailVerification/";
+               var url = $"http://mahdhir.epizy.com/advert.php?id={ad.Id}";
 
-             _emailSender.SendEmailAsync(seller.UserName, "About ",
-            $"Please confirm your  account by clicking this link: <a href='{url}'>link</a>");
+             _emailSender.SendEmailAsync(seller.UserName, "Payment For Advertisement",
+            $"Please open this link from your mobile and proceed to payment: <a href='{url}'>link</a>");
 
              return Ok();
 
-          }else if(ad.Status.Equals("Rejected"))
+          }else if(ad.Status.ToLower().Equals("rejected"))
           {
-              _emailSender.SendEmailAsync(seller.UserName, "About ",
-            $"Please confirm your account ");
+              _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
+            $"Your Advertisement for product {ad.ProductId} has been rejected.\nReason:{reason}");
 
              return Ok();
           }else

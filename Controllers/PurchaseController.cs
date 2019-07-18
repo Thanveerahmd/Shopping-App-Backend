@@ -279,6 +279,7 @@ namespace pro.backend.Controllers
                 ad.PaymentStatus = "success";
                 try
                 {
+                     _repo.Add(paymentInfo);
                     await _adService.UpdateAdvertisement(ad);
                 }
                 catch (System.Exception)
@@ -303,6 +304,7 @@ namespace pro.backend.Controllers
 
                 try
                 {
+                    _repo.Add(paymentInfo);
                     await _adService.UpdateAdvertisement(ad);
                 }
                 catch (System.Exception)
@@ -316,6 +318,7 @@ namespace pro.backend.Controllers
                 ad.PaymentStatus = "chargedback";
                 try
                 {
+                    _repo.Add(paymentInfo);
                     await _adService.UpdateAdvertisement(ad);
 
                 }
