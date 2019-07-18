@@ -274,7 +274,7 @@ namespace pro.backend.Controllers
                 var paymentInfo = _mapper.Map<SellerPaymentInfo>(PaymentInfoDto);
                 var ad = await _adService.GetAdvertisement(paymentInfo.order_id);
                 var seller = await _usermanger.FindByIdAsync(ad.UserId);
-
+                paymentInfo.UserId = seller.Id;
 
 
                 if (paymentInfo.status_code == 2)
@@ -291,7 +291,7 @@ namespace pro.backend.Controllers
                     catch (AppException ex)
                     {
 
-                        return BadRequest(ex.Message.ToString());
+                        return BadRequest(new{message = ex.Message.ToString()});
                     }
                 }
                 else if (paymentInfo.status_code == -1 || paymentInfo.status_code == -2)
@@ -316,7 +316,7 @@ namespace pro.backend.Controllers
                     }
                     catch (AppException ex)
                     {
-                        return BadRequest(ex.Message.ToString());
+                        return BadRequest(new{message = ex.Message.ToString()});
                     }
                 }
                 else if (paymentInfo.status_code == -3)
@@ -334,7 +334,7 @@ namespace pro.backend.Controllers
                     catch (AppException ex)
                     {
 
-                         return BadRequest(ex.Message.ToString());
+                        return BadRequest(new{message = ex.Message.ToString()});
                     }
 
                 }
