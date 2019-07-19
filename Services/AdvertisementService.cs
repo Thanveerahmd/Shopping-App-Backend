@@ -51,7 +51,7 @@ namespace pro.backend.Services
         public async Task<ICollection<Advertisement>> GetPendingAdvertisement()
         {
             var ad = await _context.Advertisement
-            .Where(p => (p.Status.ToLower().Equals("pending") || p.PaymentStatus.ToLower().Equals("pending")))
+            .Where(p => (p.PaymentStatus.ToLower().Equals("pending") && !p.Status.ToLower().Equals("rejected")))
             .ToListAsync();
 
             return ad;
