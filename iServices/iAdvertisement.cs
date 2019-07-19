@@ -7,7 +7,7 @@ namespace pro.backend.iServices
     public interface iAdvertisement
     {
         Task<ICollection<Advertisement>> GetPendingAdvertisement();
-        Task<ICollection<Advertisement>> GetAcceptedAdvertisement();
+        Task<ICollection<Advertisement>> GetActiveAdvertisement();
         Task<ICollection<Advertisement>> GetAllAdvertisementOfSeller(string userId);
         Task<ICollection<Advertisement>> GetRejectedAdvertisement();
         string GetPaymentStatusOfAdvertisement(int id);

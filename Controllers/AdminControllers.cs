@@ -294,11 +294,11 @@ namespace Project.Controllers
             return Ok(ad);
         }
 
-        [HttpGet("acceptedAdvertisements")]
+        [HttpGet("activeAdvertisements")]
         [AllowAnonymous]
-        public IActionResult GetAllAcceptedAdvertisement()
+        public IActionResult GetAllActiveAdvertisement()
         {
-            var ad = _adService.GetAcceptedAdvertisement().Result;
+            var ad = _adService.GetActiveAdvertisement().Result;
             return Ok(ad);
         }
 

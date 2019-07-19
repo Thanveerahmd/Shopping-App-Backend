@@ -44,7 +44,7 @@ namespace pro.backend.Controllers
 
         [HttpPost("paymentForOrders")]
         [AllowAnonymous]
-        public async Task PaymentDetails([FromBody]PaymentInfoDto PaymentInfoDto)
+        public async Task PaymentDetails([FromForm]PaymentInfoDto PaymentInfoDto)
         {
             var paymentInfo = _mapper.Map<BuyerPaymentInfo>(PaymentInfoDto);
 
@@ -205,9 +205,9 @@ namespace pro.backend.Controllers
                     {
                         return Ok(order.Id);
                     }
-                    return BadRequest("OrderDetail is not added");
+                    return BadRequest(new{message = "OrderDetail is not added"});
                 }
-                return BadRequest("OrderDetail is not added");
+                return BadRequest(new{message = "OrderDetail is not added"});
 
 
 
@@ -235,7 +235,10 @@ namespace pro.backend.Controllers
 
                 if (counter > 0)
                 {
-                    return BadRequest(OutOfStockProducts);
+                    return BadRequest(new{
+                        message = "Out of Stock Products Found.Please recheck",
+                        outOfStockProduct=OutOfStockProducts
+                    });
                 }
 
 
@@ -268,7 +271,7 @@ namespace pro.backend.Controllers
 
         [HttpPost("paymentForAdvertisement")]
         [AllowAnonymous]
-        public async  Task PaymentDetailsofAdvertisements([FromBody]PaymentInfoDto PaymentInfoDto)
+        public async  Task PaymentDetailsofAdvertisements([FromForm]PaymentInfoDto PaymentInfoDto)
         {
             
                 var paymentInfo = _mapper.Map<SellerPaymentInfo>(PaymentInfoDto);

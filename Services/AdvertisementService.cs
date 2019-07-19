@@ -17,9 +17,11 @@ namespace pro.backend.Services
             _context = context;
         }
 
-        public async Task<ICollection<Advertisement>> GetAcceptedAdvertisement()
+        public async Task<ICollection<Advertisement>> GetActiveAdvertisement()
         {
-            var ad = await _context.Advertisement.Where(p => p.Status.ToLower().Equals("accepted") && p.ActivationStatus.ToLower().Equals("not expired")).ToListAsync();
+            var ad = await _context.Advertisement
+            .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success") &&p.ActivationStatus.ToLower().Equals("not expired"))
+            .ToListAsync();
 
             return ad;
 
@@ -48,7 +50,9 @@ namespace pro.backend.Services
 
         public async Task<ICollection<Advertisement>> GetPendingAdvertisement()
         {
-            var ad = await _context.Advertisement.Where(p => p.Status.ToLower().Equals("pending") && p.ActivationStatus.ToLower().Equals("not expired")).ToListAsync();
+            var ad = await _context.Advertisement
+            .Where(p => (p.Status.ToLower().Equals("pending") || p.PaymentStatus.ToLower().Equals("pending")))
+            .ToListAsync();
 
             return ad;
         }
@@ -130,7 +134,7 @@ namespace pro.backend.Services
         {
             var ad = await _context.Advertisement
                 .Where(p => p.UserId == sellerId)
-                .Where(p => p.Status.ToLower().Equals("pending") && p.ActivationStatus.ToLower().Equals("not expired"))
+                .Where(p => (p.Status.ToLower().Equals("pending") || p.PaymentStatus.ToLower().Equals("pending")))
                 .ToListAsync();
 
             return ad;
