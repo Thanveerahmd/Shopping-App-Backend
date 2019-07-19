@@ -67,6 +67,7 @@ namespace pro.backend.Controllers
                         await _emailSender.SendEmailAsync(seller.UserName, "About ReOrderLevel ",
                      $"Your product " + product.Product_name + " has reached to the ReOrder Level ");
                     }
+
                     try
                     {
                         await _ProductService.UpdateProduct(product);
@@ -77,8 +78,13 @@ namespace pro.backend.Controllers
                     }
                 }
 
+                var Buyer = await _usermanger.FindByIdAsync(order.BuyerId);
+                await _emailSender.SendEmailAsync(Buyer.UserName, "Transaction Status",
+             $"Your payment has been successful. Your payment Id is {PaymentInfoDto.payment_id}.");
+
                 try
                 {
+                    paymentInfo.UserId = order.BuyerId;
                     await _repo.UpdateOrder(order);
                     _repo.Add(paymentInfo);
                 }
@@ -111,7 +117,9 @@ namespace pro.backend.Controllers
                 order.Total_Price = 0;
 
                 try
-                {
+                {   
+                    paymentInfo.UserId = order.BuyerId;
+                    _repo.Add(paymentInfo);
                     await _repo.UpdateOrder(order);
                     Console.WriteLine("canceled Or Failed");
                 }
@@ -137,6 +145,7 @@ namespace pro.backend.Controllers
 
                     try
                     {
+                        await _repo.UpdateBuyerInfo(paymentInfo);
                         await _ProductService.UpdateProduct(product);
                     }
                     catch (AppException ex)
@@ -147,7 +156,7 @@ namespace pro.backend.Controllers
                 }
 
                 try
-                {
+                {   paymentInfo.UserId = order.BuyerId;
                     await _repo.UpdateOrder(order);
                     _repo.Add(paymentInfo);
                 }
@@ -193,6 +202,7 @@ namespace pro.backend.Controllers
                 if (product.Quantity < BuyNowProduct.Count)
                     return BadRequest(BuyNowProduct.product_Name);
 
+                order.Total_Price = checkoutDto.Price;
                 _repo.Add(order);
 
 
@@ -205,9 +215,9 @@ namespace pro.backend.Controllers
                     {
                         return Ok(order.Id);
                     }
-                    return BadRequest(new{message = "OrderDetail is not added"});
+                    return BadRequest(new { message = "OrderDetail is not added" });
                 }
-                return BadRequest(new{message = "OrderDetail is not added"});
+                return BadRequest(new { message = "OrderDetail is not added" });
 
 
 
@@ -218,7 +228,7 @@ namespace pro.backend.Controllers
                 var orderDetails = await _repo.GetAllCartProduct(checkoutDto.CartId);
                 var counter = 0;
 
-                IList<string> OutOfStockProducts = new List<string>();
+                IList<orderDetails> OutOfStockProducts = new List<orderDetails>();
 
                 foreach (var el in orderDetails)
                 {
@@ -229,15 +239,16 @@ namespace pro.backend.Controllers
                     if (product.Quantity < CartProduct.Count)
                     {
                         counter++;
-                        OutOfStockProducts.Add(OrderProduct.product_Name);
+                        OutOfStockProducts.Add(OrderProduct);
                     }
                 }
 
                 if (counter > 0)
                 {
-                    return BadRequest(new{
+                    return BadRequest(new
+                    {
                         message = "Out of Stock Products Found.Please recheck",
-                        outOfStockProduct=OutOfStockProducts
+                        outOfStockProduct = OutOfStockProducts
                     });
                 }
 
@@ -271,86 +282,86 @@ namespace pro.backend.Controllers
 
         [HttpPost("paymentForAdvertisement")]
         [AllowAnonymous]
-        public async  Task PaymentDetailsofAdvertisements([FromForm]PaymentInfoDto PaymentInfoDto)
+        public async Task PaymentDetailsofAdvertisements([FromForm]PaymentInfoDto PaymentInfoDto)
         {
-            
-                var paymentInfo = _mapper.Map<SellerPaymentInfo>(PaymentInfoDto);
-                var ad = await _adService.GetAdvertisement(paymentInfo.order_id);
-                var seller = await _usermanger.FindByIdAsync(ad.UserId);
-                paymentInfo.UserId = seller.Id;
+
+            var paymentInfo = _mapper.Map<SellerPaymentInfo>(PaymentInfoDto);
+            var ad = await _adService.GetAdvertisement(paymentInfo.order_id);
+            var seller = await _usermanger.FindByIdAsync(ad.UserId);
+            paymentInfo.UserId = seller.Id;
 
 
-                if (paymentInfo.status_code == 2)
+            if (paymentInfo.status_code == 2)
+            {
+                ad.PaymentStatus = "success";
+                await _emailSender.SendEmailAsync(seller.UserName, $"Payment for Advert {paymentInfo.order_id}",
+                    $"Your payment has been successful. Your payment Id is {PaymentInfoDto.payment_id}. Your Ad will be live for {ad.timestamp} days");
+                try
                 {
-                    ad.PaymentStatus = "success";
-                    await _emailSender.SendEmailAsync(seller.UserName, $"Payment for Advert {paymentInfo.order_id}",
-                        $"Your payment has been successful. Your payment Id is {PaymentInfoDto.payment_id}. Your Ad will be live for {ad.timestamp} days");
-                    try
-                    {
-                        _repo.Add(paymentInfo);
-                        await _adService.UpdateAdvertisement(ad);
-                      //  return Ok();
-                    }
-                    catch (AppException ex)
-                    {
-
-                       // return BadRequest(ex.Message.ToString());
-                        Console.WriteLine(ex.Message);
-                    }
+                    _repo.Add(paymentInfo);
+                    await _adService.UpdateAdvertisement(ad);
+                    //  return Ok();
                 }
-                else if (paymentInfo.status_code == -1 || paymentInfo.status_code == -2)
+                catch (AppException ex)
                 {
-                    if (paymentInfo.status_code == -1)
-                    {
-                        ad.PaymentStatus = "canceled";
-                    }
-                    else
-                    {
-                        ad.PaymentStatus = "failed";
 
-                        await _emailSender.SendEmailAsync(seller.UserName, $"Payment for Advert {paymentInfo.order_id}",
-                        $"Your payment has failed.");
-                    }
-
-                    try
-                    {
-                        _repo.Add(paymentInfo);
-                        await _adService.UpdateAdvertisement(ad);
-                       // return Ok();
-                    }
-                    catch (AppException ex)
-                    {
-                        //return BadRequest(ex.Message.ToString());
-                         Console.WriteLine(ex.Message);
-                    }
+                    // return BadRequest(ex.Message.ToString());
+                    Console.WriteLine(ex.Message);
                 }
-                else if (paymentInfo.status_code == -3)
+            }
+            else if (paymentInfo.status_code == -1 || paymentInfo.status_code == -2)
+            {
+                if (paymentInfo.status_code == -1)
                 {
-                    ad.PaymentStatus = "chargedback";
-                    await _emailSender.SendEmailAsync(seller.UserName, $"Payment ChargeBack for Advert {paymentInfo.order_id}",
-                        $"Your payment has been chargebacked.");
-                    try
-                    {
-                        await _repo.UpdateSellerInfo(paymentInfo);
-                        await _adService.UpdateAdvertisement(ad);
-                        // return Ok();
-
-                    }
-                    catch (AppException ex)
-                    {
-
-                        // return BadRequest(ex.Message.ToString());
-                         Console.WriteLine(ex.Message);
-                    }
-
+                    ad.PaymentStatus = "canceled";
                 }
                 else
                 {
-                    //return Ok();
-                    Console.WriteLine("pending");
+                    ad.PaymentStatus = "failed";
+
+                    await _emailSender.SendEmailAsync(seller.UserName, $"Payment for Advert {paymentInfo.order_id}",
+                    $"Your payment has failed.");
                 }
 
-           
+                try
+                {
+                    _repo.Add(paymentInfo);
+                    await _adService.UpdateAdvertisement(ad);
+                    // return Ok();
+                }
+                catch (AppException ex)
+                {
+                    //return BadRequest(ex.Message.ToString());
+                    Console.WriteLine(ex.Message);
+                }
+            }
+            else if (paymentInfo.status_code == -3)
+            {
+                ad.PaymentStatus = "chargedback";
+                await _emailSender.SendEmailAsync(seller.UserName, $"Payment ChargeBack for Advert {paymentInfo.order_id}",
+                    $"Your payment has been chargebacked.");
+                try
+                {
+                    await _repo.UpdateSellerInfo(paymentInfo);
+                    await _adService.UpdateAdvertisement(ad);
+                    // return Ok();
+
+                }
+                catch (AppException ex)
+                {
+
+                    // return BadRequest(ex.Message.ToString());
+                    Console.WriteLine(ex.Message);
+                }
+
+            }
+            else
+            {
+                //return Ok();
+                Console.WriteLine("pending");
+            }
+
+
 
         }
 

@@ -103,6 +103,10 @@ namespace Project.Helpers
 
             CreateMap<SellerPaymentInfo,PaymentInfoDto>();
 
+            CreateMap<PaymentInfoDto,BuyerPaymentInfo>();
+
+            CreateMap<BuyerPaymentInfo,PaymentInfoDto>();
+
         }
     }
 }

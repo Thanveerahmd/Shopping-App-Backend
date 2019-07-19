@@ -134,7 +134,7 @@ namespace pro.backend.Services
         {
             var ad = await _context.Advertisement
                 .Where(p => p.UserId == sellerId)
-                .Where(p => (p.Status.ToLower().Equals("pending") || p.PaymentStatus.ToLower().Equals("pending")))
+                .Where(p => (p.PaymentStatus.ToLower().Equals("pending") && !p.Status.ToLower().Equals("rejected")))
                 .ToListAsync();
 
             return ad;
