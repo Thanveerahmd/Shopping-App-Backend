@@ -13,6 +13,7 @@ using Project.Entities;
 using System.Net.Http;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Identity;
+using Google.Cloud.Vision.V1;
 
 namespace pro.backend.Controllers
 {
@@ -74,16 +75,17 @@ namespace pro.backend.Controllers
             {
                 return BadRequest("your file is corrupted");
             }
-            // var value = new{
-            //     DataRepresentation="URL",
-            //     Value = Upload_result.Uri.ToString()
-            // };
 
-            // // Client.DefaultRequestHeaders.Add("Content-Type", "application/json");
-            // Client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Keys.Ocp_Apim_Subscription_Key);
-            // var ImageModeration = await Client.PostAsSAsync(Keys.ImageModerationUrl,value);
-            // var Data = JsonConvert.DeserializeObject(ImageModeration.Content.ToString());
+            var value = new{
+                DataRepresentation="URL",
+                Value = Upload_result.Uri.ToString()
+            };
 
+            Image image3 = Image.FromUri(Upload_result.Uri.ToString());
+
+            ImageAnnotatorClient client = ImageAnnotatorClient.Create();
+            SafeSearchAnnotation annotation = client.DetectSafeSearch(image3);
+            
             PhotoUploadDto.Url = Upload_result.Uri.ToString();
 
             PhotoUploadDto.PublicID = Upload_result.PublicId;
