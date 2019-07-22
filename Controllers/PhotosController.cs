@@ -10,7 +10,8 @@ using pro.backend.Dtos;
 using pro.backend.Entities;
 using pro.backend.iServices;
 using Project.Entities;
-using Microsoft.AspNetCore.Http;
+using System.Net.Http;
+using Newtonsoft.Json;
 using Microsoft.AspNetCore.Identity;
 
 namespace pro.backend.Controllers
@@ -24,6 +25,8 @@ namespace pro.backend.Controllers
         private readonly UserManager<User> _usermanger;
         private Cloudinary _cloudinary;
         private readonly iAdvertisement _adService;
+
+        private static readonly HttpClient Client = new HttpClient();
 
         public PhotosController(IMapper mapper,
          iShoppingRepo repo,
@@ -71,7 +74,15 @@ namespace pro.backend.Controllers
             {
                 return BadRequest("your file is corrupted");
             }
+            // var value = new{
+            //     DataRepresentation="URL",
+            //     Value = Upload_result.Uri.ToString()
+            // };
 
+            // // Client.DefaultRequestHeaders.Add("Content-Type", "application/json");
+            // Client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Keys.Ocp_Apim_Subscription_Key);
+            // var ImageModeration = await Client.PostAsSAsync(Keys.ImageModerationUrl,value);
+            // var Data = JsonConvert.DeserializeObject(ImageModeration.Content.ToString());
 
             PhotoUploadDto.Url = Upload_result.Uri.ToString();
 
