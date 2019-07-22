@@ -17,7 +17,7 @@ namespace WebApi
         {
 
             //BuildWebHost(args).Run();
-            // System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "E:\\helix_git\\pro.backend\\ShoppingApp-290887bd35d4.json");
+            System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "ShoppingApp-290887bd35d4.json");
             var host = BuildWebHost(args);
             using (var scope = host.Services.CreateScope())
             {
