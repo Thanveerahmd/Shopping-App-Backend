@@ -11,5 +11,7 @@ namespace pro.backend.Dtos
         public string Category { get; set; }
         public string Sub_category { get; set; }
         public string PhotoUrl { get; set; }
+
+        public bool visibility {get;set;}
     }
 }

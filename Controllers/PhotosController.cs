@@ -11,7 +11,7 @@ using pro.backend.Entities;
 using pro.backend.iServices;
 using Project.Entities;
 using System.Net.Http;
-using Newtonsoft.Json;
+using  pro.backend.Services;
 using Microsoft.AspNetCore.Identity;
 using Google.Cloud.Vision.V1;
 
@@ -27,9 +27,12 @@ namespace pro.backend.Controllers
         private Cloudinary _cloudinary;
         private readonly iAdvertisement _adService;
 
+        private readonly iProductService _productService;
+
         private static readonly HttpClient Client = new HttpClient();
 
         public PhotosController(IMapper mapper,
+        iProductService productService,
          iShoppingRepo repo,
          UserManager<User> usermanger,
          iAdvertisement adService)
@@ -38,6 +41,7 @@ namespace pro.backend.Controllers
             _mapper = mapper;
             _usermanger = usermanger;
             _adService = adService;
+            _productService = productService;
 
             Account acc = new Account(
             Keys.Cloudinary_cloud_name,
@@ -88,13 +92,25 @@ namespace pro.backend.Controllers
 
             SafeSearchAnnotation annotation = await client.DetectSafeSearchAsync(image3);
 
-            var adult_content = annotation.Adult.ToString().ToLower();
-            var Spoof = annotation.Spoof.ToString().ToLower();
-            var Medical = annotation.Medical.ToString().ToLower();
-            var Violence = annotation.Violence.ToString().ToLower();
-            var Racy = annotation.Racy.ToString().ToLower();
+            var adult_content = annotation.Adult;
+            var Spoof = annotation.Spoof;
+            var Medical = annotation.Medical;
+            var Violence = annotation.Violence;
+            var Racy = annotation.Racy;
 
-           // if((adult_content.){}
+            bool Adult_flag = (adult_content == Likelihood.Unlikely || adult_content == Likelihood.VeryUnlikely);
+            bool Spoof_flag = (Spoof == Likelihood.Unlikely || Spoof == Likelihood.VeryUnlikely);
+            bool Medical_flag = (Medical == Likelihood.Unlikely || Medical == Likelihood.VeryUnlikely);
+            bool Violence_flag = (Violence == Likelihood.Unlikely || Violence == Likelihood.VeryUnlikely);
+            bool Racy_flag = (Racy == Likelihood.Unlikely || Racy == Likelihood.VeryUnlikely);
+
+            product.visibility = false;
+
+            if(Adult_flag && Spoof_flag && Medical_flag && Violence_flag && Racy_flag){
+                product.visibility = true;
+            }
+
+            await _productService.UpdateProduct(product);
 
             PhotoUploadDto.Url = Upload_result.Uri.ToString();
 
@@ -102,6 +118,7 @@ namespace pro.backend.Controllers
 
             var photo = _mapper.Map<Photo>(PhotoUploadDto);
 
+            
             if (!product.Photos.Any(u => u.isMain))
                 photo.isMain = true;
 

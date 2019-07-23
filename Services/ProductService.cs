@@ -60,7 +60,9 @@ namespace pro.backend.Services
             prod.Product_Discription = product.Product_Discription;
             prod.Category = product.Category;
             prod.Sub_category = product.Sub_category;
-
+            if(prod.visibility){
+                prod.visibility = product.visibility;
+            }
             _context.Products.Update(prod);
              return await _context.SaveChangesAsync()>0;
         }
