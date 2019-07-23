@@ -11,9 +11,10 @@ using pro.backend.Entities;
 using pro.backend.iServices;
 using Project.Entities;
 using System.Net.Http;
-using  pro.backend.Services;
+using pro.backend.Services;
 using Microsoft.AspNetCore.Identity;
 using Google.Cloud.Vision.V1;
+using Project.Helpers;
 
 namespace pro.backend.Controllers
 {
@@ -106,11 +107,21 @@ namespace pro.backend.Controllers
 
             product.visibility = false;
 
-            if(Adult_flag && Spoof_flag && Medical_flag && Violence_flag && Racy_flag){
+            if (Adult_flag && Spoof_flag && Medical_flag && Violence_flag && Racy_flag)
+            {
                 product.visibility = true;
             }
 
-            await _productService.UpdateProduct(product);
+            try
+            {
+                await _productService.UpdateProduct(product);
+            }
+            catch (AppException ex)
+            {
+
+                return BadRequest(new { message = ex.Message });
+            }
+
 
             PhotoUploadDto.Url = Upload_result.Uri.ToString();
 
@@ -118,7 +129,7 @@ namespace pro.backend.Controllers
 
             var photo = _mapper.Map<Photo>(PhotoUploadDto);
 
-            
+
             if (!product.Photos.Any(u => u.isMain))
                 photo.isMain = true;
 
@@ -127,7 +138,7 @@ namespace pro.backend.Controllers
             if (await _repo.SaveAll())
             {
                 var photoToReturn = _mapper.Map<PhotoForReturnDto>(photo);
-                return CreatedAtRoute("GetPhoto", new { id = photo.Id }, photoToReturn);
+                return CreatedAtRoute("GetPhoto", new { id = photo.Id , visibility= product.visibility }, photoToReturn);
             }
             return BadRequest("Coudn't add the Photo");
         }
