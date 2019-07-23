@@ -76,16 +76,26 @@ namespace pro.backend.Controllers
                 return BadRequest("your file is corrupted");
             }
 
-            var value = new{
-                DataRepresentation="URL",
+            var value = new
+            {
+                DataRepresentation = "URL",
                 Value = Upload_result.Uri.ToString()
             };
 
             Image image3 = Image.FromUri(Upload_result.Uri.ToString());
 
-            ImageAnnotatorClient client = ImageAnnotatorClient.Create();
-            SafeSearchAnnotation annotation = client.DetectSafeSearch(image3);
-            
+            ImageAnnotatorClient client = await ImageAnnotatorClient.CreateAsync();
+
+            SafeSearchAnnotation annotation = await client.DetectSafeSearchAsync(image3);
+
+            var adult_content = annotation.Adult.ToString().ToLower();
+            var Spoof = annotation.Spoof.ToString().ToLower();
+            var Medical = annotation.Medical.ToString().ToLower();
+            var Violence = annotation.Violence.ToString().ToLower();
+            var Racy = annotation.Racy.ToString().ToLower();
+
+           // if((adult_content.){}
+
             PhotoUploadDto.Url = Upload_result.Uri.ToString();
 
             PhotoUploadDto.PublicID = Upload_result.PublicId;
@@ -332,7 +342,7 @@ namespace pro.backend.Controllers
             PhotoUploadDto.PublicID = Upload_result.PublicId;
 
             var photo = _mapper.Map<PhotoForAd>(PhotoUploadDto);
-            
+
 
             var ad = await _adService.GetAdvertisement(AdId);
 
@@ -351,20 +361,20 @@ namespace pro.backend.Controllers
 
         [HttpDelete("deleteAd/{sellerId}/{AdId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> DeleteAdPhoto(string sellerId,int AdId)
+        public async Task<IActionResult> DeleteAdPhoto(string sellerId, int AdId)
         {
 
 
             var Ad = await _adService.GetAdvertisement(AdId);
 
             var photoFromRepo = await _adService.GetPhotoOfad(AdId);
-         
-            if(photoFromRepo.UserId != sellerId)
+
+            if (photoFromRepo.UserId != sellerId)
             {
-                return BadRequest(new{message="Not Authorized to delete"});
+                return BadRequest(new { message = "Not Authorized to delete" });
             }
 
-        
+
             if (photoFromRepo.PublicID != null)
             {
                 var delParams = new DelResParams()
