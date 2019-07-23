@@ -18,6 +18,13 @@ namespace pro.backend.Services
             _context = context;
         }
 
+        public async Task<ICollection<Store>> GetAllStores()
+        {
+            var info = await _context.Store.ToListAsync();
+
+            return info;
+        }
+
         public async Task<ICollection<Store>> GetAllStoresOfSeller(string sellerID)
         {
             var info = await _context.Store.Where(p => p.UserId == sellerID).ToListAsync();

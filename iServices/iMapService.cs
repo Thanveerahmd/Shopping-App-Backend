@@ -8,6 +8,7 @@ namespace pro.backend.iServices
     {
         Task<Store> GetStore(int id);
         Task<ICollection<Store>> GetAllStoresOfSeller(string sellerID);
+        Task<ICollection<Store>> GetAllStores();
         Task<bool> UpdateStore(Store Store);
     }
 }

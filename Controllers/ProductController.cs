@@ -80,6 +80,7 @@ namespace pro.backend.Controllers
                 }
                 _productService.AddProduct(product);
                 return Ok(product.Id);
+                 //return Ok(product.Id,new {visibility = product.visibility});
 
             }
             catch (AppException ex)

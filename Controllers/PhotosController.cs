@@ -193,9 +193,8 @@ namespace pro.backend.Controllers
 
             var photoFromRepo = await _repo.GetPhoto(id);
 
-            // if (photoFromRepo.isMain)
-            //     return BadRequest("You cannot delete your main photo");
-
+        
+                
             if (photoFromRepo.PublicID != null)
             {
                 var delParams = new DelResParams()
