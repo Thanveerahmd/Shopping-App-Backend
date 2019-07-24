@@ -79,8 +79,8 @@ namespace pro.backend.Controllers
                     }
                 }
                 _productService.AddProduct(product);
-                return Ok(product.Id);
-                 //return Ok(product.Id,new {visibility = product.visibility});
+                
+                 return Ok(new {id=product.Id,visibility = product.visibility});
 
             }
             catch (AppException ex)
@@ -122,11 +122,13 @@ namespace pro.backend.Controllers
                         if (flag_status.ToObject<bool>())
                         {
                             prod.visibility = false;
+                        }else{
+                            prod.visibility = true;
                         }
                     }
                 }
                 await _productService.UpdateProduct(prod);
-                return Ok();
+                return Ok(new { visibility= prod.visibility });
             }
             catch (AppException ex)
             {
@@ -143,6 +145,16 @@ namespace pro.backend.Controllers
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
         }
+
+        [HttpGet("seller/unflagged/{sellerID}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllUnflagedProductsOfSeller(string sellerID)
+        {
+            var products = await _repo.GetAllUnflaggedProductsOfSeller(sellerID);
+            var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+            return Ok(productsToReturn);
+        }
+
 
         [HttpGet("{parameter}/{searchQuery}")]
         [AllowAnonymous]

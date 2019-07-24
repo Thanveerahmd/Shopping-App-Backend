@@ -54,6 +54,15 @@ namespace pro.backend.Services
             return products;
         }
 
+        public async Task<IEnumerable<Product>> GetAllUnflaggedProductsOfSeller(string sellerID) //have to change
+        {
+            var products = await _context.Products.Where(p => p.SellerId == sellerID)
+            .Where(p => p.visibility==true)
+            .Include(p => p.Photos).ToListAsync();
+
+            return products;
+        }
+
         public async Task<Cart> GetCart(string id)
         {
             var cart = await _context.Cart.Include(p => p.CartDetails)
