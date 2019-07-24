@@ -33,7 +33,7 @@ namespace pro.backend.Services
         }
         public async Task<DeviceToken> GetDeviceDetails(string deviceId)
         {
-            var info = await _context.DeviceToken.FindAsync(deviceId);
+            var info = await _context.DeviceToken.FirstOrDefaultAsync(d => d.DeviceId == deviceId);
 
             return info;
         }

@@ -28,7 +28,7 @@ namespace pro.backend.Helpers
                         text = body
                     },
                     data = data,
-                    registration_id = deviceToken
+                    to = deviceToken
                 };
 
                 //Object to JSON STRUCTURE => using Newtonsoft.Json;
@@ -44,7 +44,7 @@ namespace pro.backend.Helpers
                 using (var client = new HttpClient())
                 {
                     result = await client.SendAsync(request);
-                    sent = sent && result.IsSuccessStatusCode;
+                    sent = result.IsSuccessStatusCode;
                 }
             
 
