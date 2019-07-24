@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using pro.backend.Dtos;
 using pro.backend.Entities;
+using pro.backend.Helpers;
 using pro.backend.iServices;
 using Project.Helpers;
 
@@ -37,6 +38,19 @@ namespace pro.backend.Controllers
             if (await _repo.SaveAll())
             {
                 return Ok(store.Id);
+            }
+            return BadRequest();
+        }
+
+        [HttpPost("DeviceDetails")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeviceDetails(DeviceDetailsDto device)
+        {
+            var DeviceDetails = _mapper.Map<DeviceToken>(device);
+            _repo.Add(DeviceDetails);
+            if (await _repo.SaveAll())
+            {
+                return Ok();
             }
             return BadRequest();
         }
@@ -107,38 +121,51 @@ namespace pro.backend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Check(string DeviceId, GPSDto[] value)
         {
+            var DeviceInfo = await _map.GetDeviceDetails(DeviceId);
+
             Position pos1 = new Position();
             pos1.Latitude = value[0].lat;
             pos1.Longitude = value[0].lng;
             var stores = await _map.GetAllStores();
-            // foreach (var store in stores)
-            // {
-            //     Position pos2 = new Position();
-            //     pos2.Latitude = store.lat;
-            //     pos2.Longitude = store.lng;
-            //     Haversine hv = new Haversine();
-            //     double result = hv.Distance(pos1, pos2, DistanceType.Kilometers);
 
-            //     if (result <= 2)
-            //     {
-            //         Console.WriteLine("notify");
-            //         return Ok();
-            //     }
-            // }
+            TimeSpan timeDiff = (DeviceInfo.LastNotifyTime - DateTime.UtcNow);
+            var time = Convert.ToInt32(timeDiff.Hours);
 
-                 Position pos2 = new Position();
-                pos2.Latitude = 6.795035;
-                pos2.Longitude = 79.900613;
+            if (time > 1)
+            {
+                return Ok();
+            }
+
+            if (DeviceInfo.Last_Lng == value[0].lng && DeviceInfo.Last_Lat == value[0].lat)
+            {
+                return Ok();
+            }
+
+            DeviceInfo.Last_Lng = value[0].lng;
+            DeviceInfo.Last_Lat = value[0].lat;
+
+            foreach (var store in stores)
+            {
+
+                Position pos2 = new Position();
+                pos2.Latitude = store.lat;
+                pos2.Longitude = store.lng;
                 Haversine hv = new Haversine();
                 double result = hv.Distance(pos1, pos2, DistanceType.Kilometers);
 
-                if (result <=5 && result>0 )
+                if (result <= 5 && result > 0)
                 {
-                    Console.WriteLine("notify");
+                    string title = "Location";
+                    string body = "You are Welcome";
+                    var data = new { action = "Play", userId = 5 };
+                    var pushSent = PushNotification.SendPushNotification(DeviceInfo.FirebaseToken, title, body, data);
+                    DeviceInfo.LastNotifyTime = DateTime.UtcNow;
                     return Ok(result);
                 }
+            }
 
-            return Ok(result);
+
+            return Ok();
         }
     }
 }

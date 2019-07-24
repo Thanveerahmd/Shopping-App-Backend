@@ -10,7 +10,7 @@ namespace pro.backend.Services
 {
     public class MapService : iMapService
     {
-        
+
         private readonly DataContext _context;
 
         public MapService(DataContext context)
@@ -31,6 +31,12 @@ namespace pro.backend.Services
 
             return info;
         }
+        public async Task<DeviceToken> GetDeviceDetails(string deviceId)
+        {
+            var info = await _context.DeviceToken.FindAsync(deviceId);
+
+            return info;
+        }
 
         public async Task<Store> GetStore(int id)
         {
@@ -40,16 +46,29 @@ namespace pro.backend.Services
 
         public async Task<bool> UpdateStore(Store Store)
         {
-             var Storeinfo = await _context.Store.FindAsync(Store.Id);
+            var Storeinfo = await _context.Store.FindAsync(Store.Id);
             if (Storeinfo == null)
                 throw new AppException("Store is not avilable ");
 
             Storeinfo.StoreName = Store.StoreName;
-            Storeinfo.lat=Store.lat;
-            Storeinfo.lng=Store.lng;
+            Storeinfo.lat = Store.lat;
+            Storeinfo.lng = Store.lng;
 
-             _context.Store.Update(Storeinfo);
-            return await _context.SaveChangesAsync()>0;
+            _context.Store.Update(Storeinfo);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<bool> LocationUpdate(DeviceToken location)
+        {
+            var Deviceinfo = await _context.DeviceToken.FindAsync(location.id);
+            if (Deviceinfo == null)
+                throw new AppException("Device Details is not avilable ");
+
+            Deviceinfo.Last_Lat = location.Last_Lat;
+            Deviceinfo.Last_Lng = location.Last_Lng;
+
+            _context.DeviceToken.Update(Deviceinfo);
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

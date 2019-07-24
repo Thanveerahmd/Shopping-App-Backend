@@ -10,5 +10,7 @@ namespace pro.backend.iServices
         Task<ICollection<Store>> GetAllStoresOfSeller(string sellerID);
         Task<ICollection<Store>> GetAllStores();
         Task<bool> UpdateStore(Store Store);
+        Task<bool> LocationUpdate(DeviceToken location);
+        Task<DeviceToken> GetDeviceDetails(string deviceId);
     }
 }

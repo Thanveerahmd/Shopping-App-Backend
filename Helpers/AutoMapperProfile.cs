@@ -106,6 +106,8 @@ namespace Project.Helpers
             CreateMap<PaymentInfoDto,BuyerPaymentInfo>();
 
             CreateMap<BuyerPaymentInfo,PaymentInfoDto>();
+            
+            CreateMap<DeviceDetailsDto, DeviceToken>();
 
         }
     }
