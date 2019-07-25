@@ -10,9 +10,8 @@ using pro.backend.Entities;
 using Project.Entities;
 using Project.Helpers;
 using Microsoft.AspNetCore.Authorization;
-
-
-
+using pro.backend.iServices;
+using AutoMapper;
 
 namespace pro.backend.Controllers
 {
@@ -22,21 +21,27 @@ namespace pro.backend.Controllers
     {
         private readonly DataContext _appDbContext;
         private readonly Token _token;
+        private readonly iShoppingRepo _repo;
+        private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
         private readonly FacebookAuthSettings _fbAuthSettings;
 
         private static readonly HttpClient Client = new HttpClient();
 
         public SocialAuthController(IOptions<FacebookAuthSettings> fbAuthSettingsAccessor,
-         UserManager<User> userManager,
-          DataContext appDbContext,
-           Token token
+        UserManager<User> userManager,
+        DataContext appDbContext,
+        Token token,
+        iShoppingRepo repo,
+        IMapper mapper
           )
         {
             _fbAuthSettings = fbAuthSettingsAccessor.Value;
             _userManager = userManager;
             _appDbContext = appDbContext;
             _token = token;
+            _repo = repo;
+            _mapper = mapper;
         }
 
         [AllowAnonymous]
@@ -62,6 +67,7 @@ namespace pro.backend.Controllers
             // 4. ready to create the local user account (if necessary) and jwt
             var user = await _userManager.FindByEmailAsync(userInfo.Email);
 
+
             if (user == null)
             {
                 var appUser = new User
@@ -76,6 +82,21 @@ namespace pro.backend.Controllers
                 };
 
                 var result = await _userManager.CreateAsync(appUser, Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8));
+
+                var cart = new Cart();
+                cart.BuyerId = appUser.Id;
+                try
+                {
+                    _repo.Add(cart);
+
+                    if (!(await _repo.SaveAll()))
+                        return BadRequest(new { message = "Could not create Cart" });
+
+                }
+                catch (AppException ex)
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
 
                 if (!result.Succeeded) return new BadRequestObjectResult(result.Errors);
 
@@ -93,6 +114,10 @@ namespace pro.backend.Controllers
 
             var jwt = _token.GenrateJwtToken(localUser);
 
+
+            var carts = await _repo.GetCart(localUser.Id);
+            var cartToReturn = _mapper.Map<CartDto>(carts);
+
             return Ok(new
             {
                 Id = localUser.Id,
@@ -101,7 +126,8 @@ namespace pro.backend.Controllers
                 FirstName = localUser.FirstName,
                 LastName = localUser.LastName,
                 Role = localUser.Role,
-                Token = jwt
+                Token = jwt,
+                cartToReturn
             });
         }
 
@@ -109,12 +135,15 @@ namespace pro.backend.Controllers
         [HttpPost("google")]
         public async Task<IActionResult> Google([FromBody]SocialAuthDto model)
         {
-        
+
             // 1. validate the user access token
             var userAccessTokenValidationResponse = "";
-            try{
+            try
+            {
                 userAccessTokenValidationResponse = await Client.GetStringAsync($"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={model.AccessToken}");
-            }catch{
+            }
+            catch
+            {
                 return BadRequest("login_failure-Invalid google token");
             }
             var userAccessTokenValidation = JsonConvert.DeserializeObject<GoogleUserAccessTokenValidation>(userAccessTokenValidationResponse);
@@ -139,6 +168,21 @@ namespace pro.backend.Controllers
                     imageUrl = userInfo.Picture.Url
                 };
 
+                var cart = new Cart();
+                cart.BuyerId = appUser.Id;
+                try
+                {
+                    _repo.Add(cart);
+
+                    if (!(await _repo.SaveAll()))
+                        return BadRequest(new { message = "Could not create Cart" });
+
+                }
+                catch (AppException ex)
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
+
                 var result = await _userManager.CreateAsync(appUser, Convert.ToBase64String(Guid.NewGuid().ToByteArray()).Substring(0, 8));
 
                 if (!result.Succeeded) return new BadRequestObjectResult(result.Errors);
@@ -157,6 +201,10 @@ namespace pro.backend.Controllers
 
             var jwt = _token.GenrateJwtToken(localUser);
 
+             var carts = await _repo.GetCart(localUser.Id);
+            var cartToReturn = _mapper.Map<CartDto>(carts);
+
+
             return Ok(new
             {
                 Id = localUser.Id,
@@ -165,7 +213,8 @@ namespace pro.backend.Controllers
                 FirstName = localUser.FirstName,
                 LastName = localUser.LastName,
                 Role = localUser.Role,
-                Token = jwt
+                Token = jwt,
+                cartToReturn
             });
         }
 

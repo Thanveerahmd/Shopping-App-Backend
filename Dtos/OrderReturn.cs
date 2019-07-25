@@ -11,6 +11,7 @@ namespace pro.backend.Dtos
         public float Total_Price { get; set; }
         public DateTime DateAdded { get; set; }
         public string PaymentStatus { get; set; }
+        public DeliveryInfo DeliveryInfo { get; set; }
         public ICollection<OrderReturnIncludes> orderDetails { get; set; }
         
     }

@@ -189,6 +189,7 @@ namespace pro.backend.Controllers
             order.BuyerId = BuyerId;
             order.PaymentStatus = "pending";
             order.DateAdded = DateTime.Now;
+            var DelivaryInfo =await _repo.GetDeliveryInfoOfDefault(BuyerId);
 
             if (checkoutDto.CartId == 0)
             {
@@ -202,6 +203,8 @@ namespace pro.backend.Controllers
                     return BadRequest(BuyNowProduct.product_Name);
 
                 order.Total_Price = checkoutDto.Price;
+                order.DeliveryInfo = DelivaryInfo;
+
                 _repo.Add(order);
 
 
@@ -257,6 +260,7 @@ namespace pro.backend.Controllers
 
                 try
                 {
+                    order.DeliveryInfo = DelivaryInfo;
                     order.Total_Price = totalPrice;
                     _repo.AddOrder(order);
                     var ordertab = await _repo.GetOrder(order.Id);

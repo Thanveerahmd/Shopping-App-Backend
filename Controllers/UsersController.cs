@@ -78,7 +78,7 @@ namespace WebApi.Controllers
                        u.NormalizedUserName == userDto.Username.ToUpper());
 
                     var token = _token.GenrateJwtToken(appuser);
-                    var cart = _repo.GetCart(user.Id).Result;
+                    var cart =await _repo.GetCart(user.Id);
                     var cartToReturn = _mapper.Map<CartDto>(cart);
                     var image = await _repo.GetPhotoOfUser(user.Id);
                     string imageUrl = null;

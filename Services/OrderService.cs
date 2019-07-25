@@ -31,7 +31,9 @@ namespace pro.backend.Services
 
         public async Task<ICollection<orderDetails>> GetOrdersOfSeller(string Sellerid)
         {
-            var orders = await _context.orderDetails.FromSql("Select * from orderDetails where orderDetails.OrderId in (Select Id from Orders where Orders.PaymentStatus = 'success') and orderDetails.sellerId='"+Sellerid+"'")
+            // var orders = await _context.orderDetails.FromSql("Select * from orderDetails where orderDetails.OrderId in (Select Id from Orders where Orders.PaymentStatus = 'success') and orderDetails.sellerId='"+Sellerid+"'")
+            // .ToListAsync();
+             var orders = await _context.orderDetails.FromSql("Select * from orderDetails JOIN Orders on(Orders.Id = orderDetails.OrderId) where orderDetails.OrderId in (Select Id from Orders where Orders.PaymentStatus = 'success') and orderDetails.sellerId='"+Sellerid+"'")
             .ToListAsync();
 
             return orders;
