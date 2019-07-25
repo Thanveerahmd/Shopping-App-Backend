@@ -9,6 +9,7 @@ namespace pro.backend.Entities
         public float Price { get; set; }
         public int Count { get; set; }
         public int OrderId { get; set; }
+        public string sellerId { get; set; }
         public Order Order { get; set; }
     }
 }

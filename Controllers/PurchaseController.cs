@@ -109,13 +109,11 @@ namespace pro.backend.Controllers
                 else
                 {
                     order.PaymentStatus = "failed";
-                    order.Total_Price = paymentInfo.payhere_amount;
+                   // order.Total_Price = paymentInfo.payhere_amount;
                     var Buyer = await _usermanger.FindByIdAsync(order.BuyerId);
                     await _emailSender.SendEmailAsync(Buyer.UserName, "About Payment Done on your Order",
                  $"Your payment status is failed  ");
                 }
-
-                order.Total_Price = 0;
 
                 try
                 {   

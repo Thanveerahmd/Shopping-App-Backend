@@ -282,7 +282,6 @@ namespace pro.backend.Services
             return info;
         }
 
-
         public async Task<BillingInfo> AlternateDefault(string userId)
         {
             var info = await _context.BillingInfo.Where(i => i.UserId == userId).FirstOrDefaultAsync(i => i.isDefault == false);
@@ -324,10 +323,10 @@ namespace pro.backend.Services
 
         public async Task<Order> GetOrder(int id)
         {
-            var cart = await _context.Orders.Include(p => p.orderDetails)
+            var order = await _context.Orders.Include(p => p.orderDetails)
           .FirstOrDefaultAsync(i => i.Id == id);
 
-            return cart;
+            return order;
         }
 
         public void AddOrder(Order Order)
