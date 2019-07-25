@@ -7,6 +7,8 @@ using pro.backend.iServices;
 
 namespace pro.backend.Controllers
 {
+    [ApiController]
+    [Route("orders")]
     public class OrderController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -25,7 +27,7 @@ namespace pro.backend.Controllers
             _order = order;
         }
 
-        [HttpGet("BuyerId")]
+        [HttpGet("buyer/{BuyerId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllOrdersOfBuyer(string BuyerId)
         {
@@ -34,7 +36,7 @@ namespace pro.backend.Controllers
            return   Ok(order);
         }
 
-        [HttpGet("SellerId")]
+        [HttpGet("seller/{SellerId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllOrdersOfSeller(string SellerId)
         {
