@@ -109,6 +109,7 @@ namespace pro.backend.Controllers
                 else
                 {
                     order.PaymentStatus = "failed";
+                    order.Total_Price = paymentInfo.payhere_amount;
                     var Buyer = await _usermanger.FindByIdAsync(order.BuyerId);
                     await _emailSender.SendEmailAsync(Buyer.UserName, "About Payment Done on your Order",
                  $"Your payment status is failed  ");
@@ -227,7 +228,7 @@ namespace pro.backend.Controllers
             {
                 var orderDetails = await _repo.GetAllCartProduct(checkoutDto.CartId);
                 var counter = 0;
-
+                var totalPrice = 0f;
                 IList<orderDetails> OutOfStockProducts = new List<orderDetails>();
 
                 foreach (var el in orderDetails)
@@ -240,6 +241,8 @@ namespace pro.backend.Controllers
                     {
                         counter++;
                         OutOfStockProducts.Add(OrderProduct);
+                    }else{
+                        totalPrice +=  CartProduct.Count * CartProduct.Price;
                     }
                 }
 
@@ -255,6 +258,7 @@ namespace pro.backend.Controllers
 
                 try
                 {
+                    order.Total_Price = totalPrice;
                     _repo.AddOrder(order);
                     var ordertab = await _repo.GetOrder(order.Id);
                     foreach (var el in orderDetails)
