@@ -119,11 +119,12 @@ namespace pro.backend.Controllers
 
         [HttpPost("map/{DeviceId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> Check(string DeviceId, GPSDto[] value)
+        public async Task Check(string DeviceId, GPSDto[] value)
         {
             var DeviceInfo = await _map.GetDeviceDetails(DeviceId);
-            if(DeviceInfo==null){
-                return Ok();
+            if (DeviceInfo == null)
+            {
+                return ;
             }
             Position pos1 = new Position();
             pos1.Latitude = value[0].lat;
@@ -135,12 +136,12 @@ namespace pro.backend.Controllers
 
             if (time > 1)
             {
-                return Ok();
+                return ;
             }
 
             if (DeviceInfo.Last_Lng == value[0].lng && DeviceInfo.Last_Lat == value[0].lat)
             {
-                return Ok();
+                return ;
             }
 
             DeviceInfo.Last_Lng = value[0].lng;
@@ -161,14 +162,23 @@ namespace pro.backend.Controllers
                     string body = "You are Welcome";
                     var data = new { action = "Play", userId = 5 };
                     var pushSent = await PushNotification.SendPushNotification(DeviceInfo.FirebaseToken, title, body, data);
-                    if(pushSent)
-                    DeviceInfo.LastNotifyTime = DateTime.UtcNow;
-                    return Ok(result);
+
+                    if (pushSent)
+                        DeviceInfo.LastNotifyTime = DateTime.UtcNow;
+
+                    if (await _map.LocationUpdate(DeviceInfo))
+                    {
+                        return ;
+                    }
+
                 }
             }
+            if (await _map.LocationUpdate(DeviceInfo))
+            {
+                return ;
+            }
 
-
-            return Ok();
+            return ;
         }
     }
 }
