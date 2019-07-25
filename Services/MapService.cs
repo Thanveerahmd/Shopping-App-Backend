@@ -64,8 +64,9 @@ namespace pro.backend.Services
             if (Deviceinfo == null)
                 throw new AppException("Device Details is not avilable ");
 
-            Deviceinfo.Last_Lat = location.Last_Lat;
-            Deviceinfo.Last_Lng = location.Last_Lng;
+                var id = Deviceinfo.id;
+                Deviceinfo = location;
+                Deviceinfo.id = id;
 
             _context.DeviceToken.Update(Deviceinfo);
             return await _context.SaveChangesAsync() > 0;
