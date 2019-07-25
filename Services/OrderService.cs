@@ -21,8 +21,10 @@ namespace pro.backend.Services
 
         public async Task<ICollection<Order>> GetOrdersForBuyer(string Buyerid)
         {
-            var orders = await _context.Orders.Include(p => p.orderDetails)
-            .Where(p => p.BuyerId == Buyerid).ToListAsync();
+            var orders = await _context.Orders
+            .Where(p => p.BuyerId == Buyerid)
+            .Include(p => p.orderDetails)
+            .ToListAsync();
 
             return orders;
         }
