@@ -29,8 +29,8 @@ namespace pro.backend.Services
 
         public async Task<ICollection<orderDetails>> GetOrdersOfSeller(string Sellerid)
         {
-            var orders = await _context.orderDetails.FromSql($"select *  from orderDetails od , Orders o  where o.Id = od.OrderId and o.PaymentStatus = 'success' and od.sellerId ='{Sellerid}'").
-            ToListAsync();
+            var orders = await _context.orderDetails.FromSql("Select * from orderDetails where orderDetails.OrderId in (Select Id from Orders where Orders.PaymentStatus = 'success') and orderDetails.sellerId='"+Sellerid+"'")
+            .ToListAsync();
 
             return orders;
         }
