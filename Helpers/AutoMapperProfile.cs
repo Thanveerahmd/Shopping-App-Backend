@@ -109,6 +109,11 @@ namespace Project.Helpers
             
             CreateMap<DeviceDetailsDto, DeviceToken>();
 
+            CreateMap<OrderProductDto, Order>();
+
+            CreateMap<Order,OrderProductDto>();
+
+
         }
     }
 }

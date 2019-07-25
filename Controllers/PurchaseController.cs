@@ -208,6 +208,7 @@ namespace pro.backend.Controllers
                 if (await _repo.SaveAll())
                 {
                     var ordertab = await _repo.GetOrder(order.Id);
+                    BuyNowProduct.sellerId = product.SellerId;
                     ordertab.orderDetails.Add(BuyNowProduct);
 
                     if (await _repo.SaveAll())
@@ -263,6 +264,8 @@ namespace pro.backend.Controllers
                     {
                         var CartProduct = _mapper.Map<OrderProductDto>(el);
                         var OrderProduct = _mapper.Map<orderDetails>(CartProduct);
+                        var product = await _repo.GetProduct(CartProduct.ProductId);
+                        OrderProduct.sellerId = product.SellerId;
                         ordertab.orderDetails.Add(OrderProduct);
                     }
                     _repo.DeleteAll(orderDetails);

@@ -45,7 +45,7 @@ namespace pro.backend.Controllers
 
             if (await _repo.SaveAll())
             {
-                return Ok();
+                return Ok(deliveryInfo.Id);
             }
             return BadRequest();
         }
