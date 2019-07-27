@@ -204,6 +204,8 @@ namespace pro.backend.Controllers
 
                 order.Total_Price = checkoutDto.Price;
                 order.DeliveryInfo = DelivaryInfo;
+            
+        
 
                 _repo.Add(order);
 
@@ -260,7 +262,7 @@ namespace pro.backend.Controllers
 
                 try
                 {
-                    order.DeliveryInfo = DelivaryInfo;
+                   // order.DeliveryInfo = DelivaryInfo;
                     order.Total_Price = totalPrice;
                     _repo.AddOrder(order);
                     var ordertab = await _repo.GetOrder(order.Id);
