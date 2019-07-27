@@ -189,7 +189,7 @@ namespace pro.backend.Controllers
             order.BuyerId = BuyerId;
             order.PaymentStatus = "pending";
             order.DateAdded = DateTime.Now;
-            var DelivaryInfo =await _repo.GetDeliveryInfoOfDefault(BuyerId);
+            var DelivaryInfo = await _repo.GetDeliveryInfo(checkoutDto.DeliveryInfoId);
 
             if (checkoutDto.CartId == 0)
             {

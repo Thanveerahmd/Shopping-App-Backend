@@ -11,6 +11,8 @@ namespace pro.backend.Dtos
         public int Count { get; set; }
         public string Description { get; set; }
         public int CartId { get; set; }
+
+        public int DeliveryInfoId {get;set;}
         
        // public Cart cart { get; set; }
     }

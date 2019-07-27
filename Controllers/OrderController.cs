@@ -44,7 +44,10 @@ namespace pro.backend.Controllers
         public async Task<IActionResult> GetAllOrdersOfSeller(string SellerId)
         {
             var order = await _order.GetOrdersOfSeller(SellerId);
-            
+            // foreach (var item in order)
+            // {
+                
+            // }
             return Ok(order);
         }
 
