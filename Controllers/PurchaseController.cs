@@ -203,7 +203,8 @@ namespace pro.backend.Controllers
                     return BadRequest(BuyNowProduct.product_Name);
 
                 order.Total_Price = checkoutDto.Price;
-                order.DeliveryInfo = DelivaryInfo;
+             order.DeliveryInfo = DelivaryInfo;
+             
             
         
 
