@@ -39,6 +39,15 @@ namespace pro.backend.Controllers
             return Ok(orderToReturn);
         }
 
+         [HttpGet("orders")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllOrders()
+        {
+            var order = await _order.GetOrders();
+            var orderToReturn = _mapper.Map<ICollection<OrderReturnDto>>(order);
+            return Ok(orderToReturn);
+        }
+
         [HttpGet("seller/{SellerId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllOrdersOfSeller(string SellerId)

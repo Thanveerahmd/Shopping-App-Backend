@@ -37,5 +37,16 @@ namespace pro.backend.Services
             var data = orders.OrderByDescending(p => p.Id);
             return data;
         }
+
+        public async Task<IOrderedEnumerable<Order>> GetOrders()
+        {
+            var orders = await _context.Orders
+            .Include(p => p.orderDetails)
+            .ToListAsync();
+
+            var data = orders.OrderByDescending(p => p.Id);
+            return data;
+        }
+        
     }
 }

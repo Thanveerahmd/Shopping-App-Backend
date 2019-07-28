@@ -25,7 +25,6 @@ namespace pro.backend.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<User> _userManager;
         private readonly FacebookAuthSettings _fbAuthSettings;
-
         private static readonly HttpClient Client = new HttpClient();
 
         public SocialAuthController(IOptions<FacebookAuthSettings> fbAuthSettingsAccessor,
