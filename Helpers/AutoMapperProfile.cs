@@ -97,21 +97,24 @@ namespace Project.Helpers
 
             CreateMap<Advertisement, AdvertisementToReturnDto>();
 
-            CreateMap<AdvertisementToReturnDto,Advertisement>();
+            CreateMap<AdvertisementToReturnDto, Advertisement>();
 
-            CreateMap<PaymentInfoDto,SellerPaymentInfo>();
+            CreateMap<PaymentInfoDto, SellerPaymentInfo>();
 
-            CreateMap<SellerPaymentInfo,PaymentInfoDto>();
+            CreateMap<SellerPaymentInfo, PaymentInfoDto>();
 
-            CreateMap<PaymentInfoDto,BuyerPaymentInfo>();
+            CreateMap<PaymentInfoDto, BuyerPaymentInfo>();
 
-            CreateMap<BuyerPaymentInfo,PaymentInfoDto>();
-            
+            CreateMap<BuyerPaymentInfo, PaymentInfoDto>();
+
             CreateMap<DeviceDetailsDto, DeviceToken>();
 
             CreateMap<OrderProductDto, Order>();
 
-            CreateMap<Order,OrderProductDto>();
+            CreateMap<Order, OrderProductDto>();
+
+            CreateMap<orderDetails,OrderInfoForSellerDto>();
+
 
 
         }

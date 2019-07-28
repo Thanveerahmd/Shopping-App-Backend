@@ -203,8 +203,7 @@ namespace pro.backend.Controllers
                     return BadRequest(BuyNowProduct.product_Name);
 
                 order.Total_Price = checkoutDto.Price;
-                order.DeliveryId  = DelivaryInfo.Id;
-              //  order.DeliveryInfo = DelivaryInfo;
+                
                        
         
 
@@ -263,8 +262,6 @@ namespace pro.backend.Controllers
 
                 try
                 {
-                   // order.DeliveryInfo = DelivaryInfo;
-                    order.DeliveryId  = DelivaryInfo.Id;
                     order.Total_Price = totalPrice;
                     _repo.AddOrder(order);
                     var ordertab = await _repo.GetOrder(order.Id);
