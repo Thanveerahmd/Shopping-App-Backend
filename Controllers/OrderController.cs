@@ -43,12 +43,18 @@ namespace pro.backend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllOrdersOfSeller(string SellerId)
         {
-            var order = await _order.GetOrdersOfSeller(SellerId);
-            // foreach (var item in order)
-            // {
-                
-            // }
-            return Ok(order);
+             var orderdetail = await _order.GetOrdersOfSeller(SellerId);
+             IList<OrderInfoForSellerDto> orderdetails = new List<OrderInfoForSellerDto>();
+
+            foreach (var item in orderdetail)
+            {
+               var orderToReturn = _mapper.Map<OrderInfoForSellerDto>(item);
+               var order =await _repo.GetOrder(orderToReturn.OrderId);
+               var delivaryInfo =await _repo.GetDeliveryInfoOfDefault(order.BuyerId);
+               orderToReturn.deliveryInfo = delivaryInfo;
+               orderdetails.Add(orderToReturn);
+            }
+            return Ok(orderdetails);
         }
 
     }
