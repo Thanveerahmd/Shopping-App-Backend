@@ -21,11 +21,9 @@ namespace pro.backend.Controllers
     {
         private readonly IMapper _mapper;
         private readonly UserManager<User> _usermanger;
-
         private readonly iChatService _chatService;
-
         public readonly iShoppingRepo _repo;
-       
+
         public ChatController(
             IMapper mapper,
             iChatService chatService,
@@ -33,17 +31,18 @@ namespace pro.backend.Controllers
             UserManager<User> usermanger
             )
         {
-            
+
             _mapper = mapper;
             _chatService = chatService;
             _repo = repo;
             _usermanger = usermanger;
-            
+
         }
 
         [HttpPost("admin/{userEmail}")]
         [AllowAnonymous]
-        public async Task<IActionResult> SendMessageFromAdmin(ChatDto chat,string userEmail){
+        public async Task<IActionResult> SendMessageFromAdmin(ChatDto chat, string userEmail)
+        {
 
             var message = _mapper.Map<Chat>(chat);
             message.Sender = "admin";
@@ -53,9 +52,30 @@ namespace pro.backend.Controllers
             return Ok();
         }
 
+        [HttpDelete("{ChatId}/{sellerId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Deleteinfo(int ChatId, string sellerId)
+        {
+            var chat = await _chatService.GetChat(ChatId);
+
+            if (!chat.Sender.Equals("admin"))
+            {
+                if (chat.Sender.Equals(sellerId))
+                {
+                    _repo.Delete(chat);
+                    if (await _repo.SaveAll())
+                        return Ok();
+                    return BadRequest();
+                }
+                return BadRequest();
+            }
+            return BadRequest();
+        }
+
         [HttpGet("admin/{userEmail}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetMessageForAdminFromUser(string userEmail){
+        public async Task<IActionResult> GetMessageForAdminFromUser(string userEmail)
+        {
 
             var userId = await _usermanger.FindByEmailAsync(userEmail);
             var chats = await _chatService.GetAllChatsOfAdminFromUser(userId.Id);
@@ -65,9 +85,10 @@ namespace pro.backend.Controllers
 
         [HttpGet("admin/all")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetLastMessageFromUsers(){
+        public async Task<IActionResult> GetLastMessageFromUsers()
+        {
 
-            
+
             var chats = await _chatService.GetLastMessageFromUsers();
             var chatsinfo = _mapper.Map<IEnumerable<Chat>>(chats);
             return Ok(chatsinfo);
@@ -75,7 +96,8 @@ namespace pro.backend.Controllers
 
         [HttpGet("admin/unread")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetUnreadMessageForAdmin(){
+        public async Task<IActionResult> GetUnreadMessageForAdmin()
+        {
 
             var chatsBool = await _chatService.GetUnreadBoolForAdmin();
             return Ok(chatsBool);
@@ -83,7 +105,8 @@ namespace pro.backend.Controllers
 
         [HttpPost("admin/opened/{userId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> MakeUnreadMessagesAsReadAdmin(string userId){
+        public async Task<IActionResult> MakeUnreadMessagesAsReadAdmin(string userId)
+        {
 
             var chatsBool = await _chatService.UpdateAllChatsOfAdminFromUserToRead(userId);
             return Ok(chatsBool);
@@ -92,7 +115,8 @@ namespace pro.backend.Controllers
 
         [HttpPost("user")]
         [AllowAnonymous]
-        public IActionResult SendMessageFromUser(ChatDto chat){
+        public IActionResult SendMessageFromUser(ChatDto chat)
+        {
 
             var message = _mapper.Map<Chat>(chat);
             message.Receiver = "admin";
@@ -102,15 +126,17 @@ namespace pro.backend.Controllers
 
         [HttpGet("user/unread/{userId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetUnreadMessageForUser(string userId){
+        public async Task<IActionResult> GetUnreadMessageForUser(string userId)
+        {
 
             var chatsBool = await _chatService.GetUnreadBoolForUser(userId);
-            return Ok(chatsBool);            
+            return Ok(chatsBool);
         }
 
         [HttpGet("user/{userId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetMessageForUserFromAdmin(string userId){
+        public async Task<IActionResult> GetMessageForUserFromAdmin(string userId)
+        {
 
             var messages = await _chatService.GetAllChatsOfUserFromAdmin(userId);
             return Ok(messages);
@@ -118,7 +144,8 @@ namespace pro.backend.Controllers
 
         [HttpPost("user/opened/{userId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> MakeUnreadMessagesAsReadUser(string userId){
+        public async Task<IActionResult> MakeUnreadMessagesAsReadUser(string userId)
+        {
 
             var chatsBool = await _chatService.UpdateAllChatsOfUserFromAdminToRead(userId);
             return Ok(chatsBool);

@@ -27,6 +27,12 @@ namespace pro.backend.Services
 
             return info;
         }
+        public async Task<Chat> GetChat(int ChatId)
+        {
+          var info =await _context.Chat.FindAsync(ChatId);
+
+            return info;
+        }
 
         public async Task<ICollection<Chat>> GetLastMessageFromUsers()
         {
