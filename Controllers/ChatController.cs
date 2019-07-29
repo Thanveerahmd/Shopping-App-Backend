@@ -41,16 +41,21 @@ namespace pro.backend.Controllers
             
         }
 
-        [HttpPost("admin/{userEmail}")]
+        [HttpPost("admin")]
         [AllowAnonymous]
-        public async Task<IActionResult> SendMessageFromAdmin(ChatDto chat,string userEmail){
+        public async Task<IActionResult> SendMessageFromAdmin(ChatDto chat){
 
             var message = _mapper.Map<Chat>(chat);
             message.Sender = "admin";
             var userId = await _usermanger.FindByEmailAsync(chat.ReceiverEmail);
             message.Receiver = userId.Id;
+            message.isUnRead = true;
             _repo.Add(message);
-            return Ok();
+            if (await _repo.SaveAll())
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         [HttpGet("admin/{userEmail}")]
@@ -92,13 +97,17 @@ namespace pro.backend.Controllers
 
         [HttpPost("user")]
         [AllowAnonymous]
-        public IActionResult SendMessageFromUser(ChatDto chat){
+        public async Task<IActionResult> SendMessageFromUser(ChatDto chat){
 
             var message = _mapper.Map<Chat>(chat);
             message.Receiver = "admin";
             message.isUnRead = true;
             _repo.Add(message);
-            return Ok();
+            if (await _repo.SaveAll())
+            {
+                return Ok();
+            }
+            return BadRequest();
         }
 
         [HttpGet("user/unread/{userId}")]

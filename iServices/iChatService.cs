@@ -6,19 +6,19 @@ namespace pro.backend.iServices
 {
     public interface iChatService
     {
-        
+
         Task<ICollection<Chat>> GetAllChatsOfAdminFromUser(string userId);
 
-       Task<ICollection<Chat>> GetLastMessageFromUsers();
+        Task<IEnumerable<Chat>> GetLastMessageFromUsers();
 
-       Task<bool> GetUnreadBoolForAdmin();
+        Task<bool> GetUnreadBoolForAdmin();
 
-       Task<bool> UpdateAllChatsOfAdminFromUserToRead(string userId);
+        Task<bool> UpdateAllChatsOfAdminFromUserToRead(string userId);
 
-       Task<IEnumerable<Chat>> GetAllChatsOfUserFromAdmin(string userId);
+        Task<ICollection<Chat>> GetAllChatsOfUserFromAdmin(string userId);
 
-       Task<bool> GetUnreadBoolForUser(string userId);
+        Task<bool> GetUnreadBoolForUser(string userId);
 
-       Task<bool> UpdateAllChatsOfUserFromAdminToRead(string userId);
+        Task<bool> UpdateAllChatsOfUserFromAdminToRead(string userId);
     }
 }
