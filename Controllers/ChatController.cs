@@ -96,6 +96,7 @@ namespace pro.backend.Controllers
 
             var message = _mapper.Map<Chat>(chat);
             message.Receiver = "admin";
+            message.isUnRead = true;
             _repo.Add(message);
             return Ok();
         }
