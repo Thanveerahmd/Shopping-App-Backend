@@ -10,6 +10,7 @@ namespace pro.backend.Dtos
         public string BuyerId { get; set; }
         public float Total_Price { get; set; }
         public DateTime DateAdded { get; set; }
+          public int deliveyId { get; set; }
         public string PaymentStatus { get; set; }
         public ICollection<OrderReturnIncludes> orderDetails { get; set; }
 

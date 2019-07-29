@@ -11,5 +11,6 @@ namespace pro.backend.Entities
         public DateTime DateAdded { get; set; }
         public string PaymentStatus { get; set; }
         public ICollection<orderDetails> orderDetails { get; set; }
+        public int deliveyId { get; set; }
     }
 }

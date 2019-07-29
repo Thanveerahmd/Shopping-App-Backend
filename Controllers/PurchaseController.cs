@@ -109,14 +109,14 @@ namespace pro.backend.Controllers
                 else
                 {
                     order.PaymentStatus = "failed";
-                   // order.Total_Price = paymentInfo.payhere_amount;
+                    // order.Total_Price = paymentInfo.payhere_amount;
                     var Buyer = await _usermanger.FindByIdAsync(order.BuyerId);
                     await _emailSender.SendEmailAsync(Buyer.UserName, "About Payment Done on your Order",
                  $"Your payment status is failed  ");
                 }
 
                 try
-                {   
+                {
                     paymentInfo.UserId = order.BuyerId;
                     _repo.Add(paymentInfo);
                     await _repo.UpdateOrder(order);
@@ -155,7 +155,8 @@ namespace pro.backend.Controllers
                 }
 
                 try
-                {   paymentInfo.UserId = order.BuyerId;
+                {
+                    paymentInfo.UserId = order.BuyerId;
                     await _repo.UpdateOrder(order);
                     _repo.Add(paymentInfo);
                 }
@@ -203,9 +204,10 @@ namespace pro.backend.Controllers
                     return BadRequest(BuyNowProduct.product_Name);
 
                 order.Total_Price = checkoutDto.Price;
-                
-                       
-        
+                order.deliveyId = checkoutDto.DeliveryInfoId;
+
+
+
 
                 _repo.Add(order);
 
@@ -245,8 +247,10 @@ namespace pro.backend.Controllers
                     {
                         counter++;
                         OutOfStockProducts.Add(OrderProduct);
-                    }else{
-                        totalPrice +=  CartProduct.Count * CartProduct.Price;
+                    }
+                    else
+                    {
+                        totalPrice += CartProduct.Count * CartProduct.Price;
                     }
                 }
 
@@ -263,6 +267,7 @@ namespace pro.backend.Controllers
                 try
                 {
                     order.Total_Price = totalPrice;
+                    order.deliveyId = checkoutDto.DeliveryInfoId;
                     _repo.AddOrder(order);
                     var ordertab = await _repo.GetOrder(order.Id);
                     foreach (var el in orderDetails)

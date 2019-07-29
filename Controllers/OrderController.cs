@@ -59,7 +59,7 @@ namespace pro.backend.Controllers
             {
                var orderToReturn = _mapper.Map<OrderInfoForSellerDto>(item);
                var order =await _repo.GetOrder(orderToReturn.OrderId);
-               var delivaryInfo =await _repo.GetDeliveryInfoOfDefault(order.BuyerId);
+               var delivaryInfo =await _repo.GetDeliveryInfo(order.deliveyId);
                orderToReturn.deliveryInfo = delivaryInfo;
                orderdetails.Add(orderToReturn);
             }
