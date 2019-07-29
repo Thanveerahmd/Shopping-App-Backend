@@ -83,5 +83,54 @@ namespace pro.backend.Services
             }
 
         }
+
+        public async Task<IEnumerable<Chat>> GetAllChatsOfUserFromAdmin(string userId)
+        {
+
+            var info = await _context.Chat
+            .Where(p => (p.Receiver == "admin" && p.Sender == userId) || (p.Receiver == userId && p.Sender == "admin"))
+            .ToListAsync();
+
+            var data = info.OrderByDescending(p => p.Id);
+            return data;
+        }
+
+        public async Task<bool> GetUnreadBoolForUser(string userId)
+        {
+
+            var info = await _context.Chat
+            .Where(p => p.Receiver == userId)
+            .Where(p => p.isUnRead == true)
+            .ToListAsync();
+
+            if (info != null)
+                return true;
+            else
+                return false;
+        }
+
+        public async Task<bool> UpdateAllChatsOfUserFromAdminToRead(string userId)
+        {
+
+            var info = await _context.Chat
+            .Where(p => (p.Receiver == userId && p.Sender == "admin"))
+            .ToListAsync();
+
+            try
+            {
+                foreach (var item in info)
+                {
+                    item.isUnRead = false;
+                    _context.Chat.Update(item);
+                }
+                return true;
+            }
+            catch (AppException e)
+            {
+                Console.WriteLine(e);
+                return false;
+            }
+
+        }
     }
 }

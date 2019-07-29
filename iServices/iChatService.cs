@@ -14,5 +14,11 @@ namespace pro.backend.iServices
        Task<bool> GetUnreadBoolForAdmin();
 
        Task<bool> UpdateAllChatsOfAdminFromUserToRead(string userId);
+
+       Task<IEnumerable<Chat>> GetAllChatsOfUserFromAdmin(string userId);
+
+       Task<bool> GetUnreadBoolForUser(string userId);
+
+       Task<bool> UpdateAllChatsOfUserFromAdminToRead(string userId);
     }
 }
