@@ -83,18 +83,20 @@ namespace pro.backend.Controllers
 
         [HttpPost("admin/opened/{userId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> MakeUnreadMessagesAsRead(string userId){
+        public async Task<IActionResult> MakeUnreadMessagesAsReadAdmin(string userId){
 
             var chatsBool = await _chatService.UpdateAllChatsOfAdminFromUserToRead(userId);
             return Ok(chatsBool);
         }
 
 
-        [HttpPost("user/{userEmail}")]
+        [HttpPost("user")]
         [AllowAnonymous]
-        public async Task<IActionResult> SendMessageFromUser(string userEmail){
+        public IActionResult SendMessageFromUser(ChatDto chat){
 
-
+            var message = _mapper.Map<Chat>(chat);
+            message.Receiver = "admin";
+            _repo.Add(message);
             return Ok();
         }
 
@@ -102,16 +104,24 @@ namespace pro.backend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetUnreadMessageForUser(string userId){
 
-            
-            return Ok();
+            var chatsBool = await _chatService.GetUnreadBoolForUser(userId);
+            return Ok(chatsBool);            
         }
 
         [HttpGet("user/{userId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetMessageForUserFromAdmin(string userId){
 
-            
-            return Ok();
+            var messages = await _chatService.GetAllChatsOfUserFromAdmin(userId);
+            return Ok(messages);
+        }
+
+        [HttpPost("user/opened/{userId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> MakeUnreadMessagesAsReadUser(string userId){
+
+            var chatsBool = await _chatService.UpdateAllChatsOfUserFromAdminToRead(userId);
+            return Ok(chatsBool);
         }
     }
 }
