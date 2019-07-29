@@ -39,7 +39,7 @@ namespace pro.backend.Controllers
             return Ok(orderToReturn);
         }
 
-         [HttpGet("orders")]
+        [HttpGet("orders")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllOrders()
         {
@@ -52,16 +52,18 @@ namespace pro.backend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllOrdersOfSeller(string SellerId)
         {
-             var orderdetail = await _order.GetOrdersOfSeller(SellerId);
-             IList<OrderInfoForSellerDto> orderdetails = new List<OrderInfoForSellerDto>();
+            var orderdetail = await _order.GetOrdersOfSeller(SellerId);
+            IList<OrderInfoForSellerDto> orderdetails = new List<OrderInfoForSellerDto>();
 
             foreach (var item in orderdetail)
             {
-               var orderToReturn = _mapper.Map<OrderInfoForSellerDto>(item);
-               var order =await _repo.GetOrder(orderToReturn.OrderId);
-               var delivaryInfo =await _repo.GetDeliveryInfo(order.deliveyId);
-               orderToReturn.deliveryInfo = delivaryInfo;
-               orderdetails.Add(orderToReturn);
+                var orderToReturn = _mapper.Map<OrderInfoForSellerDto>(item);
+                var order = await _repo.GetOrder(orderToReturn.OrderId);
+                var delivaryInfo = await _repo.GetDeliveryInfo(order.deliveyId);
+                orderToReturn.deliveryInfo = delivaryInfo;
+                var billingInfo = await _repo.GetBillingInfoOfDefault(order.BuyerId);
+                orderToReturn.emergencyContact = billingInfo.MobileNumber;
+                orderdetails.Add(orderToReturn);
             }
             return Ok(orderdetails);
         }
