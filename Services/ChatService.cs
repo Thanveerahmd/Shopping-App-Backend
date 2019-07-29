@@ -30,12 +30,20 @@ namespace pro.backend.Services
 
         public async Task<ICollection<Chat>> GetLastMessageFromUsers()
         {
+            var chats = await _context.Chat.ToListAsync();
 
-            var info = await _context.Chat
-            .Where(p => p.Receiver == "admin" || p.Sender == "admin")
-            .ToListAsync();
+            IList<Chat> lastChats = new List<Chat>();
 
-            return info;
+            foreach (var item in chats)
+            {
+                if (!item.Sender.Equals("admin"))
+                {
+                    var info = await _context.Chat
+           .Where(p => p.Receiver == "admin").LastOrDefaultAsync(p => p.Sender == item.Sender);
+                    lastChats.Add(item);
+                }
+            }
+            return lastChats;
         }
 
         public async Task<bool> GetUnreadBoolForAdmin()
