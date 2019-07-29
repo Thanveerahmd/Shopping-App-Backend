@@ -39,8 +39,11 @@ namespace pro.backend.Services
                 if (!item.Sender.Equals("admin"))
                 {
                     var info = await _context.Chat
-           .Where(p => p.Receiver == "admin").LastOrDefaultAsync(p => p.Sender == item.Sender);
-                    lastChats.Add(item);
+                                .Where(p => p.Receiver == "admin").
+                                LastOrDefaultAsync(p => p.Sender == item.Sender);
+
+                    if (!lastChats.Contains(info))
+                        lastChats.Add(info);
                 }
             }
             return lastChats;
