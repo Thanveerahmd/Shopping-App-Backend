@@ -51,6 +51,7 @@ namespace WebApi
             services.AddScoped<iAdvertisement, AdvertisementService>();
             services.AddScoped<Token>();
             services.AddScoped<iShoppingRepo, ShoppingRepo>();
+            services.AddScoped<iChatService, ChatService>();
             services.AddScoped<iMapService, MapService>();
             services.AddScoped<iOrderService, OrderService>();
             services.AddTransient<IEmailSender, EmailSender>();

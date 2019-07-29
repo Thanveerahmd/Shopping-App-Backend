@@ -115,6 +115,9 @@ namespace Project.Helpers
 
             CreateMap<orderDetails,OrderInfoForSellerDto>();
 
+            CreateMap<ChatDto,Chat>();
+
+            CreateMap<Chat,ChatDto>();
 
 
         }
