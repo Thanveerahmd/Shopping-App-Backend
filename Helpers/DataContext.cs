@@ -28,6 +28,7 @@ namespace Project.Helpers
         public DbSet<Advertisement> Advertisement { get; set; }
         public DbSet<PhotoForAd> PhotoForAd { get; set; }
         public DbSet<DeviceToken> DeviceToken{ get; set; }
+        public DbSet<Chat> Chat{ get; set; }
        
         protected override void OnModelCreating(ModelBuilder builder)
         {
