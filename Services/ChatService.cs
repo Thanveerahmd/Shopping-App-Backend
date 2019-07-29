@@ -34,7 +34,7 @@ namespace pro.backend.Services
             return info;
         }
 
-        public async Task<ICollection<Chat>> GetLastMessageFromUsers()
+        public async Task<IEnumerable<Chat>> GetLastMessageFromUsers()
         {
             var chats = await _context.Chat.ToListAsync();
 
@@ -52,7 +52,9 @@ namespace pro.backend.Services
                         lastChats.Add(info);
                 }
             }
-            return lastChats;
+
+            var descChats = lastChats.OrderByDescending(p => p.Id);
+            return descChats;
         }
 
         public async Task<bool> GetUnreadBoolForAdmin()
@@ -63,7 +65,7 @@ namespace pro.backend.Services
             .Where(p => p.isUnRead == true)
             .ToListAsync();
 
-            if (info != null)
+            if (info.Count != 0)
                 return true;
             else
                 return false;
@@ -83,6 +85,7 @@ namespace pro.backend.Services
                     item.isUnRead = false;
                     _context.Chat.Update(item);
                 }
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (AppException e)
@@ -93,15 +96,16 @@ namespace pro.backend.Services
 
         }
 
-        public async Task<IEnumerable<Chat>> GetAllChatsOfUserFromAdmin(string userId)
+        public async Task<ICollection<Chat>> GetAllChatsOfUserFromAdmin(string userId)
         {
 
             var info = await _context.Chat
             .Where(p => (p.Receiver == "admin" && p.Sender == userId) || (p.Receiver == userId && p.Sender == "admin"))
             .ToListAsync();
 
-            var data = info.OrderByDescending(p => p.Id);
-            return data;
+            // var data = info.OrderByDescending(p => p.Id);
+            // return data;
+            return info;
         }
 
         public async Task<bool> GetUnreadBoolForUser(string userId)
@@ -112,7 +116,7 @@ namespace pro.backend.Services
             .Where(p => p.isUnRead == true)
             .ToListAsync();
 
-            if (info != null)
+            if (info.Count != 0)
                 return true;
             else
                 return false;
@@ -132,6 +136,7 @@ namespace pro.backend.Services
                     item.isUnRead = false;
                     _context.Chat.Update(item);
                 }
+                await _context.SaveChangesAsync();
                 return true;
             }
             catch (AppException e)
