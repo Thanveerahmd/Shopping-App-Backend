@@ -33,18 +33,16 @@ namespace pro.backend.Controllers
             _repo = repo;
             _productService = productService;
         }
-
-        [HttpGet]
         [AllowAnonymous]
+        [HttpGet]
         public async Task<IActionResult> GetAllProducts()
         {
             var products = await _repo.GetAllProducts();
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
         }
-
-        [HttpGet("{id}")]
         [AllowAnonymous]
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
             var product = await _repo.GetProduct(id);
@@ -74,13 +72,15 @@ namespace pro.backend.Controllers
                     if (flag_status.ToObject<bool>())
                     {
                         product.visibility = false;
-                    }else{
+                    }
+                    else
+                    {
                         product.visibility = true;
                     }
                 }
                 _productService.AddProduct(product);
-                
-                 return Ok(new {id=product.Id,visibility = product.visibility});
+
+                return Ok(new { id = product.Id, visibility = product.visibility });
 
             }
             catch (AppException ex)
@@ -122,13 +122,15 @@ namespace pro.backend.Controllers
                         if (flag_status.ToObject<bool>())
                         {
                             prod.visibility = false;
-                        }else{
+                        }
+                        else
+                        {
                             prod.visibility = true;
                         }
                     }
                 }
                 await _productService.UpdateProduct(prod);
-                return Ok(new { visibility= prod.visibility });
+                return Ok(new { visibility = prod.visibility });
             }
             catch (AppException ex)
             {

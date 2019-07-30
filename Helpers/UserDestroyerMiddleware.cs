@@ -25,7 +25,7 @@ namespace pro.backend.Helpers
             
             if (!string.IsNullOrEmpty(httpContext.User.Identity.Name))
             {
-                var user = await userManager.FindByNameAsync(httpContext.User.Identity.Name);
+                var user = await userManager.FindByIdAsync(httpContext.User.Identity.Name);
 
                 if (await userManager.IsLockedOutAsync(user))
                 {

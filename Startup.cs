@@ -191,11 +191,11 @@ namespace WebApi
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
-
             app.UseAuthentication();
             app.UseIdentity();
-            app.UseMvc();
             app.UseUserDestroyer();
+            app.UseMvc();
+
         }
     }
 }

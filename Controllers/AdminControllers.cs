@@ -363,7 +363,7 @@ namespace Project.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost("LockUser/{userId}")]
+        [HttpPost("LockUser/{userId}/{forDays}")]
         public virtual async Task<IdentityResult> LockUserAccount(string userId, int? forDays)
         {
             var user = await _usermanger.FindByIdAsync(userId);
