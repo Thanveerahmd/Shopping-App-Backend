@@ -319,45 +319,80 @@ namespace Project.Controllers
         }
         [AllowAnonymous]
         [HttpPut("approval/{reason}")]
-        public IActionResult approval([FromBody]AdvertismentUploadDto adDto,string reason)
+        public IActionResult approval([FromBody]AdvertismentUploadDto adDto, string reason)
         {
             // status UserId is need
-          var ad = _mapper.Map<Advertisement>(adDto);
-          var prevAd = _adService.GetAdvertisement(adDto.Id).Result;
-          prevAd.Status = adDto.Status;
-          prevAd.DateAdded = DateTime.Now;
-          var sellerId = prevAd.UserId;
-          var seller = _usermanger.FindByIdAsync(sellerId).Result;
+            var ad = _mapper.Map<Advertisement>(adDto);
+            var prevAd = _adService.GetAdvertisement(adDto.Id).Result;
+            prevAd.Status = adDto.Status;
+            prevAd.DateAdded = DateTime.Now;
+            var sellerId = prevAd.UserId;
+            var seller = _usermanger.FindByIdAsync(sellerId).Result;
 
-          try
-          {
-              _adService.UpdateAdvertisement(prevAd);
-          }
-          catch ( AppException ex)
-          {
-               return BadRequest(new { message = ex.Message });
-          }
-          
-          if (ad.Status.ToLower().Equals("accepted"))
-          {
-               var url = $"http://mahdhir.epizy.com/advert.php?id={ad.Id}";
+            try
+            {
+                _adService.UpdateAdvertisement(prevAd);
+            }
+            catch (AppException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
 
-             _emailSender.SendEmailAsync(seller.UserName, "Payment For Advertisement",
-            $"Please open this link from your mobile and proceed to payment: <a href='{url}'>link</a>");
+            if (ad.Status.ToLower().Equals("accepted"))
+            {
+                var url = $"http://mahdhir.epizy.com/advert.php?id={ad.Id}";
 
-             return Ok();
+                _emailSender.SendEmailAsync(seller.UserName, "Payment For Advertisement",
+               $"Please open this link from your mobile and proceed to payment: <a href='{url}'>link</a>");
 
-          }else if(ad.Status.ToLower().Equals("rejected"))
-          {
-              _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
-            $"Your Advertisement for product {ad.ProductId} has been rejected.\nReason:{reason}");
+                return Ok();
 
-             return Ok();
-          }else
-          {
-            return BadRequest("Status is Required");
-          }
+            }
+            else if (ad.Status.ToLower().Equals("rejected"))
+            {
+                _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
+              $"Your Advertisement for product {ad.ProductId} has been rejected.\nReason:{reason}");
 
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Status is Required");
+            }
+
+        }
+
+        [AllowAnonymous]
+        [HttpPost("LockUser/{userId}")]
+        public virtual async Task<IdentityResult> LockUserAccount(string userId, int? forDays)
+        {
+            var user = await _usermanger.FindByIdAsync(userId);
+            var result = await _usermanger.SetLockoutEnabledAsync(user, true);
+            if (result.Succeeded)
+            {
+                if (forDays.HasValue)
+                {
+                    result = await _usermanger.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddDays(forDays.Value));
+                }
+                else
+                {
+                    result = await _usermanger.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+                }
+            }
+            return result;
+        }
+
+        [AllowAnonymous]
+        [HttpPost("UnLockUser/{userId}")]
+        public virtual async Task<IdentityResult> UnlockUserAccount(string userId)
+        {
+            var user = await _usermanger.FindByIdAsync(userId);
+            var result = await _usermanger.SetLockoutEnabledAsync(user, false);
+            if (result.Succeeded)
+            {
+                await _usermanger.ResetAccessFailedCountAsync(user);
+            }
+            return result;
         }
     }
 

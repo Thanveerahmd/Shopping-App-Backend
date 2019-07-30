@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Http;
 using pro.backend.Controllers;
 using pro.backend.Services;
 using pro.backend.iServices;
+using pro.backend.Helpers;
 
 namespace WebApi
 {
@@ -195,6 +196,7 @@ namespace WebApi
             app.UseAuthentication();
             app.UseIdentity();
             app.UseMvc();
+            app.UseUserDestroyer();
         }
     }
 }
