@@ -56,15 +56,15 @@ namespace pro.backend.Controllers
             return BadRequest();
         }
 
-        [HttpDelete("{ChatId}/{sellerId}")]
+        [HttpDelete("{ChatId}/{userId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> Deleteinfo(int ChatId, string sellerId)
+        public async Task<IActionResult> Deleteinfo(int ChatId, string userId)
         {
             var chat = await _chatService.GetChat(ChatId);
-
+            TimeSpan duration = DateTime.Now - chat.TimeSent;
             if (!chat.Sender.Equals("admin"))
             {
-                if (chat.Sender.Equals(sellerId))
+                if (chat.Sender.Equals(userId) && (duration.TotalMinutes<=10))
                 {
                     _repo.Delete(chat);
                     if (await _repo.SaveAll())
@@ -127,7 +127,7 @@ namespace pro.backend.Controllers
             _repo.Add(message);
             if (await _repo.SaveAll())
             {
-                return Ok();
+                return Ok(message.Id);
             }
             return BadRequest();
         }
