@@ -373,11 +373,17 @@ namespace Project.Controllers
                 if (forDays.HasValue)
                 {
                     result = await _usermanger.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddDays(forDays.Value));
+                    await _emailSender.SendEmailAsync(user.UserName, "About Your Account Activation",
+               $"Please note that your Account has been blocked for {forDays} Days due violation of Our Rules and Regulations , contact us in Winkel@gmail.com");
                 }
                 else
                 {
                     result = await _usermanger.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+                    await _emailSender.SendEmailAsync(user.UserName, "About Your Account Activation",
+               $"Please note that your Account has been blocked Permently due violation of Our Rules and Regulations  , contact us in Winkel@gmail.com");
                 }
+                
+
             }
             return result;
         }
@@ -391,6 +397,8 @@ namespace Project.Controllers
             if (result.Succeeded)
             {
                 await _usermanger.ResetAccessFailedCountAsync(user);
+                 await _emailSender.SendEmailAsync(user.UserName, "About Your Account Activation",
+               $"Please note that your Account has been Reactivated  ,contact us in Winkel@gmail.com");
             }
             return result;
         }
