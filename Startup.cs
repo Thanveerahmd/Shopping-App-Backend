@@ -193,7 +193,7 @@ namespace WebApi
                 .AllowAnyHeader());
             app.UseAuthentication();
             app.UseIdentity();
-            app.UseUserDestroyer();
+            // app.UseUserDestroyer();
             app.UseMvc();
 
         }

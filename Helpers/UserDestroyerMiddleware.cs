@@ -23,6 +23,7 @@ namespace pro.backend.Helpers
             SignInManager<User> signInManager)
         {
             
+            var source = httpContext.Request.Path.Value;
             if (!string.IsNullOrEmpty(httpContext.User.Identity.Name))
             {
                 var user = await userManager.FindByIdAsync(httpContext.User.Identity.Name);
