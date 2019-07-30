@@ -22,9 +22,9 @@ namespace pro.backend.Helpers
             UserManager<User> userManager,
             SignInManager<User> signInManager)
         {
-            
-            var source = httpContext.Request.Path.Value;
-            if (!string.IsNullOrEmpty(httpContext.User.Identity.Name))
+
+            bool canParse = int.TryParse(httpContext.User.Identity.Name, out var Id);
+            if (!string.IsNullOrEmpty(httpContext.User.Identity.Name)&&!canParse)
             {
                 var user = await userManager.FindByIdAsync(httpContext.User.Identity.Name);
 
