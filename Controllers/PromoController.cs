@@ -16,7 +16,7 @@ using Project.Helpers;
 namespace pro.backend.Controllers
 {
     [ApiController]
-    [Route("promo")]
+    [Route("promos")]
 
     public class PromoController : ControllerBase
     {
@@ -41,7 +41,7 @@ namespace pro.backend.Controllers
 
         }
 
-        [HttpPost("user/add/{userId}")]
+        [HttpPost("user/{userId}")]
         [AllowAnonymous]
         public async Task<IActionResult> addPromotion(string userId,PromoDto promo){
             var promotion = _mapper.Map<Promo>(promo);
@@ -58,9 +58,9 @@ namespace pro.backend.Controllers
             return BadRequest();
         }
 
-        [HttpPut("user/{userId}")]
+        [HttpPut("user")]
         [AllowAnonymous]
-        public async Task<IActionResult> updatePromotion(string userId,PromoDto promo){
+        public async Task<IActionResult> updatePromotion(PromoDto promo){
             var promotion = _mapper.Map<Promo>(promo);
             promotion.Status = "pending";
             promotion.Id = promo.Id;
@@ -97,7 +97,18 @@ namespace pro.backend.Controllers
             return Ok(promotions);
         }
 
-        
+        [HttpDelete("user/{promoId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> deletePromo(int promoId){
+
+            var promotion = await _promoService.GetPromo(promoId);
+            if(promotion!=null)
+            _repo.Delete(promotion);
+
+            if (await _repo.SaveAll())
+                return Ok();
+            return BadRequest(new { message = "Could Not Delete Promo" });
+        }
 
         
         
