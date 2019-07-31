@@ -41,6 +41,10 @@ namespace Project.Helpers
             .HasOne(p => p.PhotoForAd)
             .WithOne(i => i.Advertisement)
             .HasForeignKey<PhotoForAd>(b => b.AdId);
+
+            builder.Entity<Promo>()
+            .Property<string>("TagCollection")
+            .HasField("_Days_of_The_Week");
             
             // Customize the ASP.NET Identity model and override the defaults if needed.
             // For example, you can rename the ASP.NET Identity table names and more.
