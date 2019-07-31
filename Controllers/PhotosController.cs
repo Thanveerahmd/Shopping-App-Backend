@@ -364,16 +364,8 @@ namespace pro.backend.Controllers
             return Ok(photo);
         }
 
-        // CREATE PROCEDURE dbo.DeleteOnSchedule
-        //  AS
-        // BEGIN
-        //  DELETE[dbo].[Table]
-        // WHERE[DateTimeToDelete] <= CURRENT_TIMESTAMP;
-        //  END
-        // automatic delete
-
-        // neee to do testing
-
+      
+        
         [HttpPost("advertisement/{AdId}")]
         [AllowAnonymous]
         public async Task<IActionResult> AddAdvertisementPhoto(int AdId, [FromForm]PhotoUploadDto PhotoUploadDto)
