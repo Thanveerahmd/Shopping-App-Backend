@@ -33,6 +33,8 @@ namespace Project.Controllers
         private readonly UserManager<User> _usermanger;
         private IUserService _userService;
         private readonly IEmailSender _emailSender;
+        private readonly iPromoService _promoService;
+
 
 
 
@@ -41,6 +43,7 @@ namespace Project.Controllers
             IUserService userService,
             IMapper mapper,
             IOptions<AppSettings> appSettings,
+            iPromoService promoService,
             IEmailSender EmailSender,
             iAdvertisement AdService,
             UserManager<User> usermanger
@@ -50,6 +53,7 @@ namespace Project.Controllers
             _adminService = adminService;
             _mapper = mapper;
             _emailSender = EmailSender;
+            _promoService = promoService;
             _appSettings = appSettings.Value;
             _adService = AdService;
             _usermanger = usermanger;
@@ -401,6 +405,65 @@ namespace Project.Controllers
                $"Please note that your Account has been Reactivated  ,contact us in Winkel@gmail.com");
             }
             return result;
+        }
+
+        [HttpPut("promo/approval/{reason}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> updatePromoStatus(PromoStatusUpdateDto promo,string reason){
+            var prevPromo = await _promoService.GetPromo(promo.Id);
+            var sellerId= prevPromo.UserId;
+            var seller = await _usermanger.FindByIdAsync(sellerId);
+             try
+            {
+                // save 
+                await _promoService.UpdatePromoStatus(promo.Id,promo.Status);
+                  if (promo.Status.ToLower().Equals("accepted"))
+            {
+                
+
+                await _emailSender.SendEmailAsync(seller.UserName, "Accepted Promotion",
+               $"Your Advertisement for product {prevPromo.ProductId} has been accepted.");
+
+                return Ok();
+
+            }
+            else if (promo.Status.ToLower().Equals("rejected"))
+            {
+                await _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
+              $"Your Advertisement for product {prevPromo.ProductId} has been rejected.\nReason:{reason}");
+
+                return Ok();
+            }
+            else
+            {
+                return BadRequest("Status is Required");
+            }
+
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+
+        }
+
+        [HttpGet("promo/active")]
+        [AllowAnonymous]
+        public async Task<IActionResult> getAllActivePromos(){
+
+            var promotions = await _promoService.GetAllActivePromos();
+
+            return Ok(promotions);
+        }
+
+        [HttpGet("promo/pending")]
+        [AllowAnonymous]
+        public async Task<IActionResult> getAllPendingPromos(){
+
+            var promotions = await _promoService.GetAllPendingPromos();
+
+            return Ok(promotions);
         }
     }
 

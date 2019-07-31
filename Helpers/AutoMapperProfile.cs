@@ -119,6 +119,13 @@ namespace Project.Helpers
 
             CreateMap<Chat,ChatDto>();
 
+            CreateMap<PromoDto,Promo>();
+
+            CreateMap<Promo,PromoDto>();
+
+            CreateMap<PromoStatusUpdateDto,Promo>();
+
+            CreateMap<Promo,PromoStatusUpdateDto>();
 
         }
     }

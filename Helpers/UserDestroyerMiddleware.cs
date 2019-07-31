@@ -28,9 +28,8 @@ namespace pro.backend.Helpers
             {
                 var user = await userManager.FindByIdAsync(httpContext.User.Identity.Name);
 
-                if (await userManager.IsLockedOutAsync(user))
+                if (user!=null && await userManager.IsLockedOutAsync(user))
                 {
-                   
                    httpContext.Response.StatusCode = 701;
                    return;
                 }
