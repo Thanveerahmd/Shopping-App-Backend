@@ -407,9 +407,9 @@ namespace Project.Controllers
             return result;
         }
 
-        [HttpPut("promo/approval/{reason}")]
+        [HttpPut("promo/approval")]
         [AllowAnonymous]
-        public async Task<IActionResult> updatePromoStatus(PromoStatusUpdateDto promo,string reason){
+        public async Task<IActionResult> updatePromoStatus(PromoStatusUpdateDto promo){
             var prevPromo = await _promoService.GetPromo(promo.Id);
             var sellerId= prevPromo.UserId;
             var seller = await _usermanger.FindByIdAsync(sellerId);
@@ -421,16 +421,16 @@ namespace Project.Controllers
             {
                 
 
-                await _emailSender.SendEmailAsync(seller.UserName, "Accepted Promotion",
-               $"Your Advertisement for product {prevPromo.ProductId} has been accepted.");
+            //     await _emailSender.SendEmailAsync(seller.UserName, "Accepted Promotion",
+            //    $"Your Advertisement for product {prevPromo.ProductId} has been accepted.");
 
                 return Ok();
 
             }
             else if (promo.Status.ToLower().Equals("rejected"))
             {
-                await _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
-              $"Your Advertisement for product {prevPromo.ProductId} has been rejected.\nReason:{reason}");
+            //     await _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
+            //   $"Your Advertisement for product {prevPromo.ProductId} has been rejected.\nReason:{promo.Reason}");
 
                 return Ok();
             }
