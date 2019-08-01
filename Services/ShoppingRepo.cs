@@ -40,12 +40,12 @@ namespace pro.backend.Services
         }
 
         public async Task<IEnumerable<Product>> GetAllProducts()
+
         {
             var products = await _context.Products.Where(p => p.visibility != false).Include(p => p.Photos).ToListAsync();
 
             return products;
         }
-
         public async Task<IEnumerable<Product>> GetAllProductsOfSeller(string sellerID) //have to change
         {
             var products = await _context.Products.Where(p => p.SellerId == sellerID)
