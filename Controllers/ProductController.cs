@@ -197,7 +197,7 @@ namespace pro.backend.Controllers
             {
                 var product = await _repo.GetProduct(rate.ProductId);
                 var sum = 0;
-                var count = 1;
+                var count = 0;
                 foreach (var item in product.Ratings)
                 {
                     sum += item.RatingValue;
@@ -249,7 +249,7 @@ namespace pro.backend.Controllers
 
                 var product = await _repo.GetProduct(rate.ProductId);
                 var sum = 0;
-                var count = 1;
+                var count = 0;
                 foreach (var item in product.Ratings)
                 {
                     sum += item.RatingValue;
