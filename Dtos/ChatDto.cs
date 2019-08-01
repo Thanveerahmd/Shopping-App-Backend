@@ -12,6 +12,8 @@ namespace pro.backend.Dtos
         public string Message { get; set; }
         public bool isUnRead { get; set; }
         public DateTime  TimeSent { get; set; }
+        public string  UserMail { get; set; }
+        public string  UserFullName { get; set; }
         public ChatDto()
         {
             TimeSent = DateTime.Now;

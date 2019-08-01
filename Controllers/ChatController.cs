@@ -41,7 +41,8 @@ namespace pro.backend.Controllers
 
         [HttpPost("admin")]
         [AllowAnonymous]
-        public async Task<IActionResult> SendMessageFromAdmin(ChatDto chat){
+        public async Task<IActionResult> SendMessageFromAdmin(ChatDto chat)
+        {
 
             var message = _mapper.Map<Chat>(chat);
             message.Sender = "admin";
@@ -64,7 +65,7 @@ namespace pro.backend.Controllers
             TimeSpan duration = DateTime.Now - chat.TimeSent;
             if (!chat.Sender.Equals("admin"))
             {
-                if (chat.Sender.Equals(userId) && (duration.TotalMinutes<=10))
+                if (chat.Sender.Equals(userId) && (duration.TotalMinutes <= 10))
                 {
                     _repo.Delete(chat);
                     if (await _repo.SaveAll())
@@ -91,11 +92,20 @@ namespace pro.backend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetLastMessageFromUsers()
         {
-
-
             var chats = await _chatService.GetLastMessageFromUsers();
-            var chatsinfo = _mapper.Map<IEnumerable<Chat>>(chats);
-            return Ok(chatsinfo);
+            var chatsinfo = _mapper.Map<IEnumerable<ChatDto>>(chats);
+            IList<ChatDto> lastChats = new List<ChatDto>();
+            foreach (var item in chatsinfo)
+            {
+                if (!item.Sender.Equals("admin"))
+                {
+                    var user = await _usermanger.FindByIdAsync(item.Sender);
+                    item.UserMail = user.Email;
+                    item.UserFullName = user.FirstName + " " + user.LastName;
+                    lastChats.Add(item);
+                }
+            }
+            return Ok(lastChats);
         }
 
         [HttpGet("admin/unread")]
@@ -119,7 +129,8 @@ namespace pro.backend.Controllers
 
         [HttpPost("user")]
         [AllowAnonymous]
-        public async Task<IActionResult> SendMessageFromUser(ChatDto chat){
+        public async Task<IActionResult> SendMessageFromUser(ChatDto chat)
+        {
 
             var message = _mapper.Map<Chat>(chat);
             message.Receiver = "admin";
