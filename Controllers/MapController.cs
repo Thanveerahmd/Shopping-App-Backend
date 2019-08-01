@@ -134,7 +134,7 @@ namespace pro.backend.Controllers
             TimeSpan timeDiff = (DeviceInfo.LastNotifyTime - DateTime.UtcNow);
             var time = Convert.ToInt32(timeDiff.Hours);
 
-            if (time > 1)
+            if (time < 1)
             {
                 return ;
             }
