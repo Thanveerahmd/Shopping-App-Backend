@@ -194,7 +194,25 @@ namespace pro.backend.Controllers
             _repo.Add(rate);
 
             if (await _repo.SaveAll())
-                return Ok(rate.Id);
+            {
+                var product = await _repo.GetProduct(rate.ProductId);
+                var sum = 0;
+                var count = 1;
+                foreach (var item in product.Ratings)
+                {
+                    sum += item.RatingValue;
+                    count++;
+                }
+                var avg = (float)sum / count;
+
+                product.rating = avg;
+
+                if (await _productService.UpdateProduct(product))
+                    return Ok(rate.Id);
+
+                return BadRequest();
+
+            }
             return BadRequest();
         }
 
@@ -228,7 +246,21 @@ namespace pro.backend.Controllers
                     return Unauthorized();
                 }
                 await _repo.UpdateRating(rate);
-                return Ok();
+
+                var product = await _repo.GetProduct(rate.ProductId);
+                var sum = 0;
+                var count = 1;
+                foreach (var item in product.Ratings)
+                {
+                    sum += item.RatingValue;
+                    count++;
+                }
+                var avg = (float)sum / count;
+
+                product.rating = avg;
+
+                if (await _productService.UpdateProduct(product))
+                    return Ok();
             }
             catch (AppException ex)
             {

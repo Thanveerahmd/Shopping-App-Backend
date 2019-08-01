@@ -17,23 +17,7 @@ namespace pro.backend.Entities
         public bool visibility { get; set; }
         public ICollection<Photo> Photos { get; set; }
         public ICollection<Rating> Ratings { get; set; }
-        
-        [NotMapped]
-        public float rating
-        {
-            get
-            {
-                var  sum =0;
-                var count =1;
-                foreach (var item in Ratings)
-                {
-                  sum+= item.RatingValue;
-                  count++;
-                }
-                var avg = sum/count;
-                return avg;
-            }
-        }
+        public float rating  {get; set;  }
     }
 
 }

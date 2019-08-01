@@ -49,6 +49,7 @@ namespace pro.backend.Services
 
             // update user properties
             prod.Product_name = product.Product_name;
+            prod.rating = prod.rating;
             prod.Quantity = product.Quantity;
             prod.ReorderLevel = product.ReorderLevel;
             prod.Price = product.Price;

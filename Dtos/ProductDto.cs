@@ -17,7 +17,7 @@ namespace pro.backend.Dtos
         public string Sub_category { get; set; }
         public string PhotoUrl { get; set; }
         public bool visibility { get; set; }
-        public float rating { get; }
+        public float rating { get;set; }
         public ICollection<PhotoDto> Photos { get; set; }
         public ICollection<Rating> Ratings { get; set; }
 
