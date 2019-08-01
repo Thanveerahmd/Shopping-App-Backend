@@ -259,8 +259,8 @@ namespace pro.backend.Controllers
 
                 product.rating = avg;
 
-                if (await _productService.UpdateProduct(product))
-                    return Ok();
+                await _productService.UpdateProduct(product);
+                return Ok();
             }
             catch (AppException ex)
             {
