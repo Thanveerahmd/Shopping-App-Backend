@@ -67,9 +67,11 @@ namespace pro.backend.Services
                 var id = Deviceinfo.id;
                 Deviceinfo = location;
                 Deviceinfo.id = id;
+                
 
             _context.DeviceToken.Update(Deviceinfo);
             return await _context.SaveChangesAsync() > 0;
         }
+
     }
 }

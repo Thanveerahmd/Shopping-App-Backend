@@ -47,7 +47,14 @@ namespace pro.backend.Controllers
         public async Task<IActionResult> DeviceDetails(DeviceDetailsDto device)
         {
             var DeviceDetails = _mapper.Map<DeviceToken>(device);
-            _repo.Add(DeviceDetails);
+            var prevData = await _map.GetDeviceDetails(DeviceDetails.DeviceId);
+            if(prevData == null){
+                _repo.Add(DeviceDetails);
+            }else{
+                prevData.FirebaseToken = DeviceDetails.FirebaseToken;
+                await _map.LocationUpdate(prevData);
+            }
+            
             if (await _repo.SaveAll())
             {
                 return Ok();
@@ -131,8 +138,8 @@ namespace pro.backend.Controllers
             pos1.Longitude = value[0].lng;
             var stores = await _map.GetAllStores();
 
-            TimeSpan timeDiff = (DeviceInfo.LastNotifyTime - DateTime.UtcNow);
-            var time = Convert.ToInt32(timeDiff.Hours);
+            TimeSpan timeDiff = (DateTime.UtcNow  - DeviceInfo.LastNotifyTime);
+            var time = Convert.ToInt32(timeDiff.TotalHours);
 
             if (time < 1)
             {

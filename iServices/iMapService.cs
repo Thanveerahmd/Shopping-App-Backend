@@ -12,5 +12,6 @@ namespace pro.backend.iServices
         Task<bool> UpdateStore(Store Store);
         Task<bool> LocationUpdate(DeviceToken location);
         Task<DeviceToken> GetDeviceDetails(string deviceId);
+
     }
 }
