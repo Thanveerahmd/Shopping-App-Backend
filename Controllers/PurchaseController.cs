@@ -237,17 +237,20 @@ namespace pro.backend.Controllers
                 var counter = 0;
                 var totalPrice = 0f;
                 IList<orderDetails> OutOfStockProducts = new List<orderDetails>();
-                var ProductIsNotFound =false;
+                var flag =true;
                 foreach (var el in orderDetails)
                 {
                     var CartProduct = _mapper.Map<OrderProductDto>(el);
                     var OrderProduct = _mapper.Map<orderDetails>(CartProduct);
                     var product = await _repo.GetProduct(CartProduct.ProductId);
 
+                    var CartProductToDelete = await _repo.GetCartProduct(el.Id);
                     if(product == null)
                     {
-                     ProductIsNotFound = (ProductIsNotFound && true); 
-                    }
+                     flag = (flag && false); 
+                     _repo.Delete(CartProductToDelete);
+
+                    }else
 
                     if (product.Quantity < CartProduct.Count)
                     {
@@ -270,9 +273,10 @@ namespace pro.backend.Controllers
                     });
                 }
                  
-                if (ProductIsNotFound)
-                {
-                    return BadRequest(new
+                if (!flag)
+                {   
+                    await _repo.SaveAll();
+                    return StatusCode(401,new
                     {
                         message = "One of Product is Deleted by seller.Please recheck"
                     });
