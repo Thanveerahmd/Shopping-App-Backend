@@ -200,6 +200,7 @@ namespace pro.backend.Controllers
                 var BuyNowProduct = _mapper.Map<orderDetails>(checkoutDto);
                 var product = await _repo.GetProduct(BuyNowProduct.ProductId);
 
+
                 if (product.Quantity < BuyNowProduct.Count)
                     return BadRequest(BuyNowProduct.product_Name);
 
@@ -236,12 +237,17 @@ namespace pro.backend.Controllers
                 var counter = 0;
                 var totalPrice = 0f;
                 IList<orderDetails> OutOfStockProducts = new List<orderDetails>();
-
+                var ProductIsNotFound =false;
                 foreach (var el in orderDetails)
                 {
                     var CartProduct = _mapper.Map<OrderProductDto>(el);
                     var OrderProduct = _mapper.Map<orderDetails>(CartProduct);
                     var product = await _repo.GetProduct(CartProduct.ProductId);
+
+                    if(product == null)
+                    {
+                     ProductIsNotFound = (ProductIsNotFound && true); 
+                    }
 
                     if (product.Quantity < CartProduct.Count)
                     {
@@ -252,6 +258,7 @@ namespace pro.backend.Controllers
                     {
                         totalPrice += CartProduct.Count * CartProduct.Price;
                     }
+
                 }
 
                 if (counter > 0)
@@ -262,7 +269,14 @@ namespace pro.backend.Controllers
                         outOfStockProduct = OutOfStockProducts
                     });
                 }
-
+                 
+                if (ProductIsNotFound)
+                {
+                    return BadRequest(new
+                    {
+                        message = "One of Product is Deleted by seller.Please recheck"
+                    });
+                }
 
                 try
                 {
