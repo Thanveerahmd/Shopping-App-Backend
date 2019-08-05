@@ -55,6 +55,8 @@ namespace WebApi
             services.AddScoped<iPromoService, PromoService>();
             services.AddScoped<iMapService, MapService>();
             services.AddScoped<iOrderService, OrderService>();
+            services.AddScoped<iCategoryService, CategoryService>();
+            services.AddTransient<PhotosController>();
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
 

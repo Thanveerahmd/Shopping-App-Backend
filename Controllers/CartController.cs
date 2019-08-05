@@ -58,7 +58,6 @@ namespace pro.backend.Controllers
 
         }
 
-
         [HttpGet("{userId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetCart(string userId)
@@ -67,7 +66,6 @@ namespace pro.backend.Controllers
             var cartToReturn = _mapper.Map<CartDto>(cart);
             return Ok(cartToReturn);
         }
-
 
         [HttpDelete("{User_Id}/{CartProductId}")]
         [AllowAnonymous]
@@ -86,7 +84,6 @@ namespace pro.backend.Controllers
                 return Ok();
             return BadRequest();
         }
-
 
         [HttpDelete("{CartId}")]
         [AllowAnonymous]

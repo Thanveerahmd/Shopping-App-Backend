@@ -27,17 +27,18 @@ namespace Project.Helpers
         public DbSet<Order> Orders { get; set; }
         public DbSet<Advertisement> Advertisement { get; set; }
         public DbSet<PhotoForAd> PhotoForAd { get; set; }
-        public DbSet<DeviceToken> DeviceToken{ get; set; }
-        public DbSet<Chat> Chat{ get; set; }
-
-        public DbSet<Promo> Promo{ get; set; }
-       
+        public DbSet<DeviceToken> DeviceToken { get; set; }
+        public DbSet<Chat> Chat { get; set; }
+        public DbSet<Category> Category { get; set; }
+        public DbSet<SubCategory> SubCategory { get; set; }
+        public DbSet<Promo> Promo { get; set; }
+        public DbSet<PhotoForCategory> photoForCategories { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
 
             builder.Entity<Advertisement>()
-            
+
             .HasOne(p => p.PhotoForAd)
             .WithOne(i => i.Advertisement)
             .HasForeignKey<PhotoForAd>(b => b.AdId);
@@ -45,7 +46,7 @@ namespace Project.Helpers
             builder.Entity<Promo>()
             .Property<string>("DayCollection")
             .HasField("_Days_of_The_Week");
-            
+
         }
 
     }

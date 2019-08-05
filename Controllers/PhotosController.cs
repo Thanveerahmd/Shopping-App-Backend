@@ -27,7 +27,7 @@ namespace pro.backend.Controllers
         private readonly UserManager<User> _usermanger;
         private Cloudinary _cloudinary;
         private readonly iAdvertisement _adService;
-
+        private readonly iCategoryService _categoryService;
         private readonly iProductService _productService;
 
         private static readonly HttpClient Client = new HttpClient();
@@ -36,12 +36,14 @@ namespace pro.backend.Controllers
         iProductService productService,
          iShoppingRepo repo,
          UserManager<User> usermanger,
-         iAdvertisement adService)
+         iAdvertisement adService,
+         iCategoryService categoryService)
         {
             _repo = repo;
             _mapper = mapper;
             _usermanger = usermanger;
             _adService = adService;
+            _categoryService = categoryService;
             _productService = productService;
 
             Account acc = new Account(
@@ -139,7 +141,7 @@ namespace pro.backend.Controllers
             {
                 var photoToReturn = _mapper.Map<PhotoForReturnDto>(photo);
                 // return CreatedAtRoute("GetPhoto", new { id = photo.Id , visibility= product.visibility }, photoToReturn);
-                return Ok(new { visibility= product.visibility });
+                return Ok(new { visibility = product.visibility });
             }
             return BadRequest("Coudn't add the Photo");
         }
@@ -194,8 +196,8 @@ namespace pro.backend.Controllers
 
             var photoFromRepo = await _repo.GetPhoto(id);
 
-        
-                
+
+
             if (photoFromRepo.PublicID != null)
             {
                 var delParams = new DelResParams()
@@ -268,15 +270,16 @@ namespace pro.backend.Controllers
             bool Violence_flag = (Violence == Likelihood.Unlikely || Violence == Likelihood.VeryUnlikely);
             bool Racy_flag = (Racy == Likelihood.Unlikely || Racy == Likelihood.VeryUnlikely);
 
-            bool safe=false;
+            bool safe = false;
 
             if (Adult_flag && Spoof_flag && Medical_flag && Violence_flag && Racy_flag)
             {
                 safe = true;
             }
 
-            if(safe == false){
-              
+            if (safe == false)
+            {
+
                 var delParams = new DelResParams()
                 {
                     PublicIds = new List<string>() { Upload_result.PublicId },
@@ -310,7 +313,7 @@ namespace pro.backend.Controllers
             }
             else
             {
-                return StatusCode(401,new { message = "Coudn't add the Photo" });
+                return StatusCode(401, new { message = "Coudn't add the Photo" });
             }
 
         }
@@ -364,8 +367,6 @@ namespace pro.backend.Controllers
             return Ok(photo);
         }
 
-      
-        
         [HttpPost("advertisement/{AdId}")]
         [AllowAnonymous]
         public async Task<IActionResult> AddAdvertisementPhoto(int AdId, [FromForm]PhotoUploadDto PhotoUploadDto)
@@ -415,12 +416,10 @@ namespace pro.backend.Controllers
             return BadRequest();
         }
 
-
         [HttpDelete("deleteAd/{sellerId}/{AdId}")]
         [AllowAnonymous]
         public async Task<IActionResult> DeleteAdPhoto(string sellerId, int AdId)
         {
-
 
             var Ad = await _adService.GetAdvertisement(AdId);
 
@@ -460,6 +459,92 @@ namespace pro.backend.Controllers
             return BadRequest(new { message = "Failed to delete photo" });
         }
 
+        [HttpPost("subCategory/{SubCategoryId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> AddSubCategoryPhoto(int SubCategoryId, [FromForm]PhotoUploadDto PhotoUploadDto)
+        {
+
+            var file = PhotoUploadDto.file;
+
+            var Upload_result = new ImageUploadResult();
+
+            if (file != null && file.Length > 0)
+            {
+                using (var stream = file.OpenReadStream())
+                {
+                    var UploadParams = new ImageUploadParams()
+                    {
+                        File = new FileDescription(file.Name, stream),
+                        Transformation = new Transformation()
+                         .Width(500).Height(500).Crop("fill").Gravity("face")
+                    };
+
+                    Upload_result = _cloudinary.Upload(UploadParams);
+                }
+            }
+            else
+            {
+                return BadRequest(new { message = "Your file is corrupted" });
+            }
+
+            PhotoUploadDto.Url = Upload_result.Uri.ToString();
+
+            PhotoUploadDto.PublicID = Upload_result.PublicId;
+
+            var photo = _mapper.Map<PhotoForCategory>(PhotoUploadDto);
+
+            var SubCategory = await _categoryService.GetSubCategory(SubCategoryId);
+
+            photo.SubCategoryId = SubCategoryId;
+
+            SubCategory.url = photo.Url;
+            SubCategory.PhotoForCategory = photo;
+            if (await _categoryService.UpdateSubCategory(SubCategory))
+            {
+                return Ok();
+            }
+            return BadRequest();
+        }
+
+        [HttpDelete("deleteSubCategory/{imageId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> DeleteCategoryPhoto(int imageId)
+        {
+          
+            var photoFromRepo = await _categoryService.GetPhotoOfCategory(imageId);
+
+              var SubCategory = await _categoryService.GetSubCategory(photoFromRepo.SubCategoryId);
+
+
+            if (photoFromRepo.PublicID != null)
+            {
+                var delParams = new DelResParams()
+                {
+                    PublicIds = new List<string>() { photoFromRepo.PublicID },
+                    Invalidate = true
+                };
+                var delResult = _cloudinary.DeleteResources(delParams);
+
+                if (!delResult.Partial)
+                {
+                    if (SubCategory != null)
+                        SubCategory.url = null;
+
+                    await _categoryService.UpdateSubCategory(SubCategory);
+                    _repo.Delete(photoFromRepo);
+
+                }
+            }
+
+            if (photoFromRepo.PublicID == null)
+            {
+                _repo.Delete(photoFromRepo);
+            }
+
+            if (await _repo.SaveAll())
+                return Ok();
+            return BadRequest(new { message = "Failed to delete photo" });
+        }
     }
 
 }

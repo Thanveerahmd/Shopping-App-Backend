@@ -43,6 +43,8 @@ namespace Project.Helpers
 
             CreateMap<PhotoUploadDto, PhotoForAd>();
 
+            CreateMap<PhotoUploadDto, PhotoForCategory>();
+
             CreateMap<Cart, CartDto>();
 
             CreateMap<CartDto, Cart>();
@@ -113,19 +115,32 @@ namespace Project.Helpers
 
             CreateMap<Order, OrderProductDto>();
 
-            CreateMap<orderDetails,OrderInfoForSellerDto>();
+            CreateMap<orderDetails, OrderInfoForSellerDto>();
 
-            CreateMap<ChatDto,Chat>();
+            CreateMap<ChatDto, Chat>();
 
-            CreateMap<Chat,ChatDto>();
+            CreateMap<Chat, ChatDto>();
 
-            CreateMap<PromoDto,Promo>();
+            CreateMap<PromoDto, Promo>();
 
-            CreateMap<Promo,PromoDto>();
+            CreateMap<Promo, PromoDto>();
 
-            CreateMap<PromoStatusUpdateDto,Promo>();
+            CreateMap<PromoStatusUpdateDto, Promo>();
 
-            CreateMap<Promo,PromoStatusUpdateDto>();
+            CreateMap<Promo, PromoStatusUpdateDto>();
+
+            CreateMap<Category, CategoryDto>();
+
+            CreateMap<CategoryDto,Category>();
+
+            CreateMap<Category, CategoryReturnDto>();
+
+            CreateMap<CategoryReturnDto,Category>();
+
+            CreateMap<SubCategory, SubCategoryDto>();
+
+            CreateMap<SubCategoryDto,SubCategory>();
+
 
         }
     }
