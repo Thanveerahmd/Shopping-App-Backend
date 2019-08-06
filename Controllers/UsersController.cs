@@ -364,9 +364,9 @@ namespace WebApi.Controllers
               if(  await _usermanger.IsLockedOutAsync(item))
               {
                    item.isLocked =true;
+              }else{
+                   item.isLocked =false;
               }
-               item.isLocked =false;
-               
               await _usermanger.UpdateAsync(item);
             }
             return Ok(users);
