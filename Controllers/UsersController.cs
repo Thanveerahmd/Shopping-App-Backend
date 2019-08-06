@@ -78,7 +78,7 @@ namespace WebApi.Controllers
                        u.NormalizedUserName == userDto.Username.ToUpper());
 
                     var token = _token.GenrateJwtToken(appuser);
-                    var cart =await _repo.GetCart(user.Id);
+                    var cart = await _repo.GetCart(user.Id);
                     var cartToReturn = _mapper.Map<CartDto>(cart);
                     var image = await _repo.GetPhotoOfUser(user.Id);
                     string imageUrl = null;
@@ -116,6 +116,7 @@ namespace WebApi.Controllers
         {
 
             var createuser = _mapper.Map<User>(userDto);
+            createuser.isLocked = false;
             var result = await _usermanger.CreateAsync(createuser, userDto.Password);
             var getuser = _mapper.Map<UserDto>(createuser);
 

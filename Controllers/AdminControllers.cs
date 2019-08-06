@@ -116,7 +116,6 @@ namespace Project.Controllers
 
         }
 
-
         [HttpGet("users")]
         public IActionResult GetAllUsers()
         {
@@ -389,6 +388,8 @@ namespace Project.Controllers
                 
 
             }
+            user.isLocked = true;
+            await _usermanger.UpdateAsync(user);
             return result;
         }
 
@@ -404,6 +405,9 @@ namespace Project.Controllers
                  await _emailSender.SendEmailAsync(user.UserName, "About Your Account Activation",
                $"Please note that your Account has been Reactivated  ,contact us in Winkel@gmail.com");
             }
+
+             user.isLocked = false;
+            await _usermanger.UpdateAsync(user);
             return result;
         }
 
