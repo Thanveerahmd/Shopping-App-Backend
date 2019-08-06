@@ -358,6 +358,17 @@ namespace WebApi.Controllers
         public async Task<IActionResult> GetAllBuyers()
         {
             var users = await _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Buyer'").ToListAsync();
+
+            foreach (var item in users)
+            {
+              if(  await _usermanger.IsLockedOutAsync(item))
+              {
+                   item.isLocked =true;
+              }
+               item.isLocked =false;
+               
+              await _usermanger.UpdateAsync(item);
+            }
             return Ok(users);
         }
 
