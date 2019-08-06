@@ -70,7 +70,7 @@ namespace pro.backend.Services
         {
             var category = await _context.SubCategory.FindAsync(CategoryId);
 
-            if (category.Products != null)
+            if (category.Products.Count!=0)
             {
                 return true;
             }

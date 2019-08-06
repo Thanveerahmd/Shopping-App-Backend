@@ -7,6 +7,7 @@ namespace pro.backend.Dtos
     {
         public int Id { get; set; }
         public string CategoryName { get; set; }
+        public int qty { get; set; }
         public ICollection<SubCategoryDto> SubCategorys { get; set; }
 
 

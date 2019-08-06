@@ -100,7 +100,7 @@ namespace pro.backend.Controllers
                         product.visibility = true;
                     }
                 }
-
+                
                 SubCategory.Products.Add(product);
                 category.SubCategorys.Add(SubCategory);
                 _productService.AddProduct(product);

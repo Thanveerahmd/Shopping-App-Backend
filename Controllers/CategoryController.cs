@@ -83,7 +83,7 @@ namespace pro.backend.Controllers
             }
 
             _repo.Add(subCategory);
-
+            // category.SubCategorys.Add(subCategory);
             if (await _repo.SaveAll())
             {
                 return Ok(subCategory.Id);
