@@ -132,18 +132,28 @@ namespace pro.backend.Controllers
                 return BadRequest(new { Message = "No Such Category" });
             }
 
-            if (await _categoryService.IsProductAvailable(categoryId))
-            {
-                return Unauthorized();
-            }
+            // if (await _categoryService.IsProductAvailable(categoryId))
+            // {
+            //     return Unauthorized();
+            // }
 
             var Subcategorys = await _categoryService.GetSubCategoryswithPhoto(categoryId);
 
+            foreach (var item in Subcategorys)
+            {
+                var subCategory = await _categoryService.GetSubCategorywithPhoto(item.Id);
+                
+                if (await _categoryService.IsProductAvailableForSubCategory(item.Id))
+                return Unauthorized();
+
+            }
 
 
             foreach (var item in Subcategorys)
             {
                 var subCategory = await _categoryService.GetSubCategorywithPhoto(item.Id);
+                
+                
                 var photo = subCategory.PhotoForCategory;
                 if(photo!=null)
                 await _photosController.DeleteCategoryPhoto(photo.Id);
@@ -183,7 +193,7 @@ namespace pro.backend.Controllers
             return BadRequest();
         }
 
-        [HttpPut("UpdateCategory")]
+        [HttpPut("updateCategory")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateCategory([FromBody]CategoryDto categoryDto)
         {
@@ -191,9 +201,20 @@ namespace pro.backend.Controllers
             var category = _mapper.Map<Category>(categoryDto);
             category.Id = categoryDto.Id;
 
-            if (await _categoryService.IsProductAvailable(category.Id))
+            // if (await _categoryService.IsProductAvailable(category.Id))
+            // {
+            //     return Unauthorized();
+            // }
+            var Subcategorys = await _categoryService.GetSubCategoryswithPhoto(categoryDto.Id);
+
+
+            foreach (var item in Subcategorys)
             {
+                var subCategory = await _categoryService.GetSubCategorywithPhoto(item.Id);
+                
+                if (await _categoryService.IsProductAvailableForSubCategory(item.Id))
                 return Unauthorized();
+
             }
 
             await _categoryService.UpdateCategory(category);
@@ -207,13 +228,15 @@ namespace pro.backend.Controllers
 
         }
 
-        [HttpPut("UpdateSubCategory")]
+        [HttpPut("updateSubCategory")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateSubCategory([FromBody]SubCategoryDto subCategoryDto)
         {
             // map dto to entity and set id
             var subCategory = _mapper.Map<SubCategory>(subCategoryDto);
             subCategory.Id = subCategoryDto.Id;
+            
+            var subCategoryCheck = await _categoryService.GetSubCategorywithPhoto(subCategoryDto.Id);
 
             if (await _categoryService.IsProductAvailableForSubCategory(subCategory.Id))
                 return Unauthorized();
