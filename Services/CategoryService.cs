@@ -27,7 +27,7 @@ namespace pro.backend.Services
         // get category with subcategory
         public async Task<Category> GettheCategory(int CategoryId)
         {
-            var category = await _context.Category.Include(p => p.SubCategorys).FirstOrDefaultAsync(p => p.Id == CategoryId);
+            var category = await _context.Category.Include(p => p.SubCategorys).Include(p => p.SubCategorys).FirstOrDefaultAsync(p => p.Id == CategoryId);
 
             return category;
         }
@@ -60,8 +60,8 @@ namespace pro.backend.Services
         public async Task<bool> IsProductAvailable(int CategoryId)
         {
             var category =await  GettheCategory(CategoryId);
-
-            if (category.SubCategorys.Any(p => p.Products.Count !=0))
+            
+            if (category.SubCategorys.Any(p => p.Products.Count != 0))
             {
                 return true;
             }
@@ -83,7 +83,6 @@ namespace pro.backend.Services
 
             return Subcategory;
         }
-
         public async Task<ICollection<SubCategory>> GetSubCategoryswithPhoto(int CategoryId)
         {
             var Subcategorys = await _context.SubCategory.Where(p => p.CategoryId == CategoryId).Include(p => p.PhotoForCategory).ToListAsync();
