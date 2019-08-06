@@ -23,12 +23,8 @@ namespace pro.backend.Controllers
         public readonly iShoppingRepo _repo;
         private readonly iCategoryService _categoryService;
         private readonly UserManager<User> _usermanger;
-
         private readonly iAdvertisement _adService;
-
         private readonly PhotosController _photosController;
-
-
 
         public CategoryController(iProductService productService,
         IMapper mapper, iShoppingRepo repo, iCategoryService categoryService,
@@ -183,19 +179,45 @@ namespace pro.backend.Controllers
             return BadRequest();
         }
 
-        [HttpPut]
+        [HttpPut("UpdateCategory")]
         [AllowAnonymous]
-        public async Task<IActionResult> UpdateCategory([FromBody]CartProductDto productDto)
+        public async Task<IActionResult> UpdateCategory([FromBody]CategoryDto categoryDto)
         {
             // map dto to entity and set id
-            var prod = _mapper.Map<CartProduct>(productDto);
-            prod.Id = productDto.Id;
+            var category = _mapper.Map<Category>(categoryDto);
+            category.Id = categoryDto.Id;
 
+            await _categoryService.UpdateCategory(category);
 
-            await _repo.UpdateCartDetails(prod);
+            if (await _categoryService.IsProductAvailable( category.Id ))
+            {
+                return Unauthorized();
+            }
+
             if (await _repo.SaveAll())
             {
-                return Ok(prod.Id);
+                return Ok(category.Id);
+            }
+            return BadRequest();
+
+        }
+       
+        [HttpPut("UpdateSubCategory")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateSubCategory([FromBody]SubCategoryDto subCategoryDto)
+        {
+            // map dto to entity and set id
+            var subCategory = _mapper.Map<SubCategory>(subCategoryDto);
+            subCategory.Id = subCategoryDto.Id;
+           
+           if (await _categoryService.IsProductAvailableForSubCategory( subCategory.Id ))
+                return Unauthorized();
+
+
+            await _categoryService.UpdateSubCategory(subCategory);
+            if (await _repo.SaveAll())
+            {
+                return Ok( subCategory.Id );
             }
             return BadRequest();
 

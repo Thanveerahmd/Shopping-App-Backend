@@ -23,14 +23,15 @@ namespace pro.backend.Controllers
         private readonly iProductService _productService;
         private readonly IMapper _mapper;
         public readonly iShoppingRepo _repo;
-
+        private readonly iCategoryService _categoryService;
         private static readonly HttpClient Client = new HttpClient();
 
         public ProductController(iProductService productService,
-        IMapper mapper, iShoppingRepo repo)
+        IMapper mapper, iShoppingRepo repo, iCategoryService categoryService)
         {
             _mapper = mapper;
             _repo = repo;
+            _categoryService = categoryService;
             _productService = productService;
         }
         [AllowAnonymous]
@@ -50,12 +51,33 @@ namespace pro.backend.Controllers
             return Ok(productToReturn);
         }
 
-        [HttpPost("addProduct")]
+        [HttpPost("addProduct/{SubCategoryId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> AddProduct([FromBody]ProductAddingDto productDto)
+        public async Task<IActionResult> AddProduct([FromBody]ProductAddingDto productDto, int SubCategoryId)
         {
             // map dto to entity
             var product = _mapper.Map<Product>(productDto);
+            var SubCategory = await _categoryService.GetSubCategorywithPhoto(SubCategoryId);
+
+
+            if (SubCategory == null)
+            {
+                return BadRequest(new { message = "There is No such SubCategory" });
+
+            }
+
+            var category = await _categoryService.GettheCategory(SubCategory.CategoryId);
+
+            if (category == null)
+            {
+                return BadRequest(new { message = "There is No such Category" });
+
+            }
+
+            product.Sub_category = SubCategory.SubCategoryName;
+            product.Category = category.CategoryName;
+            product.Sub_categoryId = SubCategoryId;
+            product.CategoryId = category.Id;
 
             try
             {
@@ -78,6 +100,11 @@ namespace pro.backend.Controllers
                         product.visibility = true;
                     }
                 }
+
+                SubCategory.Products.Add(product);
+                category.SubCategorys.Add(SubCategory);
+                await _categoryService.UpdateSubCategory(SubCategory);
+                await _categoryService.UpdateCategory(category);
                 _productService.AddProduct(product);
 
                 return Ok(new { id = product.Id, visibility = product.visibility });
@@ -105,6 +132,32 @@ namespace pro.backend.Controllers
             var prod = _mapper.Map<Product>(productDto);
             prod.Id = productDto.Id;
 
+            // var oldproduct = await _repo.GetProduct(prod.Id);
+            // var SubCategory = await _categoryService.GetSubCategorywithPhoto(oldproduct.Sub_categoryId);
+            // var Category = await _categoryService.GettheCategory(oldproduct.CategoryId);
+            
+            //  var newSubCategory = await _categoryService.GetSubCategorywithPhoto(SubCategoryId);
+            // SubCategory.Products.Remove(oldproduct);
+
+            // if (newSubCategory == null)
+            // {
+            //     return BadRequest(new { message = "There is No such SubCategory" });
+
+            // }
+
+            // var newcategory = await _categoryService.GettheCategory(SubCategory.CategoryId);
+
+            // if (newcategory == null)
+            // {
+            //     return BadRequest(new { message = "There is No such Category" });
+
+            // }
+
+            // prod.Sub_category = newSubCategory.SubCategoryName;
+            // prod.Category = newcategory.CategoryName;
+            // prod.Sub_categoryId = SubCategoryId;
+            // prod.CategoryId = newcategory.Id;
+
             try
             {
                 if (prod.Product_name != null && prod.Product_Discription != null)
@@ -130,6 +183,7 @@ namespace pro.backend.Controllers
                     }
                 }
                 await _productService.UpdateProduct(prod);
+                //await _categoryService.UpdateSubCategory(newSubCategory);
                 return Ok(new { visibility = prod.visibility });
             }
             catch (AppException ex)
