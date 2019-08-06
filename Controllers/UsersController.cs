@@ -357,14 +357,14 @@ namespace WebApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllBuyers()
         {
-            var users = await _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Buyer'").ToListAsync();
+            var users = await _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Buyer'").Include(p => p.DeliveryDetails).Include(p => p.BillingInfo).ToListAsync();
 
+            
             foreach (var item in users)
             {
-              if(  await _usermanger.IsLockedOutAsync(item))
-              {
+              if(  await _usermanger.IsLockedOutAsync(item)){
                    item.isLocked =true;
-              }else{
+              }else {
                    item.isLocked =false;
               }
               await _usermanger.UpdateAsync(item);
@@ -376,7 +376,7 @@ namespace WebApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAllSellers()
         {
-            var users = await _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Seller'").ToListAsync();
+            var users = await _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Seller'").Include(p => p.DeliveryDetails).Include(p => p.BillingInfo).ToListAsync();
             return Ok(users);
         }
     }
