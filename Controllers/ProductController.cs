@@ -103,9 +103,9 @@ namespace pro.backend.Controllers
 
                 SubCategory.Products.Add(product);
                 category.SubCategorys.Add(SubCategory);
+                _productService.AddProduct(product);
                 await _categoryService.UpdateSubCategory(SubCategory);
                 await _categoryService.UpdateCategory(category);
-                _productService.AddProduct(product);
 
                 return Ok(new { id = product.Id, visibility = product.visibility });
 

@@ -28,7 +28,7 @@ namespace pro.backend.Controllers
 
         public CategoryController(iProductService productService,
         IMapper mapper, iShoppingRepo repo, iCategoryService categoryService,
-        iAdvertisement adService, UserManager<User> usermanger,PhotosController photosController)
+        iAdvertisement adService, UserManager<User> usermanger, PhotosController photosController)
         {
             _mapper = mapper;
             _repo = repo;
@@ -101,7 +101,7 @@ namespace pro.backend.Controllers
             var category = _mapper.Map<ICollection<CategoryDto>>(Category);
             return Ok(category);
         }
-        
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetCategorywithSubCategories()
@@ -110,7 +110,7 @@ namespace pro.backend.Controllers
             var category = _mapper.Map<ICollection<CategoryReturnDto>>(Category);
             return Ok(category);
         }
-        
+
         [HttpGet("getSubCategory/{categoryId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetSubCategory(int categoryId)
@@ -126,8 +126,9 @@ namespace pro.backend.Controllers
         {
             var category = await _categoryService.GettheCategory(categoryId);
 
-            if(category == null){
-                return BadRequest(new {Message="No Such Category"});
+            if (category == null)
+            {
+                return BadRequest(new { Message = "No Such Category" });
             }
 
             if (await _categoryService.IsProductAvailable(categoryId))
@@ -137,12 +138,13 @@ namespace pro.backend.Controllers
 
             var Subcategorys = await _categoryService.GetSubCategoryswithPhoto(categoryId);
 
-         
-         
+
+
             foreach (var item in Subcategorys)
             {
                 var subCategory = await _categoryService.GetSubCategorywithPhoto(item.Id);
                 var photo = subCategory.PhotoForCategory;
+                if(photo!=null)
                 await _photosController.DeleteCategoryPhoto(photo.Id);
             }
 
@@ -165,12 +167,13 @@ namespace pro.backend.Controllers
                 return Unauthorized();
 
             var Subcategory = await _categoryService.GetSubCategorywithPhoto(SubcategoryId);
-            
+
             if (await _categoryService.IsProductAvailableForSubCategory(SubcategoryId))
                 return Unauthorized();
 
             var photo = Subcategory.PhotoForCategory;
-          
+
+            if(photo!=null)
             await _photosController.DeleteCategoryPhoto(photo.Id);
             _repo.Delete(Subcategory);
 
@@ -187,12 +190,13 @@ namespace pro.backend.Controllers
             var category = _mapper.Map<Category>(categoryDto);
             category.Id = categoryDto.Id;
 
-            await _categoryService.UpdateCategory(category);
-
-            if (await _categoryService.IsProductAvailable( category.Id ))
+            if (await _categoryService.IsProductAvailable(category.Id))
             {
                 return Unauthorized();
             }
+
+            await _categoryService.UpdateCategory(category);
+
 
             if (await _repo.SaveAll())
             {
@@ -201,7 +205,7 @@ namespace pro.backend.Controllers
             return BadRequest();
 
         }
-       
+
         [HttpPut("UpdateSubCategory")]
         [AllowAnonymous]
         public async Task<IActionResult> UpdateSubCategory([FromBody]SubCategoryDto subCategoryDto)
@@ -209,15 +213,16 @@ namespace pro.backend.Controllers
             // map dto to entity and set id
             var subCategory = _mapper.Map<SubCategory>(subCategoryDto);
             subCategory.Id = subCategoryDto.Id;
-           
-           if (await _categoryService.IsProductAvailableForSubCategory( subCategory.Id ))
+
+            if (await _categoryService.IsProductAvailableForSubCategory(subCategory.Id))
                 return Unauthorized();
 
 
             await _categoryService.UpdateSubCategory(subCategory);
+
             if (await _repo.SaveAll())
             {
-                return Ok( subCategory.Id );
+                return Ok(subCategory.Id);
             }
             return BadRequest();
 

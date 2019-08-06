@@ -78,10 +78,11 @@ namespace pro.backend.Services
         }
          public async Task<SubCategory> GetSubCategorywithPhoto(int SubCategoryId)
         {
-            var Subcategory = await _context.SubCategory.Include(p => p.PhotoForCategory).FirstOrDefaultAsync(p => p.Id == SubCategoryId);
+            var Subcategory = await _context.SubCategory.Include(p => p.PhotoForCategory).Include(p => p.Products).FirstOrDefaultAsync(p => p.Id == SubCategoryId);
 
             return Subcategory;
         }
+
         public async Task<ICollection<SubCategory>> GetSubCategoryswithPhoto(int CategoryId)
         {
             var Subcategorys = await _context.SubCategory.Where(p => p.CategoryId == CategoryId).Include(p => p.PhotoForCategory).ToListAsync();
