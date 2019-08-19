@@ -50,7 +50,7 @@ namespace pro.backend.Controllers
         {
             var product = await _repo.GetProduct(id);
             var productToReturn = _mapper.Map<ProductDto>(product);
-            var RecommendedProducts = await _repo.GetProductsBySearchQuery(product.subCategory.SubCategoryName, "Sub Category");
+            var RecommendedProducts = await _repo.GetProductsBySearchQuery(productToReturn.Sub_category, "Sub Category");
             var RecommendedProductsToReturn = _mapper.Map<ICollection<ProductListDto>>(RecommendedProducts);
 
             IList<ProductListDto> Products = new List<ProductListDto>();
