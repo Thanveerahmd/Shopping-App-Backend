@@ -52,17 +52,45 @@ namespace pro.backend.Controllers
             var productToReturn = _mapper.Map<ProductDto>(product);
             var RecommendedProducts = await _repo.GetProductsBySearchQuery(product.subCategory.SubCategoryName, "Sub Category");
             var RecommendedProductsToReturn = _mapper.Map<ICollection<ProductListDto>>(RecommendedProducts);
-          IList<Product> Products = new List<Product>();
+
+            IList<ProductListDto> Products = new List<ProductListDto>();
+
             if (RecommendedProductsToReturn.Count > 5)
             {
-                RecommendedProducts = await _repo.GetProductsByNameAndSubCategory(id);
-                RecommendedProductsToReturn = _mapper.Map<ICollection<ProductListDto>>(RecommendedProducts);
-            
+                var Prod = await _repo.GetProductsByNameAndSubCategory(id);
+                var ProductsToReturn = _mapper.Map<ICollection<ProductListDto>>(RecommendedProducts);
+                foreach (var item in ProductsToReturn)
+                {
+                    Products.Add(item);
+                    if (Products.Count == 5)
+                        break;
 
-                
+
+                }
+                if (Products.Count < 5)
+                {
+                    foreach (var items in RecommendedProductsToReturn)
+                    {
+                        Products.Add(items);
+
+                        if (Products.Count == 5)
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                foreach (var item in RecommendedProductsToReturn)
+                {
+                    Products.Add(item);
+
+                    if (Products.Count == 5)
+                        break;
+                }
             }
 
-            return Ok(productToReturn);
+
+            return Ok(new{product=productToReturn,recommendedProducts=Products});
         }
 
         [HttpPost("addProduct/{SubCategoryId}")]
