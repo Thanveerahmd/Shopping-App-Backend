@@ -90,7 +90,7 @@ namespace pro.backend.Controllers
             }
 
 
-            return Ok(new{product=productToReturn,recommendedProducts=Products});
+            return Ok(new{product=productToReturn,similarProducts=Products});
         }
 
         [HttpPost("addProduct/{SubCategoryId}")]
