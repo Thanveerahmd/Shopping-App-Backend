@@ -57,7 +57,7 @@ namespace pro.backend.Services
         public async Task<IEnumerable<Product>> GetAllUnflaggedProductsOfSeller(string sellerID) //have to change
         {
             var products = await _context.Products.Where(p => p.SellerId == sellerID)
-            .Where(p => p.visibility==true)
+            .Where(p => p.visibility == true)
             .Include(p => p.Photos).ToListAsync();
 
             return products;
@@ -134,6 +134,19 @@ namespace pro.backend.Services
                     }
                 }
             }
+
+            return products;
+        }
+
+        public async Task<ICollection<Product>> GetProductsByNameAndSubCategory( int productId)
+        {
+            List<Product> products = null;
+            var product = await GetProduct(productId);
+            
+
+            products = await _context.Products.Where(p => p.Sub_category.ToLower().Contains(product.subCategory.SubCategoryName.ToLower()))
+            .Where(q => q.Product_name.ToLower().Equals(product.Product_name.ToLower())).Where(p => p.visibility != false)
+            .Include(p => p.Photos).ToListAsync();
 
             return products;
         }

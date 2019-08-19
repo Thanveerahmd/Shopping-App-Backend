@@ -12,6 +12,7 @@ namespace pro.backend.iServices
         void AddAll<T>(ICollection<T> entity) where T : class;
         void DeleteAll<T>(ICollection<T> entity) where T : class;
         Task<bool> SaveAll();
+        Task<ICollection<Product>> GetProductsByNameAndSubCategory(int productId);
         Task<IEnumerable<Product>> GetAllProducts();
         Task<IEnumerable<Product>> GetAllProductsOfSeller(string sellerID);
 

@@ -21,10 +21,12 @@ namespace pro.backend.Controllers
         private readonly IMapper _mapper;
         public readonly iShoppingRepo _repo;
         public readonly iMapService _map;
-        public MapController(IMapper mapper, iShoppingRepo repo, iMapService map)
+        private readonly iPromoService _promoService;
+        public MapController(IMapper mapper, iPromoService promoService, iShoppingRepo repo, iMapService map)
         {
             _repo = repo;
             _mapper = mapper;
+            _promoService = promoService;
             _map = map;
 
         }
@@ -48,13 +50,16 @@ namespace pro.backend.Controllers
         {
             var DeviceDetails = _mapper.Map<DeviceToken>(device);
             var prevData = await _map.GetDeviceDetails(DeviceDetails.DeviceId);
-            if(prevData == null){
+            if (prevData == null)
+            {
                 _repo.Add(DeviceDetails);
-            }else{
+            }
+            else
+            {
                 prevData.FirebaseToken = DeviceDetails.FirebaseToken;
                 await _map.LocationUpdate(prevData);
             }
-            
+
             if (await _repo.SaveAll())
             {
                 return Ok();
@@ -131,24 +136,24 @@ namespace pro.backend.Controllers
             var DeviceInfo = await _map.GetDeviceDetails(DeviceId);
             if (DeviceInfo == null)
             {
-                return ;
+                return;
             }
             Position pos1 = new Position();
             pos1.Latitude = value[0].lat;
             pos1.Longitude = value[0].lng;
             var stores = await _map.GetAllStores();
 
-            TimeSpan timeDiff = (DateTime.UtcNow  - DeviceInfo.LastNotifyTime);
+            TimeSpan timeDiff = (DateTime.UtcNow - DeviceInfo.LastNotifyTime);
             var time = Convert.ToInt32(timeDiff.TotalHours);
 
             if (time < 1)
             {
-                return ;
+                return;
             }
 
             if (DeviceInfo.Last_Lng == value[0].lng && DeviceInfo.Last_Lat == value[0].lat)
             {
-                return ;
+                return;
             }
 
             DeviceInfo.Last_Lng = value[0].lng;
@@ -165,27 +170,40 @@ namespace pro.backend.Controllers
 
                 if (result <= 5 && result > 0)
                 {
-                    string title = "Location";
-                    string body = "You are Welcome";
-                    var data = new { action = "Play", userId = 5 };
-                    var pushSent = await PushNotification.SendPushNotification(DeviceInfo.FirebaseToken, title, body, data);
 
-                    if (pushSent)
-                        DeviceInfo.LastNotifyTime = DateTime.UtcNow;
+                    var promotion = await _promoService.GetAllActivePromosOfSeller(store.UserId);
+                    var promo = new Promo();
 
-                    if (await _map.LocationUpdate(DeviceInfo))
+                    if (promotion.Count != 0)
                     {
-                        return ;
+                        foreach (var item in promotion)
+                        {
+                            promo = item;
+                            break;
+                        }
+                        string title = "Avail this promotion";
+                        string body = promo.Promotion_Description;
+                        var data = new { Lat = store.lat, Lng = store.lng };
+                        var pushSent = await PushNotification.SendPushNotification(DeviceInfo.FirebaseToken, title, body, data);
+
+                        if (pushSent)
+                            DeviceInfo.LastNotifyTime = DateTime.UtcNow;
+
+                        if (await _map.LocationUpdate(DeviceInfo))
+                        {
+                            return;
+                        }
                     }
 
+                    return;
                 }
             }
             if (await _map.LocationUpdate(DeviceInfo))
             {
-                return ;
+                return;
             }
 
-            return ;
+            return;
         }
     }
 }

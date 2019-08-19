@@ -41,6 +41,8 @@ namespace pro.backend.Controllers
             var products = await _repo.GetAllProducts();
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
+
+
         }
         [AllowAnonymous]
         [HttpGet("{id}")]
@@ -48,6 +50,18 @@ namespace pro.backend.Controllers
         {
             var product = await _repo.GetProduct(id);
             var productToReturn = _mapper.Map<ProductDto>(product);
+            var RecommendedProducts = await _repo.GetProductsBySearchQuery(product.subCategory.SubCategoryName, "Sub Category");
+            var RecommendedProductsToReturn = _mapper.Map<ICollection<ProductListDto>>(RecommendedProducts);
+          IList<Product> Products = new List<Product>();
+            if (RecommendedProductsToReturn.Count > 5)
+            {
+                RecommendedProducts = await _repo.GetProductsByNameAndSubCategory(id);
+                RecommendedProductsToReturn = _mapper.Map<ICollection<ProductListDto>>(RecommendedProducts);
+            
+
+                
+            }
+
             return Ok(productToReturn);
         }
 
@@ -100,7 +114,7 @@ namespace pro.backend.Controllers
                         product.visibility = true;
                     }
                 }
-                
+
                 SubCategory.Products.Add(product);
                 category.SubCategorys.Add(SubCategory);
                 _productService.AddProduct(product);
@@ -135,7 +149,7 @@ namespace pro.backend.Controllers
             // var oldproduct = await _repo.GetProduct(prod.Id);
             // var SubCategory = await _categoryService.GetSubCategorywithPhoto(oldproduct.Sub_categoryId);
             // var Category = await _categoryService.GettheCategory(oldproduct.CategoryId);
-            
+
             //  var newSubCategory = await _categoryService.GetSubCategorywithPhoto(SubCategoryId);
             // SubCategory.Products.Remove(oldproduct);
 
