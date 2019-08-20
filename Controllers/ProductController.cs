@@ -58,9 +58,10 @@ namespace pro.backend.Controllers
             if (RecommendedProductsToReturn.Count > 5)
             {
                 var Prod = await _repo.GetProductsByNameAndSubCategory(id);
-                var ProductsToReturn = _mapper.Map<ICollection<ProductListDto>>(RecommendedProducts);
+                var ProductsToReturn = _mapper.Map<ICollection<ProductListDto>>(Prod);
                 foreach (var item in ProductsToReturn)
                 {
+                    if(item.Id != id)
                     Products.Add(item);
                     if (Products.Count == 5)
                         break;
@@ -71,6 +72,7 @@ namespace pro.backend.Controllers
                 {
                     foreach (var items in RecommendedProductsToReturn)
                     {
+                        if(items.Id != id)
                         Products.Add(items);
 
                         if (Products.Count == 5)
@@ -82,6 +84,7 @@ namespace pro.backend.Controllers
             {
                 foreach (var item in RecommendedProductsToReturn)
                 {
+                    if(item.Id != id)
                     Products.Add(item);
 
                     if (Products.Count == 5)
