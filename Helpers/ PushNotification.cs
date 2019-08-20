@@ -25,7 +25,8 @@ namespace pro.backend.Helpers
                     notification = new Notification()
                     {
                         title = title,
-                        text = body
+                        text = body,
+                        click_action = "FCM_PLUGIN_ACTIVITY"
                     },
                     data = data,
                     to = deviceToken

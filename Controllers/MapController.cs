@@ -181,9 +181,9 @@ namespace pro.backend.Controllers
                             promo = item;
                             break;
                         }
-                        string title = "Avail this promotion";
+                        string title = $"Avail this promotion from {store.StoreName}";
                         string body = promo.Promotion_Description;
-                        var data = new { Lat = store.lat, Lng = store.lng };
+                        var data = new { Lat = store.lat, Lng = store.lng, StoreName = store.StoreName };
                         var pushSent = await PushNotification.SendPushNotification(DeviceInfo.FirebaseToken, title, body, data);
 
                         if (pushSent)
