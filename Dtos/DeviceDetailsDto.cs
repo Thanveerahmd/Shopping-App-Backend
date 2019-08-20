@@ -7,6 +7,7 @@ namespace pro.backend.Dtos
         public int id { get; set; }
         public string DeviceId { get; set; }
         public string FirebaseToken { get; set; }
+        public string UserId { get; set; }
         public double Last_Lat { get; set; }
         public double Last_Lng { get; set; }
         public DateTime LastNotifyTime { get; set; }
