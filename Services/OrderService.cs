@@ -30,9 +30,11 @@ namespace pro.backend.Services
             return data;
         }
 
+
+
         public async Task<IOrderedEnumerable<orderDetails>> GetOrdersOfSeller(string Sellerid)
         {
-            var orders = await _context.orderDetails.FromSql("Select * from orderDetails where orderDetails.OrderId in (Select Id from Orders where Orders.PaymentStatus = 'success') and orderDetails.sellerId='"+Sellerid+"'")
+            var orders = await _context.orderDetails.FromSql("Select * from orderDetails where orderDetails.OrderId in (Select Id from Orders where Orders.PaymentStatus = 'success') and orderDetails.sellerId='" + Sellerid + "'")
             .ToListAsync();
             var data = orders.OrderByDescending(p => p.Id);
             return data;
@@ -47,6 +49,24 @@ namespace pro.backend.Services
             var data = orders.OrderByDescending(p => p.Id);
             return data;
         }
-        
+
+        public async Task<Order> GetOrderById(int orderId)
+        {
+            var order = await _context.Orders.FirstOrDefaultAsync(p => p.Id == orderId);
+            return order;
+        }
+
+        public async Task<bool> UpdateOrderDeliveryStatus(int  orderId)
+        {
+            var OldOrder = await GetOrderById(orderId);
+
+            if (OldOrder == null)
+                return false;
+            OldOrder.DeliveryStatus = true;
+
+            _context.Orders.Update(OldOrder);
+            return await _context.SaveChangesAsync() > 0;
+
+        }
     }
 }

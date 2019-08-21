@@ -10,5 +10,8 @@ namespace pro.backend.iServices
         Task<IOrderedEnumerable<Order>> GetOrdersForBuyer(string Buyerid);
         Task<IOrderedEnumerable<orderDetails>> GetOrdersOfSeller(string Sellerid);
         Task<IOrderedEnumerable<Order>> GetOrders();
+        Task<Order> GetOrderById(int orderId);
+        Task<bool> UpdateOrderDeliveryStatus(int  orderId);
+
     }
 }

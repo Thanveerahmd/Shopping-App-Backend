@@ -12,5 +12,6 @@ namespace pro.backend.Entities
         public string PaymentStatus { get; set; }
         public ICollection<orderDetails> orderDetails { get; set; }
         public int deliveyId { get; set; }
+        public bool DeliveryStatus { get; set; }
     }
 }

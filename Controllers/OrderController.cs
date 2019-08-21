@@ -38,6 +38,16 @@ namespace pro.backend.Controllers
             return Ok(orderToReturn);
         }
 
+        [HttpPut("deliveryStatus/{orderId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateDeliveryStatus(int orderId)
+        {
+          if(await _order.UpdateOrderDeliveryStatus(orderId))
+              return Ok();
+
+          return BadRequest();
+        }
+
         [HttpGet("orders")]
         [AllowAnonymous]
         public async Task<IActionResult> GetAllOrders()
@@ -61,6 +71,7 @@ namespace pro.backend.Controllers
                 var delivaryInfo = await _repo.GetDeliveryInfo(order.deliveyId);
                 orderToReturn.deliveryInfo = delivaryInfo;
                 var billingInfo = await _repo.GetBillingInfoOfDefault(order.BuyerId);
+                orderToReturn.DeliveryStatus = order.DeliveryStatus;
                 orderToReturn.emergencyContact = billingInfo.MobileNumber;
                 orderdetails.Add(orderToReturn);
             }

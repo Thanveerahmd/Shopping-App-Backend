@@ -12,6 +12,7 @@ namespace pro.backend.Dtos
         public DateTime DateAdded { get; set; }
         public int deliveyId { get; set; }
         public string PaymentStatus { get; set; }
+        public bool DeliveryStatus { get; set; }
         public ICollection<OrderReturnIncludes> orderDetails { get; set; }
 
     }

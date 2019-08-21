@@ -15,10 +15,10 @@ namespace pro.backend.Dtos
         public float Price { get; set; }
         public int Count { get; set; }
         public DeliveryInfo deliveryInfo { get; set; }
-
         public string emergencyContact { get; set; }
         public int OrderId { get; set; }
         public string sellerId { get; set; }
+        public bool  DeliveryStatus { get; set; }
 
     }
 
