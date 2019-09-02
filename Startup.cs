@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +19,10 @@ using Project.Data;
 using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using pro.backend.Controllers;
+using pro.backend.Services;
+using pro.backend.iServices;
+using pro.backend.Helpers;
 
 namespace WebApi
 {
@@ -37,11 +40,26 @@ namespace WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-            services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            // services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+
+            services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("MSConnection")));
+
+            // services.AddDbContext<DataContext>(x => x.UseSqlServer(Configuration.GetConnectionString("MSLocalConnction")));
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<iAdminServices, AdminServices>();
+            services.AddScoped<iProductService, ProductService>();
+            services.AddScoped<iAdvertisement, AdvertisementService>();
+            services.AddScoped<Token>();
+            services.AddScoped<iShoppingRepo, ShoppingRepo>();
+            services.AddScoped<iChatService, ChatService>();
+            services.AddScoped<iPromoService, PromoService>();
+            services.AddScoped<iMapService, MapService>();
+            services.AddScoped<iOrderService, OrderService>();
+            services.AddScoped<iCategoryService, CategoryService>();
+            services.AddTransient<PhotosController>();
             services.AddTransient<IEmailSender, EmailSender>();
             services.Configure<AuthMessageSenderOptions>(Configuration);
+
             Mapper.Reset();
             services.AddAutoMapper();
 
@@ -62,6 +80,8 @@ namespace WebApi
                 opt.Password.RequireLowercase = false;
                 opt.Password.RequireNonAlphanumeric = false;
                 opt.Password.RequireUppercase = false;
+                opt.Password.RequiredLength = 8;
+                opt.Password.RequireDigit = false;
                 opt.SignIn.RequireConfirmedEmail = true;
                 opt.User.RequireUniqueEmail = true;
             }).AddEntityFrameworkStores<DataContext>()
@@ -101,6 +121,7 @@ namespace WebApi
                         var adminService = context.HttpContext.RequestServices.GetRequiredService<iAdminServices>();
                         var source = context.Request.Path.Value;
                         bool canParse = int.TryParse(context.Principal.Identity.Name, out var Id);
+
                         if (canParse)
                         {
                             var admin = adminService.GetById(Id);
@@ -118,12 +139,6 @@ namespace WebApi
                                 context.Fail("Unauthorized");
                             }
                         }
-                        
-
-
-
-
-
 
 
                         return Task.CompletedTask;
@@ -136,7 +151,8 @@ namespace WebApi
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateLifetime = false
                 };
             });
 
@@ -178,10 +194,11 @@ namespace WebApi
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
-
             app.UseAuthentication();
             app.UseIdentity();
+            app.UseUserDestroyer();
             app.UseMvc();
+
         }
     }
 }

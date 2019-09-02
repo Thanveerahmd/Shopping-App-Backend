@@ -16,7 +16,13 @@ using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Web;
+using Microsoft.AspNetCore.Http;
 using System.IO;
+using Microsoft.AspNetCore.Hosting;
+using pro.backend.Controllers;
+using pro.backend.Dtos;
+using pro.backend.Entities;
+using pro.backend.iServices;
 
 namespace WebApi.Controllers
 {
@@ -25,23 +31,33 @@ namespace WebApi.Controllers
     [Route("[controller]")]
     public class UsersController : ControllerBase
     {
+        private readonly Token _token;
         private IMapper _mapper;
         private readonly AppSettings _appSettings;
         private readonly UserManager<User> _usermanger;
         private readonly SignInManager<User> _signmanger;
         private readonly IEmailSender _emailSender;
+        private readonly IHostingEnvironment hostingEnv;
+        private const string ChampionsImageFolder = "images";
+        public readonly iShoppingRepo _repo;
 
         public UsersController(
+            Token token,
             IMapper mapper,
             IOptions<AppSettings> appSettings,
             UserManager<User> usermanger,
             SignInManager<User> signmanger,
-            IEmailSender EmailSender
+            IEmailSender EmailSender,
+            IHostingEnvironment hostingEnv,
+            iShoppingRepo repo
             )
         {
             _usermanger = usermanger;
             _signmanger = signmanger;
             _emailSender = EmailSender;
+            this.hostingEnv = hostingEnv;
+            _repo = repo;
+            _token = token;
             _mapper = mapper;
             _appSettings = appSettings.Value;
         }
@@ -61,6 +77,13 @@ namespace WebApi.Controllers
                     var appuser = await _usermanger.Users.FirstOrDefaultAsync(u =>
                        u.NormalizedUserName == userDto.Username.ToUpper());
 
+                    var token = _token.GenrateJwtToken(appuser);
+                    var cart = await _repo.GetCart(user.Id);
+                    var cartToReturn = _mapper.Map<CartDto>(cart);
+                    var image = await _repo.GetPhotoOfUser(user.Id);
+                    string imageUrl = null;
+                    if (image != null)
+                        imageUrl = image.Url;
                     return Ok(new
                     {
                         Id = user.Id,
@@ -68,7 +91,9 @@ namespace WebApi.Controllers
                         FirstName = user.FirstName,
                         LastName = user.LastName,
                         Role = user.Role,
-                        Token = GenrateJwtToken(appuser)
+                        imageurl = imageUrl,
+                        Token = token,
+                        cartToReturn
                     });
                 }
                 else
@@ -85,38 +110,34 @@ namespace WebApi.Controllers
 
         }
 
-        private String GenrateJwtToken(User user)
-        {
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(_appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
-                }),
-                // token dont expire 
-                // Expires = DateTime.UtcNow.AddDays(7), 
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
-            return tokenString;
-        }
-
         [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody]UserDto userDto)
         {
-            // map dto to entity
+
             var createuser = _mapper.Map<User>(userDto);
+            createuser.isLocked = false;
             var result = await _usermanger.CreateAsync(createuser, userDto.Password);
             var getuser = _mapper.Map<UserDto>(createuser);
 
-
-            if (result.Succeeded)
+            if (result != null && result.Succeeded)
             {
+                var user = await _usermanger.FindByNameAsync(getuser.Username);
+
+                var cart = new Cart();
+                cart.BuyerId = getuser.Id;
+                try
+                {
+                    _repo.Add(cart);
+
+                    if (!(await _repo.SaveAll()))
+                        return BadRequest(new { message = "Could not create Cart" });
+
+                }
+                catch (AppException ex)
+                {
+                    return BadRequest(new { message = ex.Message });
+                }
                 var useridentity = await _usermanger.FindByNameAsync(userDto.Username);
                 // var userrole = await _usermanger.AddToRoleAsync(useridentity,userDto.Role);
                 var code = await _usermanger.GenerateEmailConfirmationTokenAsync(createuser);
@@ -124,13 +145,12 @@ namespace WebApi.Controllers
                 var callbackUrl = Url.Action(nameof(ConfirmEmail), "Users",
                 new { userId = createuser.Id, code = code }, protocol: HttpContext.Request.Scheme);
                 var mobileCode = System.Net.WebUtility.UrlEncode(code);
-                var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
+                var mobileCallbackUrl = $"http://mahdhir.epizy.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
                 Uri uri = new Uri(mobileCallbackUrl);
                 await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
              $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
 
-                //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
-                return StatusCode(201);
+                return Ok(new { Id = user.Id });
             }
 
             return BadRequest(result.Errors);
@@ -141,8 +161,6 @@ namespace WebApi.Controllers
         [HttpPost("activate")]
         public async Task<IActionResult> ActivateAsync([FromBody]UserDto userDto)
         {
-
-
             var useridentity = await _usermanger.FindByNameAsync(userDto.Username);
 
             if (useridentity != null)
@@ -155,18 +173,14 @@ namespace WebApi.Controllers
                 new { userId = useridentity.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
                 var mobileCode = System.Net.WebUtility.UrlEncode(code);
-                var mobileCallbackUrl = $"http://mahdhir.gungoos.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
+                var mobileCallbackUrl = $"http://mahdhir.epizy.com/winkel.php?id={useridentity.Id}&code={mobileCode}";
                 Uri uri = new Uri(mobileCallbackUrl);
                 await _emailSender.SendEmailAsync(useridentity.Email, "Confirm your account",
                       $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a> or <a href='{uri.AbsoluteUri}'>mobile link</a>");
 
-                //return CreatedAtRoute("GetUser", new{Controller="Users", id=createuser.Id },getuser);
                 return StatusCode(201);
             }
-
             return BadRequest();
-
-
         }
 
         [HttpGet]
@@ -189,7 +203,6 @@ namespace WebApi.Controllers
             else return StatusCode(400);
         }
 
-
         [AllowAnonymous]
         [HttpPost("ForgetPassword")]
         public async Task<IActionResult> ForgetPassword([FromBody]ForgetPasswordDto forgetPasswordDto)
@@ -205,14 +218,13 @@ namespace WebApi.Controllers
             }
             else
             {
-
                 var code = await _usermanger.GeneratePasswordResetTokenAsync(user);
 
                 var callbackUrl = Url.Action(nameof(ResetPassword), "Users",
                 new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
 
                 var mobileCode = System.Net.WebUtility.UrlEncode(code);
-                var mobileCallbackUrl = $"http://mahdhir.gungoos.com/passwordreset.php?id={user.Id}&code={mobileCode}";
+                var mobileCallbackUrl = $"http://mahdhir.epizy.com/passwordreset.php?id={user.Id}&code={mobileCode}";
                 Uri uri = new Uri(mobileCallbackUrl);
                 await _emailSender.SendEmailAsync(email, "Reset Password for your Winkel account",
                       $"Please click this link to reset password:<a href='{uri.AbsoluteUri}'>mobile link</a>");
@@ -237,8 +249,6 @@ namespace WebApi.Controllers
         public async Task<IActionResult> ResetPasswordConfirmation(ResetPasswordDto model)
         {
 
-            //   var user =await _usermanger.FindByNameAsync(model.UserName);
-
             var user = await _usermanger.FindByIdAsync(model.Id);
 
             var code = System.Net.WebUtility.UrlDecode(model.code);
@@ -257,48 +267,117 @@ namespace WebApi.Controllers
             }
         }
 
-
-        // [HttpGet("Getusers")]
-        // public IActionResult GetAll()
-        // {
-        //     var users =  _userService.GetAllUser();
-        //     var userDtos = _mapper.Map<IList<UserDto>>(users);
-        //     return Ok(userDtos);
-        // }
-
-        // [HttpGet("{id}")]
-        // public IActionResult GetById(int id)
-        // {
-        //    // var user =  _userService.GetById(id);
-        //     var userDto = _mapper.Map<UserDto>(user);
-        //     return Ok(userDto);
-        // }
-
-        [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody]UserDto userDto)
+        [AllowAnonymous]
+        [HttpPut]
+        public async Task<IActionResult> Update(UpdateUserDto model)
         {
-            // map dto to entity and set id
-            var user = _mapper.Map<User>(userDto);
-            //  user.Id = id;
 
-            try
+            var user = await _usermanger.FindByIdAsync(model.Id);
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+
+            if (model.Password != null)
+                await _usermanger.ChangePasswordAsync(user, model.OldPassword, model.Password);
+
+            user.Role = model.Role;
+
+            // if (model.imageUrl != null)
+            // {
+
+            //     var file = Convert.FromBase64String(model.imageUrl);
+            //     var filename = user.Id;
+            //     var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", filename + ".jpg");
+            //     using (var imageFile = new FileStream(path, FileMode.Create))
+            //     {
+            //         imageFile.Write(file, 0, file.Length);
+            //         imageFile.Flush();
+            //     }
+
+
+            //     var pic = Path.Combine(hostingEnv.WebRootPath, ChampionsImageFolder);
+
+            //     user.imageUrl = pic + "//" + filename + ".jpg";
+
+            // }
+
+            var result = await _usermanger.UpdateAsync(user);
+
+
+            if (result.Succeeded)
             {
-                // save 
-                //     _userService.UpdateUser(user, userDto.Password);
                 return Ok();
             }
-            catch (AppException ex)
+            else
             {
-                // return error message if there was an exception
-                return BadRequest(new { message = ex.Message });
+                return StatusCode(400, "Error while Update!");
             }
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        [AllowAnonymous]
+        [HttpPut("password")]
+        public async Task<IActionResult> UpdatePassword(UpdateUserDto model)
         {
-            //  _userService.DeleteUser(id);
-            return Ok();
+
+            var user = await _usermanger.FindByIdAsync(model.Id);
+
+            var result = await _usermanger.ChangePasswordAsync(user, model.OldPassword, model.Password);
+
+
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            else
+            {
+                return StatusCode(400, "Error while Update!");
+            }
+        }
+
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetUserDetailsById(string userId)
+        {
+
+            var user = await _usermanger.FindByIdAsync(userId);
+            var image = await _repo.GetPhotoOfUser(user.Id);
+            string imageUrl = null;
+            if (image != null)
+                imageUrl = image.Url;
+            return Ok(new
+            {
+                Id = user.Id,
+                Username = user.UserName,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = user.Role,
+                imageurl = imageUrl,
+            });
+        }
+
+        [HttpGet("allBuyers")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllBuyers()
+        {
+            var users = await _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Buyer'").Include(p => p.DeliveryDetails).Include(p => p.BillingInfo).ToListAsync();
+
+            
+            foreach (var item in users)
+            {
+              if(  await _usermanger.IsLockedOutAsync(item)){
+                   item.isLocked =true;
+              }else {
+                   item.isLocked =false;
+              }
+              await _usermanger.UpdateAsync(item);
+            }
+            return Ok(users);
+        }
+
+        [HttpGet("allSellers")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllSellers()
+        {
+            var users = await _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Seller'").Include(p => p.DeliveryDetails).Include(p => p.BillingInfo).ToListAsync();
+            return Ok(users);
         }
     }
 }

@@ -15,30 +15,34 @@ namespace WebApi
     {
         public static void Main(string[] args)
         {
-            
+
             //BuildWebHost(args).Run();
-             var host = BuildWebHost(args);
-    using (var scope = host.Services.CreateScope())
-    {
-        var serviceProvider = scope.ServiceProvider;
-        try
+            System.Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", "ShoppingApp-290887bd35d4.json");
+            var host = BuildWebHost(args);
+            using (var scope = host.Services.CreateScope())
             {
-                var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
-                 Seed.SeedRoles(roleManager);  
-            }
-        catch(Exception e)
-            {
+                var serviceProvider = scope.ServiceProvider;
+                try
+                {
+                    var roleManager = serviceProvider.GetRequiredService<RoleManager<Role>>();
+                    Seed.SeedRoles(roleManager);
+                }
+                catch (Exception e)
+                {
                     Console.WriteLine(e.ToString());
+                }
             }
-    }
-    host.Run();
-            
+            host.Run();
+
         }
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
-                .UseUrls("http://localhost:4009")
+                .UseContentRoot(Directory.GetCurrentDirectory())
+                .UseIISIntegration()
+                .UseKestrel() 
+                .UseUrls("http://*:4009")
                 .Build();
     }
 }
