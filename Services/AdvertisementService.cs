@@ -20,7 +20,7 @@ namespace pro.backend.Services
         public async Task<ICollection<Advertisement>> GetActiveAdvertisement()
         {
             var ad = await _context.Advertisement
-            .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success") &&p.ActivationStatus.ToLower().Equals("not expired"))
+            .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success") && p.ActivationStatus.ToLower().Equals("not expired"))
             .ToListAsync();
 
             return ad;
@@ -77,10 +77,10 @@ namespace pro.backend.Services
             var advertisement = await _context.Advertisement.FindAsync(ad.Id);
             if (advertisement == null)
                 throw new AppException("advertisement not found");
-            if(advertisement.Status!=null)
-            advertisement.Status = ad.Status.ToLower();
-            if(advertisement.PaymentStatus !=null)
-            advertisement.PaymentStatus = ad.PaymentStatus.ToLower();
+            if (advertisement.Status != null)
+                advertisement.Status = ad.Status.ToLower();
+            if (advertisement.PaymentStatus != null)
+                advertisement.PaymentStatus = ad.PaymentStatus.ToLower();
             advertisement.ActivationStatus = "not expired";
             advertisement.DateAdded = ad.DateAdded;
             advertisement.PublicID = ad.PublicID;
@@ -115,7 +115,7 @@ namespace pro.backend.Services
         {
             var ad = await _context.Advertisement
                 .Where(p => p.UserId == sellerId)
-                .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success") &&p.ActivationStatus.ToLower().Equals("not expired"))
+                .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success") && p.ActivationStatus.ToLower().Equals("not expired"))
                 .ToListAsync();
 
             return ad;
@@ -162,8 +162,8 @@ namespace pro.backend.Services
 
         public async Task<PhotoForAd> GetPhotoOfad(int id)
         {
-             var PhotoForAd = await _context.PhotoForAd
-            .FirstOrDefaultAsync(i => i.AdId == id);
+            var PhotoForAd = await _context.PhotoForAd
+           .FirstOrDefaultAsync(i => i.AdId == id);
 
             return PhotoForAd;
         }

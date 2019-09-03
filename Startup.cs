@@ -49,6 +49,7 @@ namespace WebApi
             services.AddScoped<iAdminServices, AdminServices>();
             services.AddScoped<iProductService, ProductService>();
             services.AddScoped<iAdvertisement, AdvertisementService>();
+            services.AddScoped<iAnalytics, AnalyticsService>();
             services.AddScoped<Token>();
             services.AddScoped<iShoppingRepo, ShoppingRepo>();
             services.AddScoped<iChatService, ChatService>();

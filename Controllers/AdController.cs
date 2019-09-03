@@ -206,10 +206,10 @@ namespace pro.backend.Controllers
         {
             var ad = await _adService.GetAdvertisement(id);
 
-            if(ad != null)
-            return Ok(ad);
+            if (ad != null)
+                return Ok(ad);
 
-            return BadRequest(new{message = "Invalid advert ID"});
+            return BadRequest(new { message = "Invalid advert ID" });
 
         }
     }

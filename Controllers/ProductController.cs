@@ -24,15 +24,19 @@ namespace pro.backend.Controllers
         private readonly IMapper _mapper;
         public readonly iShoppingRepo _repo;
         private readonly iCategoryService _categoryService;
+
+        private readonly iAnalytics _analyticsService;
         private static readonly HttpClient Client = new HttpClient();
 
         public ProductController(iProductService productService,
-        IMapper mapper, iShoppingRepo repo, iCategoryService categoryService)
+        IMapper mapper, iShoppingRepo repo, iCategoryService categoryService,
+        iAnalytics analyticsService)
         {
             _mapper = mapper;
             _repo = repo;
             _categoryService = categoryService;
             _productService = productService;
+            _analyticsService = analyticsService;
         }
         [AllowAnonymous]
         [HttpGet]
@@ -48,7 +52,34 @@ namespace pro.backend.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
+
+            var identity = HttpContext.User.Identity;
+            string userId = "";
+            if (identity != null)
+            {
+                userId = identity.Name;
+            }
+
             var product = await _repo.GetProduct(id);
+            if (userId != "")
+            {
+                var previousSubCategoryView = await _analyticsService.GetPageViewRecordIfAvailable(product.Sub_category, userId);
+                if (previousSubCategoryView == null)
+                {
+                    PageViews data = new PageViews();
+                    data.UserId = userId;
+                    data.Sub_category = product.Sub_category;
+                    data.Sub_categoryId = product.Sub_categoryId;
+                    data.NoOfVisits = 1;
+                    data.LatestVisit = DateTime.Now;
+                    await _analyticsService.AddPageViewRecord(data);
+                }
+                else
+                {
+                    await _analyticsService.UpdatePageViewRecord(previousSubCategoryView);
+                }
+            }
+
             var productToReturn = _mapper.Map<ProductDto>(product);
             var RecommendedProducts = await _repo.GetProductsBySearchQuery(productToReturn.Sub_category, "Sub Category");
             var RecommendedProductsToReturn = _mapper.Map<ICollection<ProductListDto>>(RecommendedProducts);
@@ -61,8 +92,8 @@ namespace pro.backend.Controllers
                 var ProductsToReturn = _mapper.Map<ICollection<ProductListDto>>(Prod);
                 foreach (var item in ProductsToReturn)
                 {
-                    if(item.Id != id)
-                    Products.Add(item);
+                    if (item.Id != id)
+                        Products.Add(item);
                     if (Products.Count == 5)
                         break;
 
@@ -72,8 +103,8 @@ namespace pro.backend.Controllers
                 {
                     foreach (var items in RecommendedProductsToReturn)
                     {
-                        if(items.Id != id)
-                        Products.Add(items);
+                        if (items.Id != id)
+                            Products.Add(items);
 
                         if (Products.Count == 5)
                             break;
@@ -84,8 +115,8 @@ namespace pro.backend.Controllers
             {
                 foreach (var item in RecommendedProductsToReturn)
                 {
-                    if(item.Id != id)
-                    Products.Add(item);
+                    if (item.Id != id)
+                        Products.Add(item);
 
                     if (Products.Count == 5)
                         break;
@@ -93,7 +124,7 @@ namespace pro.backend.Controllers
             }
 
 
-            return Ok(new{product=productToReturn,similarProducts=Products});
+            return Ok(new { product = productToReturn, similarProducts = Products });
         }
 
         [HttpPost("addProduct/{SubCategoryId}")]
@@ -257,11 +288,38 @@ namespace pro.backend.Controllers
         }
 
 
-        [HttpGet("{parameter}/{searchQuery}")]
+        [HttpGet("{parameter}/{searchQuery}/{type?}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetProductsByQuery(string searchQuery, string parameter)
+        public async Task<IActionResult> GetProductsByQuery(string searchQuery, string parameter, string type)
         {
+            var identity = HttpContext.User.Identity;
+            string userId = "";
+            if (identity != null)
+            {
+                userId = identity.Name;
+            }
 
+            if (type == "click" && userId != "")
+            {
+                var keyWordArray = searchQuery.Split(" ");
+                foreach (var item in keyWordArray)
+                {
+                    var prevRecord = await _analyticsService.GetBuyerSearchRecordIfAvailable(item.ToLower(), userId);
+                    if (prevRecord == null)
+                    {
+                        var Record = new BuyerSearch();
+                        Record.Keyword = item.ToLower();
+                        Record.UserId = userId;
+                        Record.NoOfSearch = 1;
+                        Record.LatestVisit = DateTime.Now;
+                        await _analyticsService.AddBuyerSearchRecord(Record);
+                    }
+                    else
+                    {
+                        await _analyticsService.UpdateBuyerSearchRecord(prevRecord);
+                    }
+                }
+            }
             var products = await _repo.GetProductsBySearchQuery(searchQuery, parameter);
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
