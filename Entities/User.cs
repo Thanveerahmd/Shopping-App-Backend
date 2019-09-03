@@ -17,6 +17,8 @@ namespace Project.Entities
         public PhotoForUser Photo { get; set; }
         public ICollection<Store> StoreInfo { get; set; }
         public ICollection<BillingInfo> BillingInfo { get; set; }
+        public ICollection<PageViews> PageViews { get; set; }
+        public ICollection<BuyerSearch> BuyerSearch { get; set; }
 
     }
 }

@@ -33,6 +33,8 @@ namespace Project.Helpers
         public DbSet<SubCategory> SubCategory { get; set; }
         public DbSet<Promo> Promo { get; set; }
         public DbSet<PhotoForCategory> photoForCategories { get; set; }
+        public DbSet<PageViews> PageViews { get; set; }
+        public DbSet<BuyerSearch> BuyerSearch { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
