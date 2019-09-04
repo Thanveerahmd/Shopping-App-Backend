@@ -150,8 +150,6 @@ namespace pro.backend.Services
             dataModel = Load();
             return dataModel;
         }
-
-
         IDataModel GetDataModelForNewUser(IDataModel baseModel, params long[] preferredItems)
         {
             var plusAnonymModel = new PlusAnonymousUserDataModel(baseModel);
@@ -164,18 +162,15 @@ namespace pro.backend.Services
             plusAnonymModel.SetTempPrefs(prefArr);
             return plusAnonymModel;
         }
-
-
-
         IList<Product> iAnalytics.getRecommendation(int currentProductID)
         {
 
             var ordersDataModel = LoadOrdersDataModel();
-
+           
             var modelWithCurrentUser = GetDataModelForNewUser(ordersDataModel, currentProductID);
 
             var similarity = new LogLikelihoodSimilarity(modelWithCurrentUser);
-
+             
             // in this example, we have no preference values (scores)
             // to get correct results 'BooleanfPref' recommenders should be used
 
@@ -303,5 +298,5 @@ namespace pro.backend.Services
 
         }
 
-    }
+            }
 }
