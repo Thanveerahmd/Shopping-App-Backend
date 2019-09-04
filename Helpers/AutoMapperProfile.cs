@@ -142,6 +142,11 @@ namespace Project.Helpers
             CreateMap<SubCategoryDto, SubCategory>();
 
             CreateMap<OrderDetailsForUserPreference, orderDetails>();
+            
+            CreateMap<AdvertScoreDto,Advertisement>();
+
+            CreateMap<Advertisement,AdvertScoreDto>();
+
 
             CreateMap< orderDetails,OrderDetailsForUserPreference>();
         }

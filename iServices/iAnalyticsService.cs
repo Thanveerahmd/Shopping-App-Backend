@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using pro.backend.Entities;
+using pro.backend.Dtos;
 
 namespace pro.backend.iServices
 {
@@ -19,6 +20,12 @@ namespace pro.backend.iServices
 
         Task<bool> AddBuyerSearchRecord(BuyerSearch prevRecord);
         IList<Product> getRecommendation(int currentProductID);
+
+        Task<ICollection<PageViews>> GetPageViewHistoryOfUser(string UserId);
+
+        Task<ICollection<BuyerSearch>> GetBuyerSearchHistoryOfUser(string UserId);
+
+        Task<List<AdvertScoreDto>> GetAdvertisementToReturn(ICollection<Advertisement> ad,string userId);
 
     }
 }
