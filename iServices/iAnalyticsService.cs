@@ -18,6 +18,7 @@ namespace pro.backend.iServices
         Task<bool> UpdateBuyerSearchRecord(BuyerSearch prevRecord);
 
         Task<bool> AddBuyerSearchRecord(BuyerSearch prevRecord);
+        IList<Product> getRecommendation(int currentProductID);
 
     }
 }

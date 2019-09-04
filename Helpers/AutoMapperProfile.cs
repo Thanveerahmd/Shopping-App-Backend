@@ -131,17 +131,19 @@ namespace Project.Helpers
 
             CreateMap<Category, CategoryDto>();
 
-            CreateMap<CategoryDto,Category>();
+            CreateMap<CategoryDto, Category>();
 
             CreateMap<Category, CategoryReturnDto>();
 
-            CreateMap<CategoryReturnDto,Category>();
+            CreateMap<CategoryReturnDto, Category>();
 
             CreateMap<SubCategory, SubCategoryDto>();
 
-            CreateMap<SubCategoryDto,SubCategory>();
+            CreateMap<SubCategoryDto, SubCategory>();
 
+            CreateMap<OrderDetailsForUserPreference, orderDetails>();
 
+            CreateMap< orderDetails,OrderDetailsForUserPreference>();
         }
     }
 }

@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using pro.backend.Dtos;
 using pro.backend.Entities;
 using pro.backend.iServices;
 using Project.Helpers;
@@ -12,11 +14,14 @@ namespace pro.backend.Services
     {
         private readonly DataContext _context;
         public readonly iShoppingRepo _repo;
+        private readonly IMapper _mapper;
 
-        public OrderService(DataContext context, iShoppingRepo repo)
+        public OrderService(DataContext context, iShoppingRepo repo, IMapper mapper)
         {
             _context = context;
             _repo = repo;
+            _mapper = mapper;
+
         }
 
         public async Task<IOrderedEnumerable<Order>> GetOrdersForBuyer(string Buyerid)
@@ -56,7 +61,7 @@ namespace pro.backend.Services
             return order;
         }
 
-        public async Task<bool> UpdateOrderDeliveryStatus(int  orderId)
+        public async Task<bool> UpdateOrderDeliveryStatus(int orderId)
         {
             var OldOrder = await GetOrderById(orderId);
 
@@ -68,5 +73,23 @@ namespace pro.backend.Services
             return await _context.SaveChangesAsync() > 0;
 
         }
+
+        public ICollection<OrderDetailsForUserPreference> GetAllOrderDetails()
+        {
+            var orders = _context.orderDetails.ToList();
+
+            IList<OrderDetailsForUserPreference> OrderList = new List<OrderDetailsForUserPreference>();
+
+            foreach (var item in orders)
+            {
+               var list = _mapper.Map<OrderDetailsForUserPreference>(item);
+               list.BuyerId = GetOrderById(list.OrderId).Result.BuyerId;
+               OrderList.Add(list);
+            }
+            return OrderList;
+        }
+
+
+
     }
 }

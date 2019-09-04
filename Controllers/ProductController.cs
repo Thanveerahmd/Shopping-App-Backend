@@ -24,7 +24,6 @@ namespace pro.backend.Controllers
         private readonly IMapper _mapper;
         public readonly iShoppingRepo _repo;
         private readonly iCategoryService _categoryService;
-
         private readonly iAnalytics _analyticsService;
         private static readonly HttpClient Client = new HttpClient();
 
@@ -122,9 +121,12 @@ namespace pro.backend.Controllers
                         break;
                 }
             }
+          
+          var RecommendedProduct  = _analyticsService.getRecommendation(id);
+            var ProductRecommended = _mapper.Map<ICollection<ProductListDto>>(RecommendedProduct);
+            return Ok(new { product = productToReturn, similarProducts = Products ,RecommendedProducts = ProductRecommended});
 
-
-            return Ok(new { product = productToReturn, similarProducts = Products });
+           
         }
 
         [HttpPost("addProduct/{SubCategoryId}")]
