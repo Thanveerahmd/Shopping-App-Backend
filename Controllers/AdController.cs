@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using System;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using pro.backend.Dtos;
@@ -23,18 +24,22 @@ namespace pro.backend.Controllers
         public IEmailSender _emailSender;
         private readonly iAdvertisement _adService;
 
+        private readonly iAnalytics _analyticsService;
+
         public AdController(
         IMapper mapper,
         iShoppingRepo repo,
         iProductService ProductService,
         IEmailSender EmailSender,
-         iAdvertisement AdService)
+         iAdvertisement AdService,
+         iAnalytics analyticsService)
         {
             _mapper = mapper;
             _repo = repo;
             _ProductService = ProductService;
             _emailSender = EmailSender;
             _adService = AdService;
+            _analyticsService = analyticsService;
         }
 
         [HttpPost("{SellerId}")]
@@ -68,18 +73,17 @@ namespace pro.backend.Controllers
         {
             var ad = await _adService.ViewAdvertisement();
 
-            IList<AdvertisementToReturnDto> adsToView = new List<AdvertisementToReturnDto>();
 
-            foreach (var item in ad)
+
+            var identity = HttpContext.User.Identity;
+            string userId = "";
+            if (identity != null)
             {
-                var adtoReturn = _mapper.Map<AdvertisementToReturnDto>(item);
-                var product = await _repo.GetProduct(item.ProductId);
-                adtoReturn.ProductName = product.Product_name;
-                adtoReturn.ProductPrice = product.Price;
-                adsToView.Add(adtoReturn);
+                userId = identity.Name;
             }
+            var dataToReturn = await _analyticsService.GetAdvertisementToReturn(ad, userId);
 
-            return Ok(adsToView);
+            return Ok(dataToReturn);
         }
 
         [HttpDelete("{Id}")]
