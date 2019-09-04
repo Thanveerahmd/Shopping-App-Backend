@@ -171,11 +171,11 @@ namespace pro.backend.Services
         {
 
             var ordersDataModel = LoadOrdersDataModel();
-
+           
             var modelWithCurrentUser = GetDataModelForNewUser(ordersDataModel, currentProductID);
 
             var similarity = new LogLikelihoodSimilarity(modelWithCurrentUser);
-
+             
             // in this example, we have no preference values (scores)
             // to get correct results 'BooleanfPref' recommenders should be used
 
