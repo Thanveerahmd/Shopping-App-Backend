@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Linq;
 using AutoMapper;
 using GeoLocation;
 using Microsoft.AspNetCore.Authorization;
@@ -22,13 +23,20 @@ namespace pro.backend.Controllers
         public readonly iShoppingRepo _repo;
         public readonly iMapService _map;
         private readonly iPromoService _promoService;
-        public MapController(IMapper mapper, iPromoService promoService, iShoppingRepo repo, iMapService map)
+
+        private readonly iAnalytics _analyticsService;
+        public MapController(
+            IMapper mapper, 
+            iPromoService promoService, 
+            iShoppingRepo repo, 
+            iMapService map,
+            iAnalytics analyticsService)
         {
             _repo = repo;
             _mapper = mapper;
             _promoService = promoService;
             _map = map;
-
+            _analyticsService = analyticsService;
         }
 
         [HttpPost]
@@ -172,15 +180,10 @@ namespace pro.backend.Controllers
                 {
 
                     var promotion = await _promoService.GetAllActivePromosOfSeller(store.UserId);
-                    var promo = new Promo();
-
+                    
                     if (promotion.Count != 0)
                     {
-                        foreach (var item in promotion)
-                        {
-                            promo = item;
-                            break;
-                        }
+                        var promo = await _analyticsService.GetNotificationToReturn(promotion,DeviceInfo.UserId); 
                         string title = $"Avail this promotion from {store.StoreName}";
                         string body = promo.Promotion_Description;
                         var data = new { Lat = store.lat, Lng = store.lng, StoreName = store.StoreName };

@@ -27,5 +27,7 @@ namespace pro.backend.iServices
 
         Task<List<AdvertScoreDto>> GetAdvertisementToReturn(ICollection<Advertisement> ad,string userId);
 
+        Task<Promo> GetNotificationToReturn(ICollection<Promo> promos, string userId);
+
     }
 }
