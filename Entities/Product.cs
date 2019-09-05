@@ -17,10 +17,12 @@ namespace pro.backend.Entities
         public int Sub_categoryId { get; set; }
         public int CategoryId { get; set; }
         public bool visibility { get; set; }
+        public int NumberOfSales { get; set; }
         public ICollection<Photo> Photos { get; set; }
         public ICollection<Rating> Ratings { get; set; }
         public float rating { get; set; }
         public SubCategory subCategory { get; set; }
+
     }
 
 }

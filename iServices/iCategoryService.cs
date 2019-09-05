@@ -20,5 +20,6 @@ namespace pro.backend.iServices
         Task<SubCategory> GetSubCategorywithPhoto(int SubCategoryId);
         Task<bool> IsCategoryAvailable(string CategoryName);
         Task<Category> GettheCategory(int CategoryId);
+        Task<ICollection<Product>> GetProductInAccordingToSales(int SubCategoryId);
     }
 }

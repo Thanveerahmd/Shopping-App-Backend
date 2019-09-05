@@ -627,6 +627,8 @@ namespace WebApi.Migrations
 
                     b.Property<int>("CategoryId");
 
+                    b.Property<int>("NumberOfSales");
+
                     b.Property<float>("Price");
 
                     b.Property<string>("Product_Discription");

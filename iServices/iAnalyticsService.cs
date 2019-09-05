@@ -25,7 +25,8 @@ namespace pro.backend.iServices
 
         Task<ICollection<BuyerSearch>> GetBuyerSearchHistoryOfUser(string UserId);
 
-        Task<List<AdvertScoreDto>> GetAdvertisementToReturn(ICollection<Advertisement> ad,string userId);
+        float getPriceSuggestions(int Sub_categoryId, string Product_Description, string Product_name);
+        Task<List<AdvertScoreDto>> GetAdvertisementToReturn(ICollection<Advertisement> ad, string userId);
 
         Task<Promo> GetNotificationToReturn(ICollection<Promo> promos, string userId);
 

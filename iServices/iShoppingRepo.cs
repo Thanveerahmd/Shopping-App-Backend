@@ -45,5 +45,6 @@ namespace pro.backend.iServices
         Task<bool> UpdateOrder(Order Order);
         Task<bool> UpdateSellerInfo(SellerPaymentInfo SellerPaymentInfo);
         Task<bool> UpdateBuyerInfo(BuyerPaymentInfo BuyerPaymentInfo);
+         Task<bool> UpdateSalesRecord(Product product);
     }
 }

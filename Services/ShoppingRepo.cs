@@ -393,5 +393,12 @@ namespace pro.backend.Services
             _context.BuyerPaymentInfo.Update(buyerinfo);
             return await _context.SaveChangesAsync() > 0;
         }
+
+         public async Task<bool> UpdateSalesRecord(Product product)
+        {
+            product.NumberOfSales++;
+            _context.Update(product);
+            return await _context.SaveChangesAsync() > 0;
+        }
     }
 }
