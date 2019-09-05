@@ -60,7 +60,7 @@ namespace pro.backend.Controllers
             }
 
             var product = await _repo.GetProduct(id);
-            if (userId != "")
+            if (userId != "" && userId != null)
             {
                 var previousSubCategoryView = await _analyticsService.GetPageViewRecordIfAvailable(product.Sub_category, userId);
                 if (previousSubCategoryView == null)
@@ -159,25 +159,28 @@ namespace pro.backend.Controllers
 
             try
             {
-                string text = product.Product_name + " " + product.Product_Discription;
+                // string text = product.Product_name + " " + product.Product_Discription;
 
-                Client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Keys.Ocp_Apim_Subscription_Key);
+                // Client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", Keys.Ocp_Apim_Subscription_Key);
 
-                var response = await Client.PostAsync(Keys.TextModerationUrl, new StringContent(text));
-                var contents = await response.Content.ReadAsStringAsync();
-                var jo = JObject.Parse(contents);
-                if (jo != null && jo["Classification"] != null && jo["Classification"]["ReviewRecommended"] != null)
-                {
-                    var flag_status = jo["Classification"]["ReviewRecommended"];
-                    if (flag_status.ToObject<bool>())
-                    {
-                        product.visibility = false;
-                    }
-                    else
-                    {
-                        product.visibility = true;
-                    }
-                }
+                // var response = await Client.PostAsync(Keys.TextModerationUrl, new StringContent(text));
+                // var contents = await response.Content.ReadAsStringAsync();
+                // var jo = JObject.Parse(contents);
+                // if (jo != null && jo["Classification"] != null && jo["Classification"]["ReviewRecommended"] != null)
+                // {
+                //     var flag_status = jo["Classification"]["ReviewRecommended"];
+                //     if (flag_status.ToObject<bool>())
+                //     {
+                //         product.visibility = false;
+                //     }
+                //     else
+                //     {
+                //         product.visibility = true;
+                //     }
+                // }
+
+                //TESTING PURPOSES
+                product.visibility = true;
 
                 SubCategory.Products.Add(product);
                 category.SubCategorys.Add(SubCategory);
@@ -301,7 +304,7 @@ namespace pro.backend.Controllers
                 userId = identity.Name;
             }
 
-            if (type == "click" && userId != "")
+            if (type == "click" && userId != "" && userId != null)
             {
                 var keyWordArray = searchQuery.Split(" ");
                 foreach (var item in keyWordArray)
