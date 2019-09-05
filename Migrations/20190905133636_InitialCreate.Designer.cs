@@ -10,8 +10,8 @@ using Project.Helpers;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20190704095333_Billing")]
-    partial class Billing
+    [Migration("20190905133636_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -210,6 +210,8 @@ namespace WebApi.Migrations
 
                     b.Property<string>("imageUrl");
 
+                    b.Property<bool>("isLocked");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -221,6 +223,39 @@ namespace WebApi.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.Advertisement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ActivationStatus");
+
+                    b.Property<DateTime>("DateAdded");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("PaymentStatus");
+
+                    b.Property<int>("ProductId");
+
+                    b.Property<string>("PublicID");
+
+                    b.Property<string>("Status");
+
+                    b.Property<string>("Url");
+
+                    b.Property<string>("UserId");
+
+                    b.Property<int>("timestamp");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Advertisement");
                 });
 
             modelBuilder.Entity("pro.backend.Entities.BillingInfo", b =>
@@ -254,6 +289,64 @@ namespace WebApi.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("BillingInfo");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.BuyerPaymentInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateOfPayment");
+
+                    b.Property<string>("UserId");
+
+                    b.Property<string>("card_expiry");
+
+                    b.Property<string>("card_holder_name");
+
+                    b.Property<string>("card_no");
+
+                    b.Property<string>("method");
+
+                    b.Property<int>("order_id");
+
+                    b.Property<float>("payhere_amount");
+
+                    b.Property<string>("payhere_currency");
+
+                    b.Property<long>("payment_id");
+
+                    b.Property<int>("status_code");
+
+                    b.Property<string>("status_message");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BuyerPaymentInfo");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.BuyerSearch", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Keyword");
+
+                    b.Property<DateTime>("LatestVisit");
+
+                    b.Property<int>("NoOfSearch");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BuyerSearch");
                 });
 
             modelBuilder.Entity("pro.backend.Entities.Cart", b =>
@@ -296,6 +389,40 @@ namespace WebApi.Migrations
                     b.ToTable("CartProduct");
                 });
 
+            modelBuilder.Entity("pro.backend.Entities.Category", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CategoryName");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Category");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.Chat", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Message");
+
+                    b.Property<string>("Receiver");
+
+                    b.Property<string>("Sender");
+
+                    b.Property<DateTime>("TimeSent");
+
+                    b.Property<bool>("isUnRead");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Chat");
+                });
+
             modelBuilder.Entity("pro.backend.Entities.DeliveryInfo", b =>
                 {
                     b.Property<int>("Id")
@@ -325,6 +452,75 @@ namespace WebApi.Migrations
                     b.ToTable("DeliveryInfo");
                 });
 
+            modelBuilder.Entity("pro.backend.Entities.DeviceToken", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("DeviceId");
+
+                    b.Property<string>("FirebaseToken");
+
+                    b.Property<DateTime>("LastNotifyTime");
+
+                    b.Property<double>("Last_Lat");
+
+                    b.Property<double>("Last_Lng");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("id");
+
+                    b.ToTable("DeviceToken");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("BuyerId");
+
+                    b.Property<DateTime>("DateAdded");
+
+                    b.Property<bool>("DeliveryStatus");
+
+                    b.Property<string>("PaymentStatus");
+
+                    b.Property<float>("Total_Price");
+
+                    b.Property<int>("deliveyId");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Orders");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.PageViews", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("LatestVisit");
+
+                    b.Property<int>("NoOfVisits");
+
+                    b.Property<string>("Sub_category");
+
+                    b.Property<int>("Sub_categoryId");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PageViews");
+                });
+
             modelBuilder.Entity("pro.backend.Entities.Photo", b =>
                 {
                     b.Property<int>("Id")
@@ -348,6 +544,54 @@ namespace WebApi.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("Photos");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.PhotoForAd", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AdId");
+
+                    b.Property<DateTime>("DateAdded");
+
+                    b.Property<string>("Description");
+
+                    b.Property<string>("PublicID");
+
+                    b.Property<string>("Url");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdId")
+                        .IsUnique();
+
+                    b.ToTable("PhotoForAd");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.PhotoForCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateAdded");
+
+                    b.Property<string>("PublicID");
+
+                    b.Property<int>("SubCategoryId");
+
+                    b.Property<string>("Url");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubCategoryId")
+                        .IsUnique();
+
+                    b.ToTable("photoForCategories");
                 });
 
             modelBuilder.Entity("pro.backend.Entities.PhotoForUser", b =>
@@ -383,6 +627,10 @@ namespace WebApi.Migrations
 
                     b.Property<string>("Category");
 
+                    b.Property<int>("CategoryId");
+
+                    b.Property<int>("NumberOfSales");
+
                     b.Property<float>("Price");
 
                     b.Property<string>("Product_Discription");
@@ -397,9 +645,46 @@ namespace WebApi.Migrations
 
                     b.Property<string>("Sub_category");
 
+                    b.Property<int>("Sub_categoryId");
+
+                    b.Property<float>("rating");
+
+                    b.Property<int?>("subCategoryId");
+
+                    b.Property<bool>("visibility");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("subCategoryId");
+
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.Promo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("DayCollection");
+
+                    b.Property<int>("Frequency");
+
+                    b.Property<int>("ProductId");
+
+                    b.Property<string>("Promotion_Description");
+
+                    b.Property<string>("Promotion_Name");
+
+                    b.Property<string>("Status");
+
+                    b.Property<string>("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Promo");
                 });
 
             modelBuilder.Entity("pro.backend.Entities.Rating", b =>
@@ -425,6 +710,43 @@ namespace WebApi.Migrations
                     b.ToTable("Ratings");
                 });
 
+            modelBuilder.Entity("pro.backend.Entities.SellerPaymentInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("DateOfPayment");
+
+                    b.Property<string>("UserId");
+
+                    b.Property<string>("card_expiry");
+
+                    b.Property<string>("card_holder_name");
+
+                    b.Property<string>("card_no");
+
+                    b.Property<string>("method");
+
+                    b.Property<int>("order_id");
+
+                    b.Property<float>("payhere_amount");
+
+                    b.Property<string>("payhere_currency");
+
+                    b.Property<long>("payment_id");
+
+                    b.Property<int>("status_code");
+
+                    b.Property<string>("status_message");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("SellerPaymentInfo");
+                });
+
             modelBuilder.Entity("pro.backend.Entities.Store", b =>
                 {
                     b.Property<int>("Id")
@@ -444,6 +766,52 @@ namespace WebApi.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Store");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.SubCategory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CategoryId");
+
+                    b.Property<string>("SubCategoryName");
+
+                    b.Property<string>("url");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.ToTable("SubCategory");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.orderDetails", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("Count");
+
+                    b.Property<string>("MainPhotoUrl");
+
+                    b.Property<int>("OrderId");
+
+                    b.Property<float>("Price");
+
+                    b.Property<int>("ProductId");
+
+                    b.Property<string>("product_Name");
+
+                    b.Property<string>("sellerId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("orderDetails");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -491,10 +859,31 @@ namespace WebApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("pro.backend.Entities.Advertisement", b =>
+                {
+                    b.HasOne("Project.Entities.User", "user")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("pro.backend.Entities.BillingInfo", b =>
                 {
                     b.HasOne("Project.Entities.User")
                         .WithMany("BillingInfo")
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.BuyerPaymentInfo", b =>
+                {
+                    b.HasOne("Project.Entities.User", "user")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.BuyerSearch", b =>
+                {
+                    b.HasOne("Project.Entities.User")
+                        .WithMany("BuyerSearch")
                         .HasForeignKey("UserId");
                 });
 
@@ -513,11 +902,34 @@ namespace WebApi.Migrations
                         .HasForeignKey("UserId");
                 });
 
+            modelBuilder.Entity("pro.backend.Entities.PageViews", b =>
+                {
+                    b.HasOne("Project.Entities.User")
+                        .WithMany("PageViews")
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("pro.backend.Entities.Photo", b =>
                 {
                     b.HasOne("pro.backend.Entities.Product", "Product")
                         .WithMany("Photos")
                         .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.PhotoForAd", b =>
+                {
+                    b.HasOne("pro.backend.Entities.Advertisement", "Advertisement")
+                        .WithOne("PhotoForAd")
+                        .HasForeignKey("pro.backend.Entities.PhotoForAd", "AdId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.PhotoForCategory", b =>
+                {
+                    b.HasOne("pro.backend.Entities.SubCategory", "subCategory")
+                        .WithOne("PhotoForCategory")
+                        .HasForeignKey("pro.backend.Entities.PhotoForCategory", "SubCategoryId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
@@ -528,6 +940,20 @@ namespace WebApi.Migrations
                         .HasForeignKey("pro.backend.Entities.PhotoForUser", "UserId");
                 });
 
+            modelBuilder.Entity("pro.backend.Entities.Product", b =>
+                {
+                    b.HasOne("pro.backend.Entities.SubCategory", "subCategory")
+                        .WithMany("Products")
+                        .HasForeignKey("subCategoryId");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.Promo", b =>
+                {
+                    b.HasOne("Project.Entities.User", "user")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("pro.backend.Entities.Rating", b =>
                 {
                     b.HasOne("pro.backend.Entities.Product")
@@ -536,11 +962,34 @@ namespace WebApi.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
+            modelBuilder.Entity("pro.backend.Entities.SellerPaymentInfo", b =>
+                {
+                    b.HasOne("Project.Entities.User", "user")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+                });
+
             modelBuilder.Entity("pro.backend.Entities.Store", b =>
                 {
                     b.HasOne("Project.Entities.User")
                         .WithMany("StoreInfo")
                         .HasForeignKey("UserId");
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.SubCategory", b =>
+                {
+                    b.HasOne("pro.backend.Entities.Category", "category")
+                        .WithMany("SubCategorys")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("pro.backend.Entities.orderDetails", b =>
+                {
+                    b.HasOne("pro.backend.Entities.Order", "Order")
+                        .WithMany("orderDetails")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 #pragma warning restore 612, 618
         }

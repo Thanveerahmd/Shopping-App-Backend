@@ -26,18 +26,20 @@ namespace pro.backend.Services
         private iOrderService _order;
         public readonly iShoppingRepo _repo;
         private readonly IMapper _mapper;
-
+        private readonly iCategoryService _categoryService;
 
         public AnalyticsService(
             DataContext context,
             iShoppingRepo repo,
             IMapper mapper,
-            iOrderService orderService)
+            iOrderService orderService,
+            iCategoryService categoryService)
         {
             _context = context;
             _repo = repo;
             _mapper = mapper;
             _order = orderService;
+            _categoryService = categoryService;
         }
 
         public async Task<bool> AddBuyerSearchRecord(BuyerSearch prevRecord)
@@ -83,7 +85,7 @@ namespace pro.backend.Services
             _context.Update(prevRecord);
             return await _context.SaveChangesAsync() > 0;
         }
-
+         
         public async Task<bool> UpdatePageViewRecord(PageViews prevRecord)
         {
             prevRecord.LatestVisit = DateTime.Now;
@@ -133,6 +135,7 @@ namespace pro.backend.Services
             }
 
             var newData = new FastByIDMap<IPreferenceArray>(data.Count());
+
             foreach (var entry in data.EntrySet())
             {
                 var prefList = (List<IPreference>)entry.Value;
@@ -150,6 +153,7 @@ namespace pro.backend.Services
             dataModel = Load();
             return dataModel;
         }
+
         IDataModel GetDataModelForNewUser(IDataModel baseModel, params long[] preferredItems)
         {
             var plusAnonymModel = new PlusAnonymousUserDataModel(baseModel);
@@ -162,29 +166,32 @@ namespace pro.backend.Services
             plusAnonymModel.SetTempPrefs(prefArr);
             return plusAnonymModel;
         }
+
         IList<Product> iAnalytics.getRecommendation(int currentProductID)
         {
 
             var ordersDataModel = LoadOrdersDataModel();
-           
+
             var modelWithCurrentUser = GetDataModelForNewUser(ordersDataModel, currentProductID);
 
             var similarity = new LogLikelihoodSimilarity(modelWithCurrentUser);
-             
+
             // in this example, we have no preference values (scores)
             // to get correct results 'BooleanfPref' recommenders should be used
 
             var recommender = new GenericBooleanPrefItemBasedRecommender(modelWithCurrentUser, similarity);
 
             var recommendedItems = recommender.Recommend(PlusAnonymousUserDataModel.TEMP_USER_ID, 6, null);
-            //IList<long> list = new List<long>();
+
             IList<Product> list = new List<Product>();
+
             foreach (var ri in recommendedItems)
             {
                 list.Add(_repo.GetProduct((int)ri.GetItemID()).Result);
             }
             return list;
         }
+
         public async Task<List<AdvertScoreDto>> GetAdvertisementToReturn(ICollection<Advertisement> ad, string userId)
         {
             int startIndex = 0;
@@ -194,6 +201,7 @@ namespace pro.backend.Services
                 if (ad.Count > 50)
                 {
                     int randomGeneratorLimit = ad.Count / 50;
+
                     Random random = new Random();
 
                     startIndex = random.Next(randomGeneratorLimit) * 50;
@@ -223,6 +231,7 @@ namespace pro.backend.Services
                 }
 
                 var searchQuery = await GetBuyerSearchHistoryOfUser(userId);
+
                 var pageViews = await GetPageViewHistoryOfUser(userId);
 
                 foreach (var record in filteredAdverts)
@@ -298,5 +307,11 @@ namespace pro.backend.Services
 
         }
 
-            }
+        public float getPriceSuggestions(int Sub_categoryId, string Product_Description, string Product_name)
+        {
+            var List_of_Products = _categoryService.GetProductInAccordingToSales(Sub_categoryId).Result;
+     
+            return 0;
+        }
+    }
 }

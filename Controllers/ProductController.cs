@@ -121,12 +121,13 @@ namespace pro.backend.Controllers
                         break;
                 }
             }
-          
-          var RecommendedProduct  = _analyticsService.getRecommendation(id);
-            var ProductRecommended = _mapper.Map<ICollection<ProductListDto>>(RecommendedProduct);
-            return Ok(new { product = productToReturn, similarProducts = Products ,RecommendedProducts = ProductRecommended});
 
-           
+            var RecommendedProduct = _analyticsService.getRecommendation(id);
+            var ProductRecommended = _mapper.Map<ICollection<ProductListDto>>(RecommendedProduct);
+            
+            return Ok(new { product = productToReturn, similarProducts = Products, RecommendedProducts = ProductRecommended });
+
+
         }
 
         [HttpPost("addProduct/{SubCategoryId}")]
@@ -465,6 +466,39 @@ namespace pro.backend.Controllers
             }
 
             return Ok();
+
+        }
+
+
+        [HttpPost("addProduct/{SubCategoryId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetPriceSuggestion([FromBody]ProductAddingDto productDto, int SubCategoryId)
+        {
+
+            var product = _mapper.Map<Product>(productDto);
+
+            var SubCategory = await _categoryService.GetSubCategorywithPhoto(SubCategoryId);
+
+            if (SubCategory == null)
+            {
+                return BadRequest(new { message = "There is No such SubCategory" });
+
+            }
+
+            product.Sub_category = SubCategory.SubCategoryName;
+            product.Sub_categoryId = SubCategoryId;
+
+            try
+            {
+                string text = product.Product_name + " " + product.Product_Discription;
+                
+                return Ok();
+            }
+            catch (AppException ex)
+            {
+
+                return BadRequest(new { message = ex.Message });
+            }
 
         }
     }

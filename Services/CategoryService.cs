@@ -128,6 +128,12 @@ namespace pro.backend.Services
             var PhotoForAd = await _context.photoForCategories.FirstOrDefaultAsync(i => i.Id == id);
             return PhotoForAd;
         }
+          public async Task<ICollection<Product>> GetProductInAccordingToSales(int SubCategoryId)
+        {
+            var listOfProducts = await _context.Products.Where(p => p.Sub_categoryId == SubCategoryId).Where(P=> P.NumberOfSales >0 ).OrderByDescending(P=> P.NumberOfSales).ToListAsync();
+         
+            return listOfProducts;
+        }
     }
 
 }
