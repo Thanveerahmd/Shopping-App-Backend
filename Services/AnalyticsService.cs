@@ -146,7 +146,7 @@ namespace pro.backend.Services
             return new GenericDataModel(newData);
         }
 
-        IDataModel LoadOrdersDataModel()
+        public IDataModel LoadOrdersDataModel()
         {
 
             IDataModel dataModel = null;
@@ -154,7 +154,8 @@ namespace pro.backend.Services
             return dataModel;
         }
 
-        IDataModel GetDataModelForNewUser(IDataModel baseModel, params long[] preferredItems)
+
+        public IDataModel GetDataModelForNewUser(IDataModel baseModel, params long[] preferredItems)
         {
             var plusAnonymModel = new PlusAnonymousUserDataModel(baseModel);
             var prefArr = new BooleanUserPreferenceArray(preferredItems.Length);
@@ -167,7 +168,9 @@ namespace pro.backend.Services
             return plusAnonymModel;
         }
 
-        IList<Product> iAnalytics.getRecommendation(int currentProductID)
+
+
+        public IList<Product> getRecommendation(int currentProductID)
         {
 
             var ordersDataModel = LoadOrdersDataModel();
@@ -208,7 +211,8 @@ namespace pro.backend.Services
                 }
 
                 IList<AdvertScoreDto> filteredAdverts = new List<AdvertScoreDto>();
-
+                var searchQuery = await GetBuyerSearchHistoryOfUser(userId);
+                var pageViews = await GetPageViewHistoryOfUser(userId);
 
                 for (int i = startIndex; i < ad.Count && i < startIndex + 50; i++)
                 {
@@ -225,58 +229,96 @@ namespace pro.backend.Services
                             filter.ProductSubCategory = product.Sub_category;
                             filter.Score = 0;
                         }
-                        filteredAdverts.Add(filter);
+
+                        int searchQueryScore = 0;
+                        int pageViewScore = 0;
+                        foreach (var value in searchQuery)
+                        {
+                            if (filter.ProductName != null && filter.ProductDescription != null)
+                            {
+                                TimeSpan timeDiff = (DateTime.UtcNow - value.LatestVisit);
+                                var time = Convert.ToInt32(timeDiff.TotalDays);
+                                if (filter.ProductName.Contains(value.Keyword))
+                                {
+                                    searchQueryScore += ((2 * value.NoOfSearch) + (time < 7 ? 5 : 0));
+                                }
+
+                                if (filter.ProductDescription.Contains(value.Keyword))
+                                {
+                                    searchQueryScore += ((1 * value.NoOfSearch) + (time < 7 ? 5 : 0));
+                                }
+                            }
+
+
+                        }
+
+                        foreach (var value in pageViews)
+                        {
+                            if (filter.ProductName != null && filter.ProductDescription != null)
+                            {
+                                TimeSpan timeDiff = (DateTime.UtcNow - value.LatestVisit);
+                                var time = Convert.ToInt32(timeDiff.TotalDays);
+                                if (filter.ProductSubCategory.Equals(value.Sub_category))
+                                {
+                                    pageViewScore += ((3 * value.NoOfVisits) + (time < 7 ? 5 : 0));
+                                    break;
+                                }
+                            }
+
+                        }
+                        filter.Score = searchQueryScore + pageViewScore;
+                        if (item.Url != null && item.ProductId != 0)
+                            filteredAdverts.Add(filter);
                     }
 
                 }
 
-                var searchQuery = await GetBuyerSearchHistoryOfUser(userId);
-
-                var pageViews = await GetPageViewHistoryOfUser(userId);
-
-                foreach (var record in filteredAdverts)
-                {
-                    int searchQueryScore = 0;
-                    int pageViewScore = 0;
-                    foreach (var value in searchQuery)
-                    {
-                        if (record.ProductName != null && record.ProductDescription != null)
-                        {
-                            TimeSpan timeDiff = (DateTime.UtcNow - value.LatestVisit);
-                            var time = Convert.ToInt32(timeDiff.TotalDays);
-                            if (record.ProductName.Contains(value.Keyword))
-                            {
-                                searchQueryScore += ((2 * value.NoOfSearch) + (time < 7 ? 5 : 0));
-                            }
-
-                            if (record.ProductDescription.Contains(value.Keyword))
-                            {
-                                searchQueryScore += ((1 * value.NoOfSearch) + (time < 7 ? 5 : 0));
-                            }
-                        }
 
 
-                    }
+                // foreach (var record in filteredAdverts)
+                // {
+                //     int searchQueryScore = 0;
+                //     int pageViewScore = 0;
+                //     foreach (var value in searchQuery)
+                //     {
+                //         if (record.ProductName != null && record.ProductDescription != null)
+                //         {
+                //             TimeSpan timeDiff = (DateTime.UtcNow - value.LatestVisit);
+                //             var time = Convert.ToInt32(timeDiff.TotalDays);
+                //             if (record.ProductName.Contains(value.Keyword))
+                //             {
+                //                 searchQueryScore += ((2 * value.NoOfSearch) + (time < 7 ? 5 : 0));
+                //             }
 
-                    foreach (var value in pageViews)
-                    {
-                        if (record.ProductName != null && record.ProductDescription != null)
-                        {
-                            TimeSpan timeDiff = (DateTime.UtcNow - value.LatestVisit);
-                            var time = Convert.ToInt32(timeDiff.TotalDays);
-                            if (record.ProductSubCategory.Equals(value.Sub_category))
-                            {
-                                pageViewScore += ((3 * value.NoOfVisits) + (time < 7 ? 5 : 0));
-                            }
-                        }
+                //             if (record.ProductDescription.Contains(value.Keyword))
+                //             {
+                //                 searchQueryScore += ((1 * value.NoOfSearch) + (time < 7 ? 5 : 0));
+                //             }
+                //         }
 
-                    }
-                    record.Score = searchQueryScore + pageViewScore;
-                }
+
+                //     }
+
+                //     foreach (var value in pageViews)
+                //     {
+                //         if (record.ProductName != null && record.ProductDescription != null)
+                //         {
+                //             TimeSpan timeDiff = (DateTime.UtcNow - value.LatestVisit);
+                //             var time = Convert.ToInt32(timeDiff.TotalDays);
+                //             if (record.ProductSubCategory.Equals(value.Sub_category))
+                //             {
+                //                 pageViewScore += ((3 * value.NoOfVisits) + (time < 7 ? 5 : 0));
+                //             }
+                //         }
+
+                //     }
+                //     record.Score = searchQueryScore + pageViewScore;
+                // }
 
                 var finalScoredAdverts = filteredAdverts.OrderByDescending(p => p.Score);
                 var dataToSend = finalScoredAdverts.Take(6);
                 var list = dataToSend.ToList();
+
                 return list;
 
             }
@@ -312,6 +354,87 @@ namespace pro.backend.Services
             var List_of_Products = _categoryService.GetProductInAccordingToSales(Sub_categoryId).Result;
      
             return 0;
+        }
+        
+        public async Task<Promo> GetNotificationToReturn(ICollection<Promo> promos, string userId)
+        {
+            Random random = new Random();
+            int startIndex = 0;
+            if (userId != "")
+            {
+                var searchQuery = await GetBuyerSearchHistoryOfUser(userId);
+                var pageViews = await GetPageViewHistoryOfUser(userId);
+                IList<PromoScoreDto> promoScoreList = new List<PromoScoreDto>();
+
+                if (promos.Count > 50)
+                {
+                    int randomGeneratorLimit = promos.Count / 50;
+                    
+
+                    startIndex = random.Next(randomGeneratorLimit) * 50;
+                }
+
+                for (int i = startIndex; i < promos.Count && i < startIndex + 50; i++)
+                {
+                    int searchQueryScore = 0;
+                    int pageViewScore = 0;
+                    var promo = promos.ElementAt(i);
+                    var filter = _mapper.Map<PromoScoreDto>(promo);
+                    var product = await _repo.GetProduct(promo.ProductId);
+
+                    foreach (var record in searchQuery)
+                    {
+                        TimeSpan timeDiff = (DateTime.UtcNow - record.LatestVisit);
+                        var time = Convert.ToInt32(timeDiff.TotalDays);
+                        if (promo.Promotion_Name.Contains(record.Keyword))
+                        {
+                            searchQueryScore += ((2 * record.NoOfSearch) + (time < 7 ? 5 : 0));
+                        }
+
+                        if (promo.Promotion_Description.Contains(record.Keyword))
+                        {
+                            searchQueryScore += ((1 * record.NoOfSearch) + (time < 7 ? 5 : 0));
+                        }
+
+                        if (product.Product_name.Contains(record.Keyword))
+                        {
+                            searchQueryScore += ((2 * record.NoOfSearch) + (time < 7 ? 5 : 0));
+                        }
+
+                        if (product.Product_Discription.Contains(record.Keyword))
+                        {
+                            searchQueryScore += ((1 * record.NoOfSearch) + (time < 7 ? 5 : 0));
+                        }
+
+                    }
+
+                    foreach (var record in pageViews)
+                    {
+                        TimeSpan timeDiff = (DateTime.UtcNow - record.LatestVisit);
+                        var time = Convert.ToInt32(timeDiff.TotalDays);
+
+                        if (product.Sub_category.Equals(record.Sub_category))
+                        {
+                            pageViewScore += ((3 * record.NoOfVisits) + (time < 7 ? 5 : 0));
+                            break;
+                        }
+                    }
+                
+                    var finalScore = pageViewScore + searchQueryScore;
+                    filter.Score = finalScore;
+                    
+                }
+
+                var orderedPromo = promoScoreList.OrderByDescending(p => p.Score);
+                var selectedPromo = orderedPromo.ElementAt(0);
+                var returnPromo = _mapper.Map<Promo>(selectedPromo);
+                return returnPromo;
+            }else{
+
+                var limit = promos.Count;
+                var rand = random.Next(limit);
+                return promos.ElementAt(rand);
+            }
         }
     }
 }

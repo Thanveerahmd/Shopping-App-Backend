@@ -147,6 +147,9 @@ namespace Project.Helpers
 
             CreateMap<Advertisement,AdvertScoreDto>();
 
+            CreateMap<Promo,PromoScoreDto>();
+
+            CreateMap<PromoScoreDto,Promo>();
 
             CreateMap< orderDetails,OrderDetailsForUserPreference>();
         }
