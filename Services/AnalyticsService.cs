@@ -17,6 +17,8 @@ using NReco.CF.Taste.Impl.Similarity;
 using NReco.CF.Taste.Impl.Recommender;
 using System.Text;
 using pro.backend.Dtos;
+using Microsoft.AspNetCore.Identity;
+using Project.Entities;
 
 namespace pro.backend.Services
 {
@@ -27,17 +29,20 @@ namespace pro.backend.Services
         public readonly iShoppingRepo _repo;
         private readonly IMapper _mapper;
         private readonly iCategoryService _categoryService;
+        private readonly UserManager<User> _usermanger;
 
         public AnalyticsService(
             DataContext context,
             iShoppingRepo repo,
             IMapper mapper,
             iOrderService orderService,
-            iCategoryService categoryService)
+            iCategoryService categoryService,
+             UserManager<User> usermanger)
         {
             _context = context;
             _repo = repo;
             _mapper = mapper;
+            _usermanger =usermanger;
             _order = orderService;
             _categoryService = categoryService;
         }
@@ -517,6 +522,58 @@ namespace pro.backend.Services
             return realScore;
 
         }
+        
+        //  public IDataModel UserModule()
+        // {
+           
 
+        //     FastByIDMap<IList<IPreference>> data = new FastByIDMap<IList<IPreference>>();
+
+        //      var users =  _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Buyer'").Include(p => p.DeliveryDetails).Include(p => p.BillingInfo).ToListAsync().Result;
+             
+
+        //     foreach (var item in users)
+        //     {
+
+        //         byte[] bytes = Encoding.ASCII.GetBytes(item.Id);
+        //         long userID = BitConverter.ToInt64(bytes, 0);
+        //        // long itemID = item.ProductId; // encoding
+
+        //         /*
+        //             Decoding
+        //             int i = result;
+        //             byte[] bytes2 = BitConverter.GetBytes(i);
+        //             string s2 = Encoding.ASCII.GetString(bytes);
+        //          */
+
+        //         var userPrefs = data.Get(userID);
+        //         if (userPrefs == null)
+        //         {
+        //             userPrefs = new List<IPreference>(6);
+        //             data.Put(userID, userPrefs);
+        //         }
+
+        //         if (hasPrefVal)
+        //         {
+        //             var prefVal = Convert.ToSingle(PrefValFld);
+        //             userPrefs.Add(new GenericPreference(userID, itemID, prefVal));
+        //         }
+        //         else
+        //         {
+        //             userPrefs.Add(new BooleanPreference(userID, itemID));
+        //         }
+        //     }
+
+        //     var newData = new FastByIDMap<IPreferenceArray>(data.Count());
+
+        //     foreach (var entry in data.EntrySet())
+        //     {
+        //         var prefList = (List<IPreference>)entry.Value;
+        //         newData.Put(entry.Key, hasPrefVal ?
+        //             (IPreferenceArray)new GenericUserPreferenceArray(prefList) :
+        //             (IPreferenceArray)new BooleanUserPreferenceArray(prefList));
+        //     }
+        //     return new GenericDataModel(newData);
+        // }
     }
 }

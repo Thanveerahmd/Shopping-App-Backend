@@ -37,6 +37,7 @@ namespace pro.backend.Controllers
             _productService = productService;
             _analyticsService = analyticsService;
         }
+        
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllProducts()
