@@ -25,10 +25,12 @@ namespace pro.backend.iServices
 
         Task<ICollection<BuyerSearch>> GetBuyerSearchHistoryOfUser(string UserId);
 
-        float getPriceSuggestions(int Sub_categoryId, string Product_Description, string Product_name);
+        Task<float> getPriceSuggestions(int Sub_categoryId, string Product_Description, string Product_name);
         Task<List<AdvertScoreDto>> GetAdvertisementToReturn(ICollection<Advertisement> ad, string userId);
 
         Task<Promo> GetNotificationToReturn(ICollection<Promo> promos, string userId);
+
+        double similarityOfProducts(string ProductName1, string ProductDescription1, string ProductName2, string ProductDescription2);
 
     }
 }
