@@ -71,6 +71,7 @@ namespace pro.backend.Controllers
             var subCategory = _mapper.Map<SubCategory>(categoryDto);
 
             subCategory.CategoryId = categoryId;
+            subCategory.url = null;
 
             if (category == null)
             {

@@ -65,6 +65,7 @@ namespace pro.backend.Controllers
             else
             {
                 prevData.FirebaseToken = DeviceDetails.FirebaseToken;
+                prevData.UserId = DeviceDetails.UserId;
                 await _map.LocationUpdate(prevData);
             }
 
@@ -184,6 +185,10 @@ namespace pro.backend.Controllers
                     if (promotion.Count != 0)
                     {
                         var promo = await _analyticsService.GetNotificationToReturn(promotion,DeviceInfo.UserId); 
+                        if(promo==null)
+
+                        return;
+                        
                         string title = $"Avail this promotion from {store.StoreName}";
                         string body = promo.Promotion_Description;
                         var data = new { Lat = store.lat, Lng = store.lng, StoreName = store.StoreName };

@@ -316,7 +316,7 @@ namespace pro.backend.Services
                 // }
 
                 var finalScoredAdverts = filteredAdverts.OrderByDescending(p => p.Score);
-                var dataToSend = finalScoredAdverts.Take(6);
+                var dataToSend = finalScoredAdverts.Take(3);
                 var list = dataToSend.ToList();
 
                 return list;
@@ -422,13 +422,17 @@ namespace pro.backend.Services
                 
                     var finalScore = pageViewScore + searchQueryScore;
                     filter.Score = finalScore;
-                    
+                    promoScoreList.Add(filter);
                 }
 
                 var orderedPromo = promoScoreList.OrderByDescending(p => p.Score);
-                var selectedPromo = orderedPromo.ElementAt(0);
-                var returnPromo = _mapper.Map<Promo>(selectedPromo);
-                return returnPromo;
+                if(orderedPromo.Count() > 0){
+                    var selectedPromo = orderedPromo.ElementAt(0);
+                    var returnPromo = _mapper.Map<Promo>(selectedPromo);
+                    return returnPromo;
+                }
+                return null;
+                
             }else{
 
                 var limit = promos.Count;

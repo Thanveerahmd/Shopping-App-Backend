@@ -473,7 +473,7 @@ namespace pro.backend.Controllers
         }
 
 
-        [HttpPost("addProduct/{SubCategoryId}")]
+        [HttpPost]
         [AllowAnonymous]
         public async Task<IActionResult> GetPriceSuggestion([FromBody]ProductAddingDto productDto, int SubCategoryId)
         {

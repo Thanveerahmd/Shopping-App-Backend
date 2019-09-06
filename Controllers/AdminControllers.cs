@@ -321,7 +321,7 @@ namespace Project.Controllers
         }
         [AllowAnonymous]
         [HttpPut("approval/{reason}")]
-        public IActionResult approval([FromBody]AdvertismentUploadDto adDto, string reason)
+        public async Task<IActionResult> approval([FromBody]AdvertismentUploadDto adDto, string reason)
         {
             // status UserId is need
             var ad = _mapper.Map<Advertisement>(adDto);
@@ -333,7 +333,7 @@ namespace Project.Controllers
 
             try
             {
-                _adService.UpdateAdvertisement(prevAd);
+                await _adService.UpdateAdvertisement(prevAd);
             }
             catch (AppException ex)
             {
@@ -344,7 +344,7 @@ namespace Project.Controllers
             {
                 var url = $"http://mahdhir.epizy.com/advert.php?id={ad.Id}";
 
-                _emailSender.SendEmailAsync(seller.UserName, "Payment For Advertisement",
+                await _emailSender.SendEmailAsync(seller.UserName, "Payment For Advertisement",
                $"Please open this link from your mobile and proceed to payment: <a href='{url}'>link</a>");
 
                 return Ok();
@@ -352,7 +352,7 @@ namespace Project.Controllers
             }
             else if (ad.Status.ToLower().Equals("rejected"))
             {
-                _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
+                await _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
               $"Your Advertisement for product {ad.ProductId} has been rejected.\nReason:{reason}");
 
                 return Ok();
