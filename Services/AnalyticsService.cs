@@ -85,7 +85,7 @@ namespace pro.backend.Services
             _context.Update(prevRecord);
             return await _context.SaveChangesAsync() > 0;
         }
-         
+
         public async Task<bool> UpdatePageViewRecord(PageViews prevRecord)
         {
             prevRecord.LatestVisit = DateTime.Now;
@@ -154,7 +154,6 @@ namespace pro.backend.Services
             return dataModel;
         }
 
-
         public IDataModel GetDataModelForNewUser(IDataModel baseModel, params long[] preferredItems)
         {
             var plusAnonymModel = new PlusAnonymousUserDataModel(baseModel);
@@ -167,8 +166,6 @@ namespace pro.backend.Services
             plusAnonymModel.SetTempPrefs(prefArr);
             return plusAnonymModel;
         }
-
-
 
         public IList<Product> getRecommendation(int currentProductID)
         {
@@ -349,13 +346,47 @@ namespace pro.backend.Services
 
         }
 
-        public float getPriceSuggestions(int Sub_categoryId, string Product_Description, string Product_name)
+        public async Task<float> getPriceSuggestions(int Sub_categoryId, string Product_Description, string Product_name)
         {
-            var List_of_Products = _categoryService.GetProductInAccordingToSales(Sub_categoryId).Result;
-     
-            return 0;
+            var List_of_Products = await _categoryService.GetProductInAccordingToSales(Sub_categoryId);
+
+            var SimilarProducts = getSimilarProducts(List_of_Products, Product_name, Product_Description);
+            
+            var newDictionary = new Dictionary<Product, double>();
+
+            foreach (KeyValuePair<Product, double> entry in SimilarProducts)
+            {
+                newDictionary.Add(entry.Key, entry.Value);
+
+                List<double> data = new List<double>();
+
+                var product = entry.Key;
+
+                data.Add(2 * (product.NumberOfSales / (product.Quantity + product.NumberOfSales)));
+                data.Add(product.rating / 5);
+                data.Add(3 * newDictionary[entry.Key]);
+
+                var newScore = data.Sum() / 6;
+
+                newDictionary[entry.Key] = newScore;
+            }
+
+            newDictionary.OrderByDescending(k => k.Value);
+
+               List<float> prices = new List<float>();
+
+            foreach (KeyValuePair<Product, double> entry in newDictionary)
+            { 
+                    prices.Add(entry.Key.Price);
+                    
+                    if(prices.Count == 5)
+                    {
+                       break;
+                    }           
+            }
+            return prices.Average();
         }
-        
+
         public async Task<Promo> GetNotificationToReturn(ICollection<Promo> promos, string userId)
         {
             Random random = new Random();
@@ -369,7 +400,7 @@ namespace pro.backend.Services
                 if (promos.Count > 50)
                 {
                     int randomGeneratorLimit = promos.Count / 50;
-                    
+
 
                     startIndex = random.Next(randomGeneratorLimit) * 50;
                 }
@@ -419,7 +450,7 @@ namespace pro.backend.Services
                             break;
                         }
                     }
-                
+
                     var finalScore = pageViewScore + searchQueryScore;
                     filter.Score = finalScore;
                     promoScoreList.Add(filter);
@@ -440,5 +471,54 @@ namespace pro.backend.Services
                 return promos.ElementAt(rand);
             }
         }
+
+        public Dictionary<Product, double> getSimilarProducts(ICollection<Product> Products, string ProductName, string ProductDescription)
+        {
+            var dictionary = new Dictionary<Product, double>();
+
+            foreach (var filter in Products)
+            {
+                double Score = 0;
+
+                if (filter.Product_name != null && filter.Product_Discription != null)
+                {
+                    Score = similarityOfProducts(filter.Product_name, filter.Product_Discription, ProductName, ProductDescription);
+
+                    if (Score > 0.5)
+                        dictionary.Add(filter, Score);
+                }
+            }
+
+            dictionary.OrderByDescending(key => key.Value);
+
+            return dictionary;
+
+        }
+
+        public double similarityOfProducts(string ProductName1, string ProductDescription1, string ProductName2, string ProductDescription2)
+        {
+            double[] Score = new double[4];
+            int n = 2;
+
+            Score[0] = LevenshteinDistance.SimilarityScore(ProductName1, ProductName2);
+
+            if (ProductDescription2.Contains(ProductName1))
+            {
+                Score[1] = LevenshteinDistance.SimilarityScore(ProductName1, ProductDescription2);
+                n++;
+            }
+            if (ProductDescription1.Contains(ProductName2))
+            {
+                Score[2] = LevenshteinDistance.SimilarityScore(ProductName2, ProductDescription1);
+                n++;
+            }
+            Score[3] = LevenshteinDistance.SimilarityScore(ProductDescription1, ProductDescription2);
+
+            var realScore = (double)(Score.Sum()) / n;
+
+            return realScore;
+
+        }
+
     }
 }

@@ -45,9 +45,7 @@ namespace pro.backend.Controllers
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
 
-
         }
-        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
@@ -124,7 +122,7 @@ namespace pro.backend.Controllers
 
             var RecommendedProduct = _analyticsService.getRecommendation(id);
             var ProductRecommended = _mapper.Map<ICollection<ProductListDto>>(RecommendedProduct);
-            
+
             return Ok(new { product = productToReturn, similarProducts = Products, RecommendedProducts = ProductRecommended });
 
 
@@ -200,10 +198,10 @@ namespace pro.backend.Controllers
 
         }
 
-        [HttpDelete("{productid}")]
-        public IActionResult Delete(int productid)
+        [HttpDelete("{ProductId}")]
+        public IActionResult Delete(int ProductId)
         {
-            _productService.DeleteProduct(productid);
+            _productService.DeleteProduct(ProductId);
             return Ok();
         }
 
@@ -473,14 +471,14 @@ namespace pro.backend.Controllers
         }
 
 
-        [HttpPost]
+        [HttpPost("pricesuggestion")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetPriceSuggestion([FromBody]ProductAddingDto productDto, int SubCategoryId)
+        public async Task<IActionResult> GetPriceSuggestion([FromBody]ProductAddingDto productDto)
         {
 
             var product = _mapper.Map<Product>(productDto);
 
-            var SubCategory = await _categoryService.GetSubCategorywithPhoto(SubCategoryId);
+            var SubCategory = await _categoryService.GetSubCategorywithPhoto(product.Sub_categoryId);
 
             if (SubCategory == null)
             {
@@ -488,14 +486,11 @@ namespace pro.backend.Controllers
 
             }
 
-            product.Sub_category = SubCategory.SubCategoryName;
-            product.Sub_categoryId = SubCategoryId;
-
             try
             {
                 string text = product.Product_name + " " + product.Product_Discription;
-                
-                return Ok();
+                var SuggestPrice = _analyticsService.getPriceSuggestions(product.Sub_categoryId, product.Product_Discription, product.Product_name);
+                return Ok(SuggestPrice);
             }
             catch (AppException ex)
             {

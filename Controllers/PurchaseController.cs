@@ -237,7 +237,7 @@ namespace pro.backend.Controllers
                 var counter = 0;
                 var totalPrice = 0f;
                 IList<orderDetails> OutOfStockProducts = new List<orderDetails>();
-                var flag =true;
+                var flag = true;
                 foreach (var el in orderDetails)
                 {
                     var CartProduct = _mapper.Map<OrderProductDto>(el);
@@ -245,12 +245,13 @@ namespace pro.backend.Controllers
                     var product = await _repo.GetProduct(CartProduct.ProductId);
 
                     var CartProductToDelete = await _repo.GetCartProduct(el.Id);
-                    if(product == null)
+                    if (product == null)
                     {
-                     flag = (flag && false); 
-                     _repo.Delete(CartProductToDelete);
+                        flag = (flag && false);
+                        _repo.Delete(CartProductToDelete);
 
-                    }else
+                    }
+                    else
 
                     if (product.Quantity < CartProduct.Count)
                     {
@@ -272,11 +273,11 @@ namespace pro.backend.Controllers
                         outOfStockProduct = OutOfStockProducts
                     });
                 }
-                 
+
                 if (!flag)
-                {   
+                {
                     await _repo.SaveAll();
-                    return StatusCode(401,new
+                    return StatusCode(401, new
                     {
                         message = "One of Product is Deleted by seller.Please recheck"
                     });
@@ -293,9 +294,11 @@ namespace pro.backend.Controllers
                         var CartProduct = _mapper.Map<OrderProductDto>(el);
                         var OrderProduct = _mapper.Map<orderDetails>(CartProduct);
                         var product = await _repo.GetProduct(CartProduct.ProductId);
+                        await _repo.UpdateSalesRecord(product);
                         OrderProduct.sellerId = product.SellerId;
                         ordertab.orderDetails.Add(OrderProduct);
                     }
+                    
                     _repo.DeleteAll(orderDetails);
 
                     if (await _repo.SaveAll())
