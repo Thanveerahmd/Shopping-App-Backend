@@ -273,6 +273,16 @@ namespace pro.backend.Services
             return rate;
         }
 
+         public async Task<ICollection<Rating>> GetRatingOfaUser(string userId)
+        {
+            var rate = await _context.Ratings.Where(p => p.UserId ==userId).ToListAsync();
+
+            if (rate == null)
+                throw new AppException("Rating Not Found");
+
+            return rate;
+        }
+
         public async Task<PhotoForUser> GetPhotoOfUser(string UserId)
         {
             var photo = await _context.PhotoForUsers.FirstOrDefaultAsync(p => p.UserId == UserId);

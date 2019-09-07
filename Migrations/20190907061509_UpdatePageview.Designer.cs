@@ -3,19 +3,21 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Project.Helpers;
 
 namespace WebApi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20190907061509_UpdatePageview")]
+    partial class UpdatePageview
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.2.6-servicing-10079")
+                .HasAnnotation("ProductVersion", "2.2.2-servicing-10034")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -506,6 +508,8 @@ namespace WebApi.Migrations
 
                     b.Property<int>("NoOfVisits");
 
+                    b.Property<int>("ProductId");
+
                     b.Property<string>("Sub_category");
 
                     b.Property<int>("Sub_categoryId");
@@ -656,25 +660,6 @@ namespace WebApi.Migrations
                     b.HasIndex("subCategoryId");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("pro.backend.Entities.ProductView", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("LatestVisit");
-
-                    b.Property<int>("NoOfVisits");
-
-                    b.Property<int>("ProductId");
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductView");
                 });
 
             modelBuilder.Entity("pro.backend.Entities.Promo", b =>

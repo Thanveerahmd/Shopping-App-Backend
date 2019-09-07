@@ -46,5 +46,6 @@ namespace pro.backend.iServices
         Task<bool> UpdateSellerInfo(SellerPaymentInfo SellerPaymentInfo);
         Task<bool> UpdateBuyerInfo(BuyerPaymentInfo BuyerPaymentInfo);
          Task<bool> UpdateSalesRecord(Product product);
+        Task<ICollection<Rating>> GetRatingOfaUser(string userId);
     }
 }

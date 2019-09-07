@@ -35,6 +35,8 @@ namespace Project.Helpers
         public DbSet<PhotoForCategory> photoForCategories { get; set; }
         public DbSet<PageViews> PageViews { get; set; }
         public DbSet<BuyerSearch> BuyerSearch { get; set; }
+        public DbSet<ProductView> ProductView { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

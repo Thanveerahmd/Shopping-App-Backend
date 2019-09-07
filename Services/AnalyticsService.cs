@@ -10,6 +10,8 @@ using NReco.CF.Taste.Model;
 using NReco.CF.Taste.Common;
 using NReco.CF.Taste.Impl.Common;
 using NReco.CF.Taste.Impl.Model;
+using NReco.CF.Taste.Impl.Neighborhood;
+using NReco.CF.Taste.Recommender;
 
 using System.Data;
 using AutoMapper;
@@ -42,7 +44,7 @@ namespace pro.backend.Services
             _context = context;
             _repo = repo;
             _mapper = mapper;
-            _usermanger =usermanger;
+            _usermanger = usermanger;
             _order = orderService;
             _categoryService = categoryService;
         }
@@ -59,6 +61,7 @@ namespace pro.backend.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
+        
         public async Task<ICollection<BuyerSearch>> GetBuyerSearchHistoryOfUser(string UserId)
         {
             var data = await _context.BuyerSearch.Where(i => i.UserId == UserId).ToListAsync();
@@ -77,9 +80,21 @@ namespace pro.backend.Services
             return data;
         }
 
+        public async Task<ICollection<ProductView>> GetProductViewHistoryOfUser(string UserId)
+        {
+            var data = await _context.ProductView.Where(i => i.UserId == UserId).ToListAsync();
+            return data;
+        }
+
         public async Task<PageViews> GetPageViewRecordIfAvailable(string Sub_category, string UserId)
         {
             var data = await _context.PageViews.FirstOrDefaultAsync(i => i.Sub_category == Sub_category && i.UserId == UserId);
+            return data;
+        }
+
+        public async Task<ProductView> GetProductViewRecordIfAvailable(int ProductId, string UserId)
+        {
+            var data = await _context.ProductView.FirstOrDefaultAsync(i => i.ProductId == ProductId && i.UserId == UserId);
             return data;
         }
 
@@ -98,6 +113,15 @@ namespace pro.backend.Services
             _context.Update(prevRecord);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<bool> UpdateProductViewRecord(ProductView prevRecord)
+        {
+            prevRecord.LatestVisit = DateTime.Now;
+            prevRecord.NoOfVisits++;
+            _context.Update(prevRecord);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
 
         public IDataModel Load(string PrefValFld = null)
         {
@@ -180,9 +204,6 @@ namespace pro.backend.Services
             var modelWithCurrentUser = GetDataModelForNewUser(ordersDataModel, currentProductID);
 
             var similarity = new LogLikelihoodSimilarity(modelWithCurrentUser);
-
-            // in this example, we have no preference values (scores)
-            // to get correct results 'BooleanfPref' recommenders should be used
 
             var recommender = new GenericBooleanPrefItemBasedRecommender(modelWithCurrentUser, similarity);
 
@@ -356,7 +377,7 @@ namespace pro.backend.Services
             var List_of_Products = await _categoryService.GetProductInAccordingToSales(Sub_categoryId);
 
             var SimilarProducts = getSimilarProducts(List_of_Products, Product_name, Product_Description);
-            
+
             var newDictionary = new Dictionary<Product, double>();
 
             foreach (KeyValuePair<Product, double> entry in SimilarProducts)
@@ -378,16 +399,16 @@ namespace pro.backend.Services
 
             newDictionary.OrderByDescending(k => k.Value);
 
-               List<float> prices = new List<float>();
+            List<float> prices = new List<float>();
 
             foreach (KeyValuePair<Product, double> entry in newDictionary)
-            { 
-                    prices.Add(entry.Key.Price);
-                    
-                    if(prices.Count == 5)
-                    {
-                       break;
-                    }           
+            {
+                prices.Add(entry.Key.Price);
+
+                if (prices.Count == 5)
+                {
+                    break;
+                }
             }
             return prices.Average();
         }
@@ -462,14 +483,17 @@ namespace pro.backend.Services
                 }
 
                 var orderedPromo = promoScoreList.OrderByDescending(p => p.Score);
-                if(orderedPromo.Count() > 0){
+                if (orderedPromo.Count() > 0)
+                {
                     var selectedPromo = orderedPromo.ElementAt(0);
                     var returnPromo = _mapper.Map<Promo>(selectedPromo);
                     return returnPromo;
                 }
                 return null;
-                
-            }else{
+
+            }
+            else
+            {
 
                 var limit = promos.Count;
                 var rand = random.Next(limit);
@@ -524,58 +548,138 @@ namespace pro.backend.Services
             return realScore;
 
         }
-        
-        //  public IDataModel UserModule()
-        // {
-           
 
-        //     FastByIDMap<IList<IPreference>> data = new FastByIDMap<IList<IPreference>>();
+        public IDataModel UserModel()
+        {
 
-        //      var users =  _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Buyer'").Include(p => p.DeliveryDetails).Include(p => p.BillingInfo).ToListAsync().Result;
-             
 
-        //     foreach (var item in users)
-        //     {
+            FastByIDMap<IList<IPreference>> data = new FastByIDMap<IList<IPreference>>();
 
-        //         byte[] bytes = Encoding.ASCII.GetBytes(item.Id);
-        //         long userID = BitConverter.ToInt64(bytes, 0);
-        //        // long itemID = item.ProductId; // encoding
+            var users = _usermanger.Users.FromSql("select * from AspNetUsers where Role='Both' OR Role ='Buyer'").Include(p => p.BuyerSearch).Include(p => p.PageViews).ToListAsync().Result;
 
-        //         /*
-        //             Decoding
-        //             int i = result;
-        //             byte[] bytes2 = BitConverter.GetBytes(i);
-        //             string s2 = Encoding.ASCII.GetString(bytes);
-        //          */
 
-        //         var userPrefs = data.Get(userID);
-        //         if (userPrefs == null)
-        //         {
-        //             userPrefs = new List<IPreference>(6);
-        //             data.Put(userID, userPrefs);
-        //         }
+            foreach (var item in users)
+            {
+                byte[] bytes = Encoding.ASCII.GetBytes(item.Id);
+                long userID = BitConverter.ToInt64(bytes, 0);
 
-        //         if (hasPrefVal)
-        //         {
-        //             var prefVal = Convert.ToSingle(PrefValFld);
-        //             userPrefs.Add(new GenericPreference(userID, itemID, prefVal));
-        //         }
-        //         else
-        //         {
-        //             userPrefs.Add(new BooleanPreference(userID, itemID));
-        //         }
-        //     }
+                var pageviews = GetProductViewHistoryOfUser(item.Id).Result;
+                var searchResults = GetBuyerSearchHistoryOfUser(item.Id).Result;
+                var UserRatings = _repo.GetRatingOfaUser(item.Id).Result;
 
-        //     var newData = new FastByIDMap<IPreferenceArray>(data.Count());
+                var dictionary = new Dictionary<Product, float>();
 
-        //     foreach (var entry in data.EntrySet())
-        //     {
-        //         var prefList = (List<IPreference>)entry.Value;
-        //         newData.Put(entry.Key, hasPrefVal ?
-        //             (IPreferenceArray)new GenericUserPreferenceArray(prefList) :
-        //             (IPreferenceArray)new BooleanUserPreferenceArray(prefList));
-        //     }
-        //     return new GenericDataModel(newData);
-        // }
+                foreach (var view in pageviews)
+                {
+                    var viewProduct = _repo.GetProduct(view.ProductId).Result;
+
+                    TimeSpan timeDiff = (DateTime.UtcNow - view.LatestVisit);
+                    var time = Convert.ToInt32(timeDiff.TotalDays);
+
+                    var score = ((3 * view.NoOfVisits) + (time < 7 ? 5 : 0));
+
+                    if (dictionary.ContainsKey(viewProduct))
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        dictionary.Add(viewProduct, score);
+                    }
+                }
+
+                foreach (var rating in UserRatings)
+                {
+                    var RatedProduct = _repo.GetProduct(rating.ProductId).Result;
+
+                    if (dictionary.ContainsKey(RatedProduct))
+                    {
+                        dictionary[RatedProduct] += 2 * rating.RatingValue;
+                    }
+                    else
+                    {
+                        dictionary.Add(RatedProduct, 2 * rating.RatingValue);
+                    }
+                }
+
+                foreach (var record in searchResults)
+                {
+                    TimeSpan timeDiff = (DateTime.UtcNow - record.LatestVisit);
+                    var time = Convert.ToInt32(timeDiff.TotalDays);
+
+                    if (time > 10)
+                    {
+                        continue;
+                    }
+
+                    var products1 = _repo.GetProductsBySearchQuery("Name", record.Keyword).Result;
+                    var products2 = _repo.GetProductsBySearchQuery("Description", record.Keyword).Result;
+
+                    var score1 = ((2 * record.NoOfSearch) + (time < 7 ? 5 : 0));
+                    var score2 = ((1 * record.NoOfSearch) + (time < 7 ? 5 : 0));
+
+                    if (dictionary.ContainsKey(products1.First()))
+                    {
+                        dictionary[products1.First()] += score1;
+                    }
+                    else
+                    {
+                        dictionary.Add(products1.First(), score1);
+                    }
+
+                    if (dictionary.ContainsKey(products2.First()))
+                    {
+                        dictionary[products2.First()] += score2;
+                    }
+                    else
+                    {
+                        dictionary.Add(products2.First(), score2);
+                    }
+
+                }
+
+                dictionary.OrderByDescending(k => k.Value);
+
+                var userPrefs = new List<IPreference>();
+                data.Put(userID, userPrefs);
+
+                foreach (KeyValuePair<Product, float> entry in dictionary)
+                {
+                    userPrefs.Add(new GenericPreference(userID, entry.Key.Id, entry.Value));
+                }
+            }
+
+            var newData = new FastByIDMap<IPreferenceArray>(data.Count());
+
+            foreach (var entry in data.EntrySet())
+            {
+                var prefList = (List<IPreference>)entry.Value;
+                newData.Put(entry.Key, (IPreferenceArray)new GenericUserPreferenceArray(prefList));
+            }
+            return new GenericDataModel(newData);
+        }
+
+        public IList<Product> GetUserPreference(string UserId)
+        {
+            byte[] bytes = Encoding.ASCII.GetBytes(UserId);
+            long userID = BitConverter.ToInt64(bytes, 0);
+
+            var model = UserModel();
+
+            var userSimilarity = new PearsonCorrelationSimilarity(model);
+
+            var neighborhood = new NearestNUserNeighborhood(3, userSimilarity, model);
+            var recommender = new GenericUserBasedRecommender(model, neighborhood, userSimilarity);
+            var cachingRecommender = new CachingRecommender(recommender);
+            IList<Product> list = new List<Product>();
+            IList<IRecommendedItem> recommendations = cachingRecommender.Recommend(userID, 6);
+
+            foreach (var item in recommendations)
+            {
+                list.Add(_repo.GetProduct((int)item.GetItemID()).Result);
+            }
+            return list;
+        }
+
     }
 }

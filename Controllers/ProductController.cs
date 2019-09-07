@@ -37,7 +37,7 @@ namespace pro.backend.Controllers
             _productService = productService;
             _analyticsService = analyticsService;
         }
-        
+
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAllProducts()
@@ -47,6 +47,7 @@ namespace pro.backend.Controllers
             return Ok(productsToReturn);
 
         }
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
@@ -62,6 +63,22 @@ namespace pro.backend.Controllers
             if (userId != "" && userId != null)
             {
                 var previousSubCategoryView = await _analyticsService.GetPageViewRecordIfAvailable(product.Sub_category, userId);
+                var oldvisit = await _analyticsService.GetProductViewRecordIfAvailable(product.Id, userId);
+                
+                if (oldvisit == null)
+                {
+                    ProductView data = new ProductView();
+                    data.UserId = userId;
+                    data.ProductId = product.Id;
+                    data.NoOfVisits = 1;
+                    data.LatestVisit = DateTime.Now;
+                    _repo.Add(data);
+                }
+                else
+                {
+                    await _analyticsService.UpdateProductViewRecord(oldvisit);
+                }
+
                 if (previousSubCategoryView == null)
                 {
                     PageViews data = new PageViews();
@@ -472,14 +489,14 @@ namespace pro.backend.Controllers
         }
 
 
-        [HttpPost("pricesuggestion")]
+        [HttpPost("pricesuggestion/{SubCategoryId}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetPriceSuggestion([FromBody]ProductAddingDto productDto)
+        public async Task<IActionResult> GetPriceSuggestion([FromBody]ProductAddingDto productDto, int SubCategoryId)
         {
 
             var product = _mapper.Map<Product>(productDto);
 
-            var SubCategory = await _categoryService.GetSubCategorywithPhoto(product.Sub_categoryId);
+            var SubCategory = await _categoryService.GetSubCategorywithPhoto(SubCategoryId);
 
             if (SubCategory == null)
             {
@@ -490,7 +507,7 @@ namespace pro.backend.Controllers
             try
             {
                 string text = product.Product_name + " " + product.Product_Discription;
-                var SuggestPrice = _analyticsService.getPriceSuggestions(product.Sub_categoryId, product.Product_Discription, product.Product_name);
+                var SuggestPrice = await _analyticsService.getPriceSuggestions(SubCategoryId, product.Product_Discription, product.Product_name);
                 return Ok(SuggestPrice);
             }
             catch (AppException ex)
