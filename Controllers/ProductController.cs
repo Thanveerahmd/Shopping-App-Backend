@@ -48,6 +48,16 @@ namespace pro.backend.Controllers
 
         }
         [AllowAnonymous]
+        [HttpGet("userpreference/{userId}")]
+        public async Task<IActionResult> GetUserPreference(string userId)
+        {
+            var products = await _analyticsService.GetUserPreference(userId);
+            var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+            return Ok(productsToReturn);
+
+        }
+
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)
         {
@@ -64,7 +74,7 @@ namespace pro.backend.Controllers
             {
                 var previousSubCategoryView = await _analyticsService.GetPageViewRecordIfAvailable(product.Sub_category, userId);
                 var oldvisit = await _analyticsService.GetProductViewRecordIfAvailable(product.Id, userId);
-                
+
                 if (oldvisit == null)
                 {
                     ProductView data = new ProductView();

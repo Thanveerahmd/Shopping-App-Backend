@@ -67,7 +67,7 @@ namespace pro.backend.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        
+
         public async Task<ICollection<BuyerSearch>> GetBuyerSearchHistoryOfUser(string UserId)
         {
             var data = await _context.BuyerSearch.Where(i => i.UserId == UserId).ToListAsync();
@@ -537,16 +537,29 @@ namespace pro.backend.Services
 
             Score[0] = LevenshteinDistance.SimilarityScore(ProductName1, ProductName2);
 
-            if (ProductDescription2.Contains(ProductName1))
+
+
+            Score[1] = LevenshteinDistance.SimilarityScore(ProductName1, ProductDescription2);
+
+            if (Score[1] > 0.5)
             {
-                Score[1] = LevenshteinDistance.SimilarityScore(ProductName1, ProductDescription2);
                 n++;
             }
-            if (ProductDescription1.Contains(ProductName2))
+            else
             {
-                Score[2] = LevenshteinDistance.SimilarityScore(ProductName2, ProductDescription1);
+                Score[1] = 0;
+            }
+            Score[2] = LevenshteinDistance.SimilarityScore(ProductName2, ProductDescription1);
+
+            if (Score[2] > 0.5)
+            {
                 n++;
             }
+            else
+            {
+                Score[2] = 0;
+            }
+
             Score[3] = LevenshteinDistance.SimilarityScore(ProductDescription1, ProductDescription2);
 
             var realScore = (double)(Score.Sum()) / n;
@@ -618,29 +631,36 @@ namespace pro.backend.Services
                         continue;
                     }
 
-                    var products1 = _repo.GetProductsBySearchQuery("Name", record.Keyword).Result;
-                    var products2 = _repo.GetProductsBySearchQuery("Description", record.Keyword).Result;
+                    var products1 = _repo.GetProductsBySearchQuery(record.Keyword, "Name").Result.FirstOrDefault();
+                    var products2 = _repo.GetProductsBySearchQuery(record.Keyword, "Description").Result.FirstOrDefault();
 
                     var score1 = ((2 * record.NoOfSearch) + (time < 7 ? 5 : 0));
                     var score2 = ((1 * record.NoOfSearch) + (time < 7 ? 5 : 0));
 
-                    if (dictionary.ContainsKey(products1.First()))
+                    if (products1 != null)
                     {
-                        dictionary[products1.First()] += score1;
-                    }
-                    else
-                    {
-                        dictionary.Add(products1.First(), score1);
+                        if (dictionary.ContainsKey(products1))
+                        {
+                            dictionary[products1] += score1;
+                        }
+                        else
+                        {
+                            dictionary.Add(products1, score1);
+                        }
                     }
 
-                    if (dictionary.ContainsKey(products2.First()))
+                    if (products2 != null)
                     {
-                        dictionary[products2.First()] += score2;
+                        if (dictionary.ContainsKey(products2))
+                        {
+                            dictionary[products2] += score2;
+                        }
+                        else
+                        {
+                            dictionary.Add(products2, score2);
+                        }
                     }
-                    else
-                    {
-                        dictionary.Add(products2.First(), score2);
-                    }
+
 
                 }
 
@@ -665,7 +685,7 @@ namespace pro.backend.Services
             return new GenericDataModel(newData);
         }
 
-        public IList<Product> GetUserPreference(string UserId)
+        public Task<IList<Product>> GetUserPreference(string UserId)
         {
             byte[] bytes = Encoding.ASCII.GetBytes(UserId);
             long userID = BitConverter.ToInt64(bytes, 0);
@@ -677,6 +697,7 @@ namespace pro.backend.Services
             var neighborhood = new NearestNUserNeighborhood(3, userSimilarity, model);
             var recommender = new GenericUserBasedRecommender(model, neighborhood, userSimilarity);
             var cachingRecommender = new CachingRecommender(recommender);
+
             IList<Product> list = new List<Product>();
             IList<IRecommendedItem> recommendations = cachingRecommender.Recommend(userID, 6);
 
@@ -684,7 +705,8 @@ namespace pro.backend.Services
             {
                 list.Add(_repo.GetProduct((int)item.GetItemID()).Result);
             }
-            return list;
+
+            return Task.FromResult<IList<Product>>(list);
         }
 
     }
