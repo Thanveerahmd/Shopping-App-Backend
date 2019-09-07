@@ -61,6 +61,12 @@ namespace pro.backend.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<bool> AddProductViewRecord(ProductView prevRecord)
+        {
+            _context.Add(prevRecord);
+            return await _context.SaveChangesAsync() > 0;
+        }
+
         
         public async Task<ICollection<BuyerSearch>> GetBuyerSearchHistoryOfUser(string UserId)
         {
