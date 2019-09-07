@@ -67,7 +67,6 @@ namespace pro.backend.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-
         public async Task<ICollection<BuyerSearch>> GetBuyerSearchHistoryOfUser(string UserId)
         {
             var data = await _context.BuyerSearch.Where(i => i.UserId == UserId).ToListAsync();
@@ -127,7 +126,6 @@ namespace pro.backend.Services
             _context.Update(prevRecord);
             return await _context.SaveChangesAsync() > 0;
         }
-
 
         public IDataModel Load(string PrefValFld = null)
         {
@@ -582,89 +580,7 @@ namespace pro.backend.Services
                 byte[] bytes = Encoding.ASCII.GetBytes(item.Id);
                 long userID = BitConverter.ToInt64(bytes, 0);
 
-                var pageviews = GetProductViewHistoryOfUser(item.Id).Result;
-                var searchResults = GetBuyerSearchHistoryOfUser(item.Id).Result;
-                var UserRatings = _repo.GetRatingOfaUser(item.Id).Result;
-
-                var dictionary = new Dictionary<Product, float>();
-
-                foreach (var view in pageviews)
-                {
-                    var viewProduct = _repo.GetProduct(view.ProductId).Result;
-
-                    TimeSpan timeDiff = (DateTime.UtcNow - view.LatestVisit);
-                    var time = Convert.ToInt32(timeDiff.TotalDays);
-
-                    var score = ((3 * view.NoOfVisits) + (time < 7 ? 5 : 0));
-
-                    if (dictionary.ContainsKey(viewProduct))
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        dictionary.Add(viewProduct, score);
-                    }
-                }
-
-                foreach (var rating in UserRatings)
-                {
-                    var RatedProduct = _repo.GetProduct(rating.ProductId).Result;
-
-                    if (dictionary.ContainsKey(RatedProduct))
-                    {
-                        dictionary[RatedProduct] += 2 * rating.RatingValue;
-                    }
-                    else
-                    {
-                        dictionary.Add(RatedProduct, 2 * rating.RatingValue);
-                    }
-                }
-
-                foreach (var record in searchResults)
-                {
-                    TimeSpan timeDiff = (DateTime.UtcNow - record.LatestVisit);
-                    var time = Convert.ToInt32(timeDiff.TotalDays);
-
-                    if (time > 10)
-                    {
-                        continue;
-                    }
-
-                    var products1 = _repo.GetProductsBySearchQuery(record.Keyword, "Name").Result.FirstOrDefault();
-                    var products2 = _repo.GetProductsBySearchQuery(record.Keyword, "Description").Result.FirstOrDefault();
-
-                    var score1 = ((2 * record.NoOfSearch) + (time < 7 ? 5 : 0));
-                    var score2 = ((1 * record.NoOfSearch) + (time < 7 ? 5 : 0));
-
-                    if (products1 != null)
-                    {
-                        if (dictionary.ContainsKey(products1))
-                        {
-                            dictionary[products1] += score1;
-                        }
-                        else
-                        {
-                            dictionary.Add(products1, score1);
-                        }
-                    }
-
-                    if (products2 != null)
-                    {
-                        if (dictionary.ContainsKey(products2))
-                        {
-                            dictionary[products2] += score2;
-                        }
-                        else
-                        {
-                            dictionary.Add(products2, score2);
-                        }
-                    }
-
-
-                }
-
-                dictionary.OrderByDescending(k => k.Value);
+                var dictionary = GetUserBehaviourMatrix(item.Id);
 
                 var userPrefs = new List<IPreference>();
                 data.Put(userID, userPrefs);
@@ -685,7 +601,7 @@ namespace pro.backend.Services
             return new GenericDataModel(newData);
         }
 
-        public Task<IList<Product>> GetUserPreference(string UserId)
+        public IList<Product> FrameworkRecommndation(string UserId)
         {
             byte[] bytes = Encoding.ASCII.GetBytes(UserId);
             long userID = BitConverter.ToInt64(bytes, 0);
@@ -693,21 +609,150 @@ namespace pro.backend.Services
             var model = UserModel();
 
             var userSimilarity = new PearsonCorrelationSimilarity(model);
-
             var neighborhood = new NearestNUserNeighborhood(3, userSimilarity, model);
             var recommender = new GenericUserBasedRecommender(model, neighborhood, userSimilarity);
+
+            //  var modelWithCurrentUser = GetDataModelForNewUser(model, currentProductID);
+            var similarity = new LogLikelihoodSimilarity(model);
+            var reco = new GenericBooleanPrefItemBasedRecommender(model, similarity);
             var cachingRecommender = new CachingRecommender(recommender);
 
-            IList<Product> list = new List<Product>();
             IList<IRecommendedItem> recommendations = cachingRecommender.Recommend(userID, 6);
+            var recommendedItems = reco.Recommend(userID, 6, null);
+
+            IList<Product> list = new List<Product>();
 
             foreach (var item in recommendations)
             {
                 list.Add(_repo.GetProduct((int)item.GetItemID()).Result);
             }
 
-            return Task.FromResult<IList<Product>>(list);
+            foreach (var ri in recommendedItems)
+            {
+                list.Add(_repo.GetProduct((int)ri.GetItemID()).Result);
+            }
+
+            return list;
         }
 
+        public Task<IList<Product>> GetUserPreference(string UserId)
+        {
+            IList<Product> list = new List<Product>();
+
+            return Task.FromResult<IList<Product>>(list);
+        }
+        public Dictionary<Product, float> GetUserBehaviourMatrix(string UserId)
+        {
+            var pageviews = GetProductViewHistoryOfUser(UserId).Result;
+            var searchResults = GetBuyerSearchHistoryOfUser(UserId).Result;
+            var UserRatings = _repo.GetRatingOfaUser(UserId).Result;
+
+            var dictionary = new Dictionary<Product, float>();
+
+            foreach (var view in pageviews)
+            {
+                var viewProduct = _repo.GetProduct(view.ProductId).Result;
+
+                TimeSpan timeDiff = (DateTime.UtcNow - view.LatestVisit);
+                var time = Convert.ToInt32(timeDiff.TotalDays);
+
+                var score = ((3 * view.NoOfVisits) + (time < 7 ? 5 : 0));
+
+                if (dictionary.ContainsKey(viewProduct))
+                {
+                    continue;
+                }
+                else
+                {
+                    dictionary.Add(viewProduct, score);
+                }
+            }
+
+            foreach (var rating in UserRatings)
+            {
+                var RatedProduct = _repo.GetProduct(rating.ProductId).Result;
+
+                if (dictionary.ContainsKey(RatedProduct))
+                {
+                    dictionary[RatedProduct] += 2 * rating.RatingValue;
+                }
+                else
+                {
+                    dictionary.Add(RatedProduct, 2 * rating.RatingValue);
+                }
+            }
+
+            foreach (var record in searchResults)
+            {
+                TimeSpan timeDiff = (DateTime.UtcNow - record.LatestVisit);
+                var time = Convert.ToInt32(timeDiff.TotalDays);
+
+                if (time > 10)
+                {
+                    continue;
+                }
+
+                var products1 = _repo.GetProductsBySearchQuery(record.Keyword, "Name").Result.FirstOrDefault();
+                var products2 = _repo.GetProductsBySearchQuery(record.Keyword, "Description").Result.FirstOrDefault();
+
+                var score1 = ((2 * record.NoOfSearch) + (time < 7 ? 5 : 0));
+                var score2 = ((1 * record.NoOfSearch) + (time < 7 ? 5 : 0));
+
+                if (products1 != null)
+                {
+                    if (dictionary.ContainsKey(products1))
+                    {
+                        dictionary[products1] += score1;
+                    }
+                    else
+                    {
+                        dictionary.Add(products1, score1);
+                    }
+                }
+
+                if (products2 != null)
+                {
+                    if (dictionary.ContainsKey(products2))
+                    {
+                        dictionary[products2] += score2;
+                    }
+                    else
+                    {
+                        dictionary.Add(products2, score2);
+                    }
+                }
+
+
+            }
+
+            dictionary.OrderByDescending(k => k.Value);
+
+            return dictionary;
+        }
+
+        public IList<Product> userPreferenceRecommndation(string UserId)
+        {
+            var dictionary = new Dictionary<Product, float>();
+
+            dictionary = GetUserBehaviourMatrix(UserId);
+
+             IList<Product> list = new List<Product>();
+            
+            foreach (KeyValuePair<Product, float> entry in dictionary)
+            {
+               list.Add(entry.Key);
+               
+               var product = _repo.
+
+               if(list.Count == 3)
+               {
+                 break;
+               }
+
+
+            }
+           
+            return list;
+        }
     }
 }
