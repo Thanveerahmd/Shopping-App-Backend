@@ -343,7 +343,7 @@ namespace pro.backend.Services
                 // }
 
                 var finalScoredAdverts = filteredAdverts.OrderByDescending(p => p.Score);
-                var dataToSend = finalScoredAdverts.Take(3);
+                var dataToSend = finalScoredAdverts.Take(6);
                 var list = dataToSend.ToList();
 
                 return list;
@@ -630,7 +630,7 @@ namespace pro.backend.Services
             List<Product> list = new List<Product>();
 
             list.AddRange(await userPreferenceRecommndation(UserId));
-            list.AddRange(FrameworkRecommndation(UserId));
+            // list.AddRange(FrameworkRecommndation(UserId));
 
             return list;
         }
