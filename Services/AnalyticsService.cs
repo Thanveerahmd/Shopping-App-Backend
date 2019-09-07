@@ -61,7 +61,13 @@ namespace pro.backend.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<bool> AddProductViewRecord(ProductView prevRecord)
+        {
+            _context.Add(prevRecord);
+            return await _context.SaveChangesAsync() > 0;
+        }
 
+        
         public async Task<ICollection<BuyerSearch>> GetBuyerSearchHistoryOfUser(string UserId)
         {
             var data = await _context.BuyerSearch.Where(i => i.UserId == UserId).ToListAsync();
@@ -679,7 +685,7 @@ namespace pro.backend.Services
             {
                 list.Add(_repo.GetProduct((int)item.GetItemID()).Result);
             }
-            
+
             return Task.FromResult<IList<Product>>(list);
         }
 

@@ -82,7 +82,7 @@ namespace pro.backend.Controllers
                     data.ProductId = product.Id;
                     data.NoOfVisits = 1;
                     data.LatestVisit = DateTime.Now;
-                    _repo.Add(data);
+                    await _analyticsService.AddProductViewRecord(data);
                 }
                 else
                 {

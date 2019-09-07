@@ -14,6 +14,8 @@ namespace pro.backend.iServices
 
         Task<bool> AddPageViewRecord(PageViews prevRecord);
 
+        Task<bool> AddProductViewRecord(ProductView prevRecord);
+
         Task<BuyerSearch> GetBuyerSearchRecordIfAvailable(string Keyword, string UserId);
 
         Task<bool> UpdateBuyerSearchRecord(BuyerSearch prevRecord);
