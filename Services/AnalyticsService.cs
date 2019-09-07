@@ -416,7 +416,7 @@ namespace pro.backend.Services
                     break;
                 }
             }
-            return prices.Average();
+            return (prices.Count>0?prices.Average():0);
         }
 
         public async Task<Promo> GetNotificationToReturn(ICollection<Promo> promos, string userId)
