@@ -533,7 +533,7 @@ namespace pro.backend.Services
         public double similarityOfProducts(string ProductName1, string ProductDescription1, string ProductName2, string ProductDescription2)
         {
             double[] Score = new double[4];
-            int n = 2;
+            int n = 1;
 
             Score[0] = LevenshteinDistance.SimilarityScore(ProductName1, ProductName2);
 
@@ -560,7 +560,7 @@ namespace pro.backend.Services
                 Score[2] = 0;
             }
 
-            Score[3] = LevenshteinDistance.SimilarityScore(ProductDescription1, ProductDescription2);
+            // Score[3] =  LevenshteinDistance.SimilarityScore(ProductDescription1, ProductDescription2);
 
             var realScore = (double)(Score.Sum()) / n;
 
