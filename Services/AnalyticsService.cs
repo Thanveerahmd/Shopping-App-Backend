@@ -414,7 +414,7 @@ namespace pro.backend.Services
                     break;
                 }
             }
-            return (prices.Count>0?prices.Average():0);
+            return (prices.Count > 0 ? prices.Average() : 0);
         }
 
         public async Task<Promo> GetNotificationToReturn(ICollection<Promo> promos, string userId)
@@ -600,7 +600,6 @@ namespace pro.backend.Services
             }
             return new GenericDataModel(newData);
         }
-
         public IList<Product> FrameworkRecommndation(string UserId)
         {
             byte[] bytes = Encoding.ASCII.GetBytes(UserId);
@@ -612,22 +611,13 @@ namespace pro.backend.Services
             var neighborhood = new NearestNUserNeighborhood(3, userSimilarity, model);
             var recommender = new GenericUserBasedRecommender(model, neighborhood, userSimilarity);
 
-            //  var modelWithCurrentUser = GetDataModelForNewUser(model, currentProductID);
-            var similarity = new LogLikelihoodSimilarity(model);
-            var reco = new GenericBooleanPrefItemBasedRecommender(model, similarity);
             var cachingRecommender = new CachingRecommender(recommender);
 
-            IList<IRecommendedItem> recommendations = cachingRecommender.Recommend(userID, 6);
-            var recommendedItems = reco.Recommend(userID, 6, null);
+            IList<IRecommendedItem> recommendations = cachingRecommender.Recommend(userID, 3);
 
             IList<Product> list = new List<Product>();
 
-            foreach (var item in recommendations)
-            {
-                list.Add(_repo.GetProduct((int)item.GetItemID()).Result);
-            }
-
-            foreach (var ri in recommendedItems)
+            foreach (var ri in recommendations)
             {
                 list.Add(_repo.GetProduct((int)ri.GetItemID()).Result);
             }
@@ -635,11 +625,14 @@ namespace pro.backend.Services
             return list;
         }
 
-        public Task<IList<Product>> GetUserPreference(string UserId)
+        public async Task<List<Product>> GetUserPreference(string UserId)
         {
-            IList<Product> list = new List<Product>();
+            List<Product> list = new List<Product>();
 
-            return Task.FromResult<IList<Product>>(list);
+            list.AddRange(await userPreferenceRecommndation(UserId));
+            list.AddRange(FrameworkRecommndation(UserId));
+
+            return list;
         }
         public Dictionary<Product, float> GetUserBehaviourMatrix(string UserId)
         {
@@ -729,29 +722,40 @@ namespace pro.backend.Services
 
             return dictionary;
         }
-
-        public IList<Product> userPreferenceRecommndation(string UserId)
+        public async Task<List<Product>> userPreferenceRecommndation(string UserId)
         {
             var dictionary = new Dictionary<Product, float>();
 
             dictionary = GetUserBehaviourMatrix(UserId);
 
-             IList<Product> list = new List<Product>();
-            
+            List<Product> list = new List<Product>();
+            var Count = 0;
             foreach (KeyValuePair<Product, float> entry in dictionary)
             {
-               list.Add(entry.Key);
-               
-               var product = _repo.
+                list.Add(entry.Key);
+                var ListOfProducts = await _categoryService.GetProductInAccordingToSales(entry.Key.Sub_categoryId);
+                var Products = getSimilarProducts(ListOfProducts, entry.Key.Product_name, entry.Key.Product_Discription);
+                var Count2 = 0;
 
-               if(list.Count == 3)
-               {
-                 break;
-               }
+                foreach (KeyValuePair<Product, double> item in Products)
+                {
+                    list.Add(item.Key);
+                    if (Count2 == 2)
+                    {
+                        break;
+                    }
+                }
+                if (Count == 3)
+                {
+                    break;
+                }
 
-
+                if (list.Count == 15)
+                {
+                    break;
+                }
             }
-           
+
             return list;
         }
     }
