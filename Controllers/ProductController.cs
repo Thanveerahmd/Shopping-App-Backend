@@ -66,8 +66,6 @@ namespace pro.backend.Controllers
             }else {
                 return BadRequest();
             }
-
-
         }
 
         [AllowAnonymous]
