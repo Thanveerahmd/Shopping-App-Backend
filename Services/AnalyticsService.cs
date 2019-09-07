@@ -69,7 +69,7 @@ namespace pro.backend.Services
 
         public async Task<ICollection<BuyerSearch>> GetBuyerSearchHistoryOfUser(string UserId)
         {
-            var data = await _context.BuyerSearch.Where(i => i.UserId == UserId).ToListAsync();
+            var data = await _context.BuyerSearch.Where(i => i.UserId == UserId).OrderBy(y => y.LatestVisit).ToListAsync();
             return data;
         }
 
@@ -87,7 +87,7 @@ namespace pro.backend.Services
 
         public async Task<ICollection<ProductView>> GetProductViewHistoryOfUser(string UserId)
         {
-            var data = await _context.ProductView.Where(i => i.UserId == UserId).ToListAsync();
+            var data = await _context.ProductView.Where(i => i.UserId == UserId).OrderBy(p =>p.LatestVisit).ToListAsync();
             return data;
         }
 
@@ -630,14 +630,14 @@ namespace pro.backend.Services
             List<Product> list = new List<Product>();
 
             list.AddRange(await userPreferenceRecommndation(UserId));
-            // list.AddRange(FrameworkRecommndation(UserId));
+            //list.AddRange(FrameworkRecommndation(UserId));
 
             return list;
         }
         public Dictionary<Product, float> GetUserBehaviourMatrix(string UserId)
         {
-            var pageviews = GetProductViewHistoryOfUser(UserId).Result;
-            var searchResults = GetBuyerSearchHistoryOfUser(UserId).Result;
+            var pageviews = GetProductViewHistoryOfUser(UserId).Result.Take(5);
+            var searchResults = GetBuyerSearchHistoryOfUser(UserId).Result.Take(5);
             var UserRatings = _repo.GetRatingOfaUser(UserId).Result;
 
             var dictionary = new Dictionary<Product, float>();
@@ -648,6 +648,11 @@ namespace pro.backend.Services
 
                 TimeSpan timeDiff = (DateTime.UtcNow - view.LatestVisit);
                 var time = Convert.ToInt32(timeDiff.TotalDays);
+                
+                if(time>7)
+                {
+                   continue;
+                }
 
                 var score = ((3 * view.NoOfVisits) + (time < 7 ? 5 : 0));
 
@@ -735,22 +740,9 @@ namespace pro.backend.Services
                 list.Add(entry.Key);
                 var ListOfProducts = await _categoryService.GetProductInAccordingToSales(entry.Key.Sub_categoryId);
                 var Products = getSimilarProducts(ListOfProducts, entry.Key.Product_name, entry.Key.Product_Discription);
-                var Count2 = 0;
-
-                foreach (KeyValuePair<Product, double> item in Products)
-                {
-                    list.Add(item.Key);
-                    if (Count2 == 2)
-                    {
-                        break;
-                    }
-                }
+                var product = Products.FirstOrDefault();
+                   list.Add(product.Key);
                 if (Count == 3)
-                {
-                    break;
-                }
-
-                if (list.Count == 15)
                 {
                     break;
                 }
