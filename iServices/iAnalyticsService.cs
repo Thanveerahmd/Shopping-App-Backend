@@ -34,7 +34,7 @@ namespace pro.backend.iServices
 
         double similarityOfProducts(string ProductName1, string ProductDescription1, string ProductName2, string ProductDescription2);
 
-        Task<IList<Product>> GetUserPreference(string UserId);
+        Task<List<Product>> GetUserPreference(string UserId);
         Task<bool> UpdateProductViewRecord(ProductView prevRecord);
         Task<ProductView> GetProductViewRecordIfAvailable(int ProductId, string UserId);
 
