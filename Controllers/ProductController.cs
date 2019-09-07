@@ -47,7 +47,7 @@ namespace pro.backend.Controllers
             return Ok(productsToReturn);
 
         }
-
+        [AllowAnonymous]
         [HttpGet("userpreference/{userId}")]
         public async Task<IActionResult> GetUserPreference(string userId)
         {
