@@ -47,13 +47,26 @@ namespace pro.backend.Controllers
             return Ok(productsToReturn);
 
         }
+
         [AllowAnonymous]
-        [HttpGet("userpreference/{userId}")]
-        public async Task<IActionResult> GetUserPreference(string userId)
+        [HttpGet("userpreference")]
+        public async Task<IActionResult> GetUserPreference()
         {
-            var products = await _analyticsService.GetUserPreference(userId);
-            var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
-            return Ok(productsToReturn);
+            var identity = HttpContext.User.Identity;
+            string userId = "";
+            if (identity != null)
+            {
+                userId = identity.Name;
+            }
+            if (userId != null && userId != "")
+            {
+                var products = await _analyticsService.GetUserPreference(userId);
+                var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+                return Ok(productsToReturn);
+            }else {
+                return BadRequest();
+            }
+
 
         }
 
