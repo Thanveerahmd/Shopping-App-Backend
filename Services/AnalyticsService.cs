@@ -61,7 +61,7 @@ namespace pro.backend.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        
+
         public async Task<ICollection<BuyerSearch>> GetBuyerSearchHistoryOfUser(string UserId)
         {
             var data = await _context.BuyerSearch.Where(i => i.UserId == UserId).ToListAsync();
@@ -659,7 +659,7 @@ namespace pro.backend.Services
             return new GenericDataModel(newData);
         }
 
-        public IList<Product> GetUserPreference(string UserId)
+        public  Task<IList<Product>> GetUserPreference(string UserId)
         {
             byte[] bytes = Encoding.ASCII.GetBytes(UserId);
             long userID = BitConverter.ToInt64(bytes, 0);
@@ -671,6 +671,7 @@ namespace pro.backend.Services
             var neighborhood = new NearestNUserNeighborhood(3, userSimilarity, model);
             var recommender = new GenericUserBasedRecommender(model, neighborhood, userSimilarity);
             var cachingRecommender = new CachingRecommender(recommender);
+
             IList<Product> list = new List<Product>();
             IList<IRecommendedItem> recommendations = cachingRecommender.Recommend(userID, 6);
 
@@ -678,7 +679,8 @@ namespace pro.backend.Services
             {
                 list.Add(_repo.GetProduct((int)item.GetItemID()).Result);
             }
-            return list;
+            
+            return Task.FromResult<IList<Product>>(list);
         }
 
     }
