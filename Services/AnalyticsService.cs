@@ -87,7 +87,7 @@ namespace pro.backend.Services
 
         public async Task<ICollection<ProductView>> GetProductViewHistoryOfUser(string UserId)
         {
-            var data = await _context.ProductView.Where(i => i.UserId == UserId).OrderBy(p =>p.LatestVisit).ToListAsync();
+            var data = await _context.ProductView.Where(i => i.UserId == UserId).OrderBy(p => p.LatestVisit).ToListAsync();
             return data;
         }
 
@@ -384,7 +384,7 @@ namespace pro.backend.Services
 
             var newDictionary = new Dictionary<Product, double>();
 
-            foreach (KeyValuePair<Product, double> entry in SimilarProducts)
+            foreach (KeyValuePair<Product, double> entry in SimilarProducts.OrderByDescending(k => k.Value))
             {
                 newDictionary.Add(entry.Key, entry.Value);
 
@@ -405,7 +405,7 @@ namespace pro.backend.Services
 
             List<float> prices = new List<float>();
 
-            foreach (KeyValuePair<Product, double> entry in newDictionary)
+            foreach (KeyValuePair<Product, double> entry in newDictionary.OrderByDescending(k => k.Value))
             {
                 prices.Add(entry.Key.Price);
 
@@ -535,8 +535,6 @@ namespace pro.backend.Services
 
             Score[0] = LevenshteinDistance.SimilarityScore(ProductName1, ProductName2);
 
-
-
             Score[1] = LevenshteinDistance.SimilarityScore(ProductName1, ProductDescription2);
 
             if (Score[1] > 0.5)
@@ -648,10 +646,10 @@ namespace pro.backend.Services
 
                 TimeSpan timeDiff = (DateTime.UtcNow - view.LatestVisit);
                 var time = Convert.ToInt32(timeDiff.TotalDays);
-                
-                if(time>7)
+
+                if (time > 7)
                 {
-                   continue;
+                    continue;
                 }
 
                 var score = ((3 * view.NoOfVisits) + (time < 7 ? 5 : 0));
@@ -730,24 +728,33 @@ namespace pro.backend.Services
         public async Task<List<Product>> userPreferenceRecommndation(string UserId)
         {
             var dictionary = new Dictionary<Product, float>();
-
             dictionary = GetUserBehaviourMatrix(UserId);
-
             List<Product> list = new List<Product>();
+
             var Count = 0;
-            foreach (KeyValuePair<Product, float> entry in dictionary)
+
+            foreach (KeyValuePair<Product, float> entry in dictionary.OrderByDescending(k => k.Value))
             {
-                list.Add(entry.Key);
+                if (!list.Contains(entry.Key) && entry.Key != null)
+                {
+                    list.Add(entry.Key);
+                }
+
                 var ListOfProducts = await _categoryService.GetProductInAccordingToSales(entry.Key.Sub_categoryId);
                 var Products = getSimilarProducts(ListOfProducts, entry.Key.Product_name, entry.Key.Product_Discription);
                 var product = Products.FirstOrDefault();
-                   list.Add(product.Key);
+
+
+                if (!list.Contains(product.Key) && product.Key != null)
+                {
+                    list.Add(product.Key);
+                }
+
                 if (Count == 3)
                 {
                     break;
                 }
             }
-
             return list;
         }
     }
