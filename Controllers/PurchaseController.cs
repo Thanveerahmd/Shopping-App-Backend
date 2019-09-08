@@ -60,12 +60,14 @@ namespace pro.backend.Controllers
                     var product = await _repo.GetProduct(Orderproduct.ProductId);
                     var oldQuntity = product.Quantity;
                     product.Quantity = (oldQuntity - Orderproduct.Count);
-
+                    var seller = await _usermanger.FindByIdAsync(product.SellerId);
                     if (product.Quantity <= product.ReorderLevel)
                     {
-                        var seller = await _usermanger.FindByIdAsync(product.SellerId);
-                        await _emailSender.SendEmailAsync(seller.UserName, "About ReOrderLevel ",
-                     $"Your product " + product.Product_name + " has reached to the ReOrder Level ");
+                        await _emailSender.SendEmailAsync(seller.UserName, "ReOrder Level Reached",
+                     $"Your product " + product.Product_name + " has reached the ReOrder Level. You have received a new Order "+paymentInfo.order_id);
+                    }else{
+                        await _emailSender.SendEmailAsync(seller.UserName, "New Order Received",
+                     $"Your product " + product.Product_name + " has received a new order. Order ID:"+paymentInfo.order_id);
                     }
 
                     try
