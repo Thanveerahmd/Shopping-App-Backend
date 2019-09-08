@@ -1,7 +1,10 @@
-using pro.backend.Entities;
-using Project.Helpers;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using pro.backend.Entities;
+using pro.backend.iServices;
+using Project.Helpers;
 
 namespace pro.backend.Services
 {
@@ -63,6 +66,21 @@ namespace pro.backend.Services
             }
             _context.Products.Update(prod);
             return await _context.SaveChangesAsync() > 0;
+        }
+
+        public async Task<IEnumerable<Product>> TopSelling(){
+
+            var products = await _context.Products.Where(p => p.visibility != false && p.NumberOfSales>0).Include(p => p.Photos).ToListAsync();
+            var ordered = products.OrderByDescending(i => i.NumberOfSales);
+
+            IEnumerable<Product> values;
+
+            if(ordered.Count()>6)
+            values = ordered.Take(6);
+            else
+            values = ordered.Take(ordered.Count());
+
+            return values;
         }
     }
 }

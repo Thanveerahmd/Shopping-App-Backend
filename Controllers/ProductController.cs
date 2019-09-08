@@ -539,5 +539,14 @@ namespace pro.backend.Controllers
             }
 
         }
+        
+        [HttpGet("topSelling")]
+        [AllowAnonymous]
+
+        public async Task<IActionResult> GetTopSelling(){
+            var products = await _productService.TopSelling();
+            var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+            return Ok(productsToReturn);
+        }
     }
 }

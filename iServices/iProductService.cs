@@ -11,6 +11,7 @@ namespace pro.backend.Services
         Product GetById(int id);
         void DeleteProduct(int id);
         Task<bool> UpdateProduct(Product product);
+        Task<IEnumerable<Product>> TopSelling();
 
     }
 }
