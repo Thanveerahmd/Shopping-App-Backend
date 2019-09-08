@@ -82,5 +82,21 @@ namespace pro.backend.Services
 
             return values;
         }
+
+          public async Task<IEnumerable<Product>> GetProductsInfiniteScrolling(int page){
+            int lowerLimit = (page>1?((page-1)*20)+1:1);
+            int limit = page*20;
+            var products = await _context.Products.FromSql("SELECT * FROM ( SELECT * , ROW_NUMBER() OVER (ORDER BY Id) AS RowNum FROM [Products] WHERE Products.visibility=1 ) AS MyDerivedTable WHERE MyDerivedTable.RowNum BETWEEN " +lowerLimit +" AND "+limit).Include(p => p.Photos).ToListAsync();
+            // var products = await _context.Products.Where(p => p.visibility != false).Include(p => p.Photos).ToListAsync();
+            
+            // if(products.Count>(limit+20))
+            // return products.GetRange(page*20,20);
+            // else
+            // if(products.Count>limit)
+            // return products.GetRange(limit,products.Count-limit);
+            // else 
+            // return null;
+            return products;
+        }
     }
 }

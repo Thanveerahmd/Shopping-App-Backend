@@ -548,5 +548,17 @@ namespace pro.backend.Controllers
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
         }
+
+        [HttpGet("infinite/{page}")]
+        [AllowAnonymous]
+
+        public async Task<IActionResult> GetProductsInfiniteScrolling(int page){
+            var products = await _productService.GetProductsInfiniteScrolling(page);
+            var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+            if(productsToReturn==null)
+            return BadRequest();
+
+            return Ok(productsToReturn);
+        }
     }
 }

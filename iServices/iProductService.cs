@@ -13,5 +13,7 @@ namespace pro.backend.Services
         Task<bool> UpdateProduct(Product product);
         Task<IEnumerable<Product>> TopSelling();
 
+        Task<IEnumerable<Product>> GetProductsInfiniteScrolling(int page);
+
     }
 }
