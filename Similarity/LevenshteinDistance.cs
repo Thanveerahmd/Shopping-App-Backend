@@ -2,35 +2,34 @@ using System;
 
 public static class LevenshteinDistance
 {
-      public static double SimilarityScore(string source, string target)
+    public static double SimilarityScore(string source, string target)
     {
         if ((source == null) || (target == null)) return 0.0;
         if ((source.Length == 0) || (target.Length == 0)) return 0.0;
         if (source == target) return 1.0;
 
         int stepsToSame = Calculate(source, target);
-        return (1-((double)stepsToSame / (double)Math.Max(source.Length, target.Length)));
+        return (1 - ((double)stepsToSame / (double)Math.Max(source.Length, target.Length)));
     }
 
-    public static int Calculate(string source1, string source2) //O(n*m)
+    public static int Calculate(string source1, string source2)
     {
         var source1Length = source1.Length;
         var source2Length = source2.Length;
 
         var matrix = new int[source1Length + 1, source2Length + 1];
 
-        // First calculation, if one entry is empty return full length
         if (source1Length == 0)
             return source2Length;
 
         if (source2Length == 0)
             return source1Length;
 
-        // Initialization of matrix with row size source1Length and columns size source2Length
+
         for (var i = 0; i <= source1Length; matrix[i, 0] = i++) { }
         for (var j = 0; j <= source2Length; matrix[0, j] = j++) { }
 
-        // Calculate rows and collumns distances
+
         for (var i = 1; i <= source1Length; i++)
         {
             for (var j = 1; j <= source2Length; j++)
@@ -42,7 +41,7 @@ public static class LevenshteinDistance
                     matrix[i - 1, j - 1] + cost);
             }
         }
-        // return result
+
         return matrix[source1Length, source2Length];
     }
 }
