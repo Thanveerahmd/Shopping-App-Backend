@@ -20,61 +20,67 @@ namespace pro.backend.Services
 
         public async Task<ICollection<Promo>> GetAllPromosOfSeller(string userId)
         {
-            var promo =await _context.Promo
-            .Where(p => p.UserId==userId)
+            var promo = await _context.Promo
+            .Where(p => p.UserId == userId)
             .ToListAsync();
 
             return promo;
         }
 
-        public async Task<ICollection<Promo>> GetAllPromos(){
-            var promo =await _context.Promo
+        public async Task<ICollection<Promo>> GetAllPromos()
+        {
+            var promo = await _context.Promo
             .ToListAsync();
 
             return promo;
         }
 
-        public async Task<ICollection<Promo>> GetAllPendingPromos(){
-            var promo =await _context.Promo
-            .Where(p =>p.Status.ToLower().Equals("pending"))
+        public async Task<ICollection<Promo>> GetAllPendingPromos()
+        {
+            var promo = await _context.Promo
+            .Where(p => p.Status.ToLower().Equals("pending"))
             .ToListAsync();
 
             return promo;
         }
 
-        public async Task<ICollection<Promo>> GetAllActivePromos(){
-            var promo =await _context.Promo
-            .Where(p =>p.Status.ToLower().Equals("accepted"))
+        public async Task<ICollection<Promo>> GetAllActivePromos()
+        {
+            var promo = await _context.Promo
+            .Where(p => p.Status.ToLower().Equals("accepted"))
             .ToListAsync();
 
             return promo;
         }
 
-        public async Task<ICollection<Promo>> GetAllActivePromosOfSeller(string userId){
-            var promo =await _context.Promo
-            .Where(p => p.UserId==userId && p.Status.ToLower().Equals("accepted"))
+        public async Task<ICollection<Promo>> GetAllActivePromosOfSeller(string userId)
+        {
+            var promo = await _context.Promo
+            .Where(p => p.UserId == userId && p.Status.ToLower().Equals("accepted"))
             .ToListAsync();
 
             return promo;
         }
 
-        public async Task<ICollection<Promo>> GetAllPendingPromosOfSeller(string userId){
-            var promo =await _context.Promo
-            .Where(p => p.UserId==userId && p.Status.ToLower().Equals("pending"))
+        public async Task<ICollection<Promo>> GetAllPendingPromosOfSeller(string userId)
+        {
+            var promo = await _context.Promo
+            .Where(p => p.UserId == userId && p.Status.ToLower().Equals("pending"))
             .ToListAsync();
 
             return promo;
         }
 
-        
-        public async Task<bool> UpdatePromo(Promo promo){
+
+        public async Task<bool> UpdatePromo(Promo promo)
+        {
             var promotion = await _context.Promo.FindAsync(promo.Id);
             if (promotion == null)
                 throw new AppException("advertisement not found");
 
-            if(promotion.Status!=null)
-            promotion.Status = promo.Status.ToLower();
-
+            if (promotion.Status != null)
+                promotion.Status = promo.Status.ToLower();
+            promotion.ExpiryDate = promo.ExpiryDate;
             promotion.Promotion_Description = promo.Promotion_Description;
             promotion.Promotion_Name = promo.Promotion_Name;
             promotion.Frequency = promo.Frequency;
@@ -84,13 +90,23 @@ namespace pro.backend.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> UpdatePromoStatus(int promotionId,string status){
+        public async Task<bool> UpdatePromoStatus(int promotionId, string status)
+        {
             var promotion = await _context.Promo.FindAsync(promotionId);
             if (promotion == null)
                 throw new AppException("promotion not found");
 
-            if(promotion.Status!=null)
-            promotion.Status = status.ToLower();
+            if (promotion.Status != null)
+            {
+                promotion.Status = status.ToLower();
+
+                if (promotion.Status.Equals("accepted"))
+                {
+                    promotion.ExpiryDate = DateTime.Now.AddDays(7 * promotion.Frequency);
+                }
+
+            }
+
 
             _context.Promo.Update(promotion);
             return await _context.SaveChangesAsync() > 0;

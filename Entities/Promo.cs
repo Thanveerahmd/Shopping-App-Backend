@@ -24,7 +24,7 @@ namespace pro.backend.Entities
         {
 
             get { return _Days_of_The_Week.Split(delimiter); }
-            
+
             set
             {
                 _Days_of_The_Week = string.Join($"{delimiter}", value);
@@ -36,6 +36,8 @@ namespace pro.backend.Entities
         public string Status { get; set; }
 
         public string UserId { get; set; }
+
+        public DateTime ExpiryDate { get; set; }
 
         public User user { get; set; }
 

@@ -366,7 +366,7 @@ namespace Project.Controllers
 
         [AllowAnonymous]
         [HttpPost("LockUser/{userId}/{forDays?}")]
-        public virtual async Task<IdentityResult> LockUserAccount(string userId,int? forDays)
+        public virtual async Task<IdentityResult> LockUserAccount(string userId, int? forDays)
         {
             var user = await _usermanger.FindByIdAsync(userId);
             var result = await _usermanger.SetLockoutEnabledAsync(user, true);
@@ -384,7 +384,7 @@ namespace Project.Controllers
                     await _emailSender.SendEmailAsync(user.UserName, "About Your Account Activation",
                $"Please note that your Account has been blocked Permently due violation of Our Rules and Regulations  , contact us in Winkel@gmail.com");
                 }
-                
+
 
             }
             user.isLocked = true;
@@ -401,46 +401,48 @@ namespace Project.Controllers
             if (result.Succeeded)
             {
                 await _usermanger.ResetAccessFailedCountAsync(user);
-                 await _emailSender.SendEmailAsync(user.UserName, "About Your Account Activation",
-               $"Please note that your Account has been Reactivated  ,contact us in Winkel@gmail.com");
+                await _emailSender.SendEmailAsync(user.UserName, "About Your Account Activation",
+              $"Please note that your Account has been Reactivated  ,contact us in Winkel@gmail.com");
             }
 
-             user.isLocked = false;
+            user.isLocked = false;
             await _usermanger.UpdateAsync(user);
             return result;
         }
 
         [HttpPut("promo/approval")]
         [AllowAnonymous]
-        public async Task<IActionResult> updatePromoStatus(PromoStatusUpdateDto promo){
+        public async Task<IActionResult> updatePromoStatus(PromoStatusUpdateDto promo)
+        {
             var prevPromo = await _promoService.GetPromo(promo.Id);
-            var sellerId= prevPromo.UserId;
+            var sellerId = prevPromo.UserId;
             var seller = await _usermanger.FindByIdAsync(sellerId);
-             try
+          
+            try
             {
                 // save 
-                await _promoService.UpdatePromoStatus(promo.Id,promo.Status);
-                  if (promo.Status.ToLower().Equals("accepted"))
-            {
-                
+                await _promoService.UpdatePromoStatus(promo.Id, promo.Status);
+                if (promo.Status.ToLower().Equals("accepted"))
+                {
 
-            //     await _emailSender.SendEmailAsync(seller.UserName, "Accepted Promotion",
-            //    $"Your Advertisement for product {prevPromo.ProductId} has been accepted.");
 
-                return Ok();
+                    //     await _emailSender.SendEmailAsync(seller.UserName, "Accepted Promotion",
+                    //    $"Your Advertisement for product {prevPromo.ProductId} has been accepted.");
 
-            }
-            else if (promo.Status.ToLower().Equals("rejected"))
-            {
-            //     await _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
-            //   $"Your Advertisement for product {prevPromo.ProductId} has been rejected.\nReason:{promo.Reason}");
+                    return Ok();
 
-                return Ok();
-            }
-            else
-            {
-                return BadRequest("Status is Required");
-            }
+                }
+                else if (promo.Status.ToLower().Equals("rejected"))
+                {
+                    //     await _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
+                    //   $"Your Advertisement for product {prevPromo.ProductId} has been rejected.\nReason:{promo.Reason}");
+
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Status is Required");
+                }
 
             }
             catch (AppException ex)
@@ -453,7 +455,8 @@ namespace Project.Controllers
 
         [HttpGet("promo/active")]
         [AllowAnonymous]
-        public async Task<IActionResult> getAllActivePromos(){
+        public async Task<IActionResult> getAllActivePromos()
+        {
 
             var promotions = await _promoService.GetAllActivePromos();
 
@@ -462,7 +465,8 @@ namespace Project.Controllers
 
         [HttpGet("promo/pending")]
         [AllowAnonymous]
-        public async Task<IActionResult> getAllPendingPromos(){
+        public async Task<IActionResult> getAllPendingPromos()
+        {
 
             var promotions = await _promoService.GetAllPendingPromos();
 
