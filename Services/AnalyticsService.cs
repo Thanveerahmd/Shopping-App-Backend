@@ -647,10 +647,10 @@ namespace pro.backend.Services
                 TimeSpan timeDiff = (DateTime.UtcNow - view.LatestVisit);
                 var time = Convert.ToInt32(timeDiff.TotalDays);
 
-                if (time > 7)
-                {
-                    continue;
-                }
+                // if (time > 7)
+                // {
+                //     continue;
+                // }
 
                 var score = ((3 * view.NoOfVisits) + (time < 7 ? 5 : 0));
 
@@ -683,10 +683,10 @@ namespace pro.backend.Services
                 TimeSpan timeDiff = (DateTime.UtcNow - record.LatestVisit);
                 var time = Convert.ToInt32(timeDiff.TotalDays);
 
-                if (time > 10)
-                {
-                    continue;
-                }
+                // if (time > 10)
+                // {
+                //     continue;
+                // }
 
                 var products1 = _repo.GetProductsBySearchQuery(record.Keyword, "Name").Result.FirstOrDefault();
                 var products2 = _repo.GetProductsBySearchQuery(record.Keyword, "Description").Result.FirstOrDefault();

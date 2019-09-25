@@ -64,7 +64,7 @@ namespace pro.backend.Controllers
                 var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
                 return Ok(productsToReturn);
             }else {
-                return BadRequest();
+                return Ok();
             }
 
         }
@@ -76,7 +76,7 @@ namespace pro.backend.Controllers
 
             var identity = HttpContext.User.Identity;
             string userId = "";
-            if (identity != null)
+            if (identity != null)           
             {
                 userId = identity.Name;
             }
