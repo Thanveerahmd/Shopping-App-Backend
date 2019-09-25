@@ -83,6 +83,7 @@ namespace pro.backend.Services
                 advertisement.PaymentStatus = ad.PaymentStatus.ToLower();
             advertisement.ActivationStatus = "not expired";
             advertisement.DateAdded = ad.DateAdded;
+            advertisement.ExpiryDate = ad.ExpiryDate;
             advertisement.PublicID = ad.PublicID;
             advertisement.Url = ad.Url;
             advertisement.PhotoForAd = ad.PhotoForAd;

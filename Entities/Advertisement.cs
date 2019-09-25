@@ -16,6 +16,7 @@ namespace pro.backend.Entities
         public int timestamp { get; set; }
         public string ActivationStatus { get; set; }
         public string Status { get; set; }
+        public DateTime ExpiryDate { get; set; }
         public User user { get; set; }
         public PhotoForAd PhotoForAd { get; set; }
     }

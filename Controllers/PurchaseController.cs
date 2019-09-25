@@ -332,6 +332,7 @@ namespace pro.backend.Controllers
             if (paymentInfo.status_code == 2)
             {
                 ad.PaymentStatus = "success";
+                ad.ExpiryDate = DateTime.Now.AddDays(ad.timestamp);
                 await _emailSender.SendEmailAsync(seller.UserName, $"Payment for Advert {paymentInfo.order_id}",
                     $"Your payment has been successful. Your payment Id is {PaymentInfoDto.payment_id}. Your Ad will be live for {ad.timestamp} days");
                 try
