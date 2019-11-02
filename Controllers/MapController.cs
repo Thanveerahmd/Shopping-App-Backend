@@ -26,9 +26,9 @@ namespace pro.backend.Controllers
 
         private readonly iAnalytics _analyticsService;
         public MapController(
-            IMapper mapper, 
-            iPromoService promoService, 
-            iShoppingRepo repo, 
+            IMapper mapper,
+            iPromoService promoService,
+            iShoppingRepo repo,
             iMapService map,
             iAnalytics analyticsService)
         {
@@ -152,6 +152,8 @@ namespace pro.backend.Controllers
             pos1.Longitude = value[0].lng;
             var stores = await _map.GetAllStores();
 
+
+
             TimeSpan timeDiff = (DateTime.UtcNow - DeviceInfo.LastNotifyTime);
             var time = Convert.ToInt32(timeDiff.TotalHours);
 
@@ -168,9 +170,10 @@ namespace pro.backend.Controllers
             DeviceInfo.Last_Lng = value[0].lng;
             DeviceInfo.Last_Lat = value[0].lat;
 
+            var newDictionary = new Dictionary<Store, double>();
+
             foreach (var store in stores)
             {
-
                 Position pos2 = new Position();
                 pos2.Latitude = store.lat;
                 pos2.Longitude = store.lng;
@@ -179,38 +182,47 @@ namespace pro.backend.Controllers
 
                 if (result <= 5 && result > 0)
                 {
+                    newDictionary.Add(store, result);
+                }
 
-                    var promotion = await _promoService.GetAllActivePromosOfSeller(store.UserId);
-                    
-                    if (promotion.Count != 0)
-                    {
-                        var promo = await _analyticsService.GetNotificationToReturn(promotion,DeviceInfo.UserId); 
-                        if(promo==null)
+                if (newDictionary.Count == 10)
+                {
+                    break;
+                }
 
+            }
+
+            newDictionary = newDictionary.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
+
+            foreach (KeyValuePair<Store, double> entry in newDictionary)
+            {
+                var promotion = await _promoService.GetAllActivePromosOfSeller(entry.Key.UserId);
+
+                if (promotion.Count != 0)
+                {
+                    var promo = await _analyticsService.GetNotificationToReturn(promotion, DeviceInfo.UserId);
+
+                    if (promo == null)
                         return;
-                        
-                        string title = $"Avail this promotion from {store.StoreName}";
-                        string body = promo.Promotion_Description;
-                        var data = new { Lat = store.lat, Lng = store.lng, StoreName = store.StoreName };
-                        var pushSent = await PushNotification.SendPushNotification(DeviceInfo.FirebaseToken, title, body, data);
 
-                        if (pushSent)
-                            DeviceInfo.LastNotifyTime = DateTime.UtcNow;
+                    string title = $"Avail this promotion from {entry.Key.StoreName}";
+                    string body = promo.Promotion_Description;
+                    var data = new { Lat = entry.Key.lat, Lng = entry.Key.lng, StoreName = entry.Key.StoreName };
+                    var pushSent = await PushNotification.SendPushNotification(DeviceInfo.FirebaseToken, title, body, data);
 
-                        if (await _map.LocationUpdate(DeviceInfo))
-                        {
-                            return;
-                        }
+                    if (pushSent)
+                        DeviceInfo.LastNotifyTime = DateTime.UtcNow;
+
+                    if (await _map.LocationUpdate(DeviceInfo))
+                    {
+                        return;
                     }
-
-                    return;
                 }
             }
             if (await _map.LocationUpdate(DeviceInfo))
             {
                 return;
             }
-
             return;
         }
     }
