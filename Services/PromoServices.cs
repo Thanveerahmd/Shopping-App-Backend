@@ -62,6 +62,15 @@ namespace pro.backend.Services
             return promo;
         }
 
+         public async Task<ICollection<Promo>> GetAllActivePromosOfSellerOnSpecificDay(string userId,string dayOfTheWeek)
+        {
+            var promo = await _context.Promo
+            .Where(p => p.UserId == userId && p.Status.ToLower().Equals("accepted") && p.Day_of_The_Week.Contains(dayOfTheWeek))
+            .ToListAsync();
+
+            return promo;
+        }
+
         public async Task<ICollection<Promo>> GetAllPendingPromosOfSeller(string userId)
         {
             var promo = await _context.Promo

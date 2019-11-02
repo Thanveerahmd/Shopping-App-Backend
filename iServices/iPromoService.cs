@@ -12,6 +12,8 @@ namespace pro.backend.iServices
         Task<ICollection<Promo>> GetAllPromos();
         Task<ICollection<Promo>> GetAllActivePromosOfSeller(string userId);
 
+        Task<ICollection<Promo>> GetAllActivePromosOfSellerOnSpecificDay(string userId,string dayOfTheWeek);
+
         Task<ICollection<Promo>> GetAllPendingPromosOfSeller(string userId);
 
         Task<ICollection<Promo>> GetAllPendingPromos();
