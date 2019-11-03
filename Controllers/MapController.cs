@@ -157,7 +157,7 @@ namespace pro.backend.Controllers
             TimeSpan timeDiff = (DateTime.UtcNow - DeviceInfo.LastNotifyTime);
             var time = Convert.ToInt32(timeDiff.TotalHours);
 
-            if (time < 1)
+            if (time < 6)
             {
                 return;
             }
