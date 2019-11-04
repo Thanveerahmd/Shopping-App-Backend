@@ -194,11 +194,13 @@ namespace pro.backend.Controllers
 
             newDictionary = newDictionary.OrderBy(x => x.Value).ToDictionary(x => x.Key, x => x.Value);
 
+
+
             foreach (KeyValuePair<Store, double> entry in newDictionary)
             {
                 DayOfWeek wk = DateTime.Today.DayOfWeek;
                 var day = wk.ToString();
-                var promotion = await _promoService.GetAllActivePromosOfSellerOnSpecificDay(entry.Key.UserId,day);
+                var promotion = await _promoService.GetAllActivePromosOfSellerOnSpecificDay(entry.Key.UserId, day);
 
                 if (promotion.Count != 0)
                 {
@@ -215,15 +217,32 @@ namespace pro.backend.Controllers
                     if (pushSent)
                         DeviceInfo.LastNotifyTime = DateTime.UtcNow;
 
-                    if (await _map.LocationUpdate(DeviceInfo))
+                    try
                     {
-                        return;
+                        if (await _map.LocationUpdate(DeviceInfo))
+                        {
+                            return;
+                        }
                     }
+                    catch (AppException ex)
+                    {
+                        Console.WriteLine(ex);
+
+                    }
+
                 }
             }
-            if (await _map.LocationUpdate(DeviceInfo))
+            try
             {
-                return;
+                if (await _map.LocationUpdate(DeviceInfo))
+                {
+                    return;
+                }
+            }
+            catch (AppException ex)
+            {
+                Console.WriteLine(ex);
+
             }
             return;
         }
