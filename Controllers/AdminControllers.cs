@@ -436,16 +436,16 @@ namespace Project.Controllers
                 {
 
 
-                    //     await _emailSender.SendEmailAsync(seller.UserName, "Accepted Promotion",
-                    //    $"Your Advertisement for product {prevPromo.ProductId} has been accepted.");
+                        await _emailSender.SendEmailAsync(seller.UserName, "Accepted Promotion",
+                       $"Your Promotion for product {prevPromo.ProductId} has been accepted.");
 
                     return Ok();
 
                 }
                 else if (promo.Status.ToLower().Equals("rejected"))
                 {
-                    //     await _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
-                    //   $"Your Advertisement for product {prevPromo.ProductId} has been rejected.\nReason:{promo.Reason}");
+                        await _emailSender.SendEmailAsync(seller.UserName, "Rejected Promotion",
+                      $"Your Promotion for product {prevPromo.ProductId} has been rejected.\nReason:{promo.Reason}");
 
                     return Ok();
                 }
