@@ -98,5 +98,11 @@ namespace pro.backend.Services
             // return null;
             return products;
         }
+
+        public async Task<IEnumerable<Product>> GetRecentlyAddedProducts(string sellerId){
+            var products = await _context.Products.Where(s => s.SellerId == sellerId).Include(p => p.Photos).OrderByDescending(s => s.Id).Take(5).ToListAsync();
+            
+            return products;
+        }
     }
 }

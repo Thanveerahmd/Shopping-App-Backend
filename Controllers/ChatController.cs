@@ -52,7 +52,7 @@ namespace pro.backend.Controllers
             _repo.Add(message);
             if (await _repo.SaveAll())
             {
-                return Ok();
+                return Ok(message);
             }
             return BadRequest();
         }

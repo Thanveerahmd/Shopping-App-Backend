@@ -560,5 +560,16 @@ namespace pro.backend.Controllers
 
             return Ok(productsToReturn);
         }
+
+        [HttpGet("recentlyadded/{sellerId}")]
+        [AllowAnonymous]
+
+        public async Task<IActionResult> GetRecentlyAddedProducts(string sellerId){
+
+            var products = await _productService.GetRecentlyAddedProducts(sellerId);
+            var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+            
+            return Ok(productsToReturn);
+        }
     }
 }
