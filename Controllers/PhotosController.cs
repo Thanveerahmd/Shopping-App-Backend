@@ -87,32 +87,32 @@ namespace pro.backend.Controllers
                 Value = Upload_result.Uri.ToString()
             };
 
-            // Image image3 = Image.FromUri(Upload_result.Uri.ToString());
+            Image image3 = Image.FromUri(Upload_result.Uri.ToString());
 
-            // ImageAnnotatorClient client = await ImageAnnotatorClient.CreateAsync();
+            ImageAnnotatorClient client = await ImageAnnotatorClient.CreateAsync();
 
-            // SafeSearchAnnotation annotation = await client.DetectSafeSearchAsync(image3);
+            SafeSearchAnnotation annotation = await client.DetectSafeSearchAsync(image3);
 
-            // var adult_content = annotation.Adult;
-            // var Spoof = annotation.Spoof;
-            // var Medical = annotation.Medical;
-            // var Violence = annotation.Violence;
-            // var Racy = annotation.Racy;
+            var adult_content = annotation.Adult;
+            var Spoof = annotation.Spoof;
+            var Medical = annotation.Medical;
+            var Violence = annotation.Violence;
+            var Racy = annotation.Racy;
 
-            // bool Adult_flag = (adult_content == Likelihood.Unlikely || adult_content == Likelihood.VeryUnlikely);
-            // bool Spoof_flag = (Spoof == Likelihood.Unlikely || Spoof == Likelihood.VeryUnlikely);
-            // bool Medical_flag = (Medical == Likelihood.Unlikely || Medical == Likelihood.VeryUnlikely);
-            // bool Violence_flag = (Violence == Likelihood.Unlikely || Violence == Likelihood.VeryUnlikely);
-            // bool Racy_flag = (Racy == Likelihood.Unlikely || Racy == Likelihood.VeryUnlikely);
+            bool Adult_flag = (adult_content == Likelihood.Unlikely || adult_content == Likelihood.VeryUnlikely);
+            bool Spoof_flag = (Spoof == Likelihood.Unlikely || Spoof == Likelihood.VeryUnlikely);
+            bool Medical_flag = (Medical == Likelihood.Unlikely || Medical == Likelihood.VeryUnlikely);
+            bool Violence_flag = (Violence == Likelihood.Unlikely || Violence == Likelihood.VeryUnlikely);
+            bool Racy_flag = (Racy == Likelihood.Unlikely || Racy == Likelihood.VeryUnlikely);
 
-            // product.visibility = product.visibility && false;
+            product.visibility = product.visibility && false;
 
-            // if (Adult_flag && Spoof_flag && Medical_flag && Violence_flag && Racy_flag)
-            // {
-            //     product.visibility = product.visibility && true;
-            // }
+            if (Adult_flag && Spoof_flag && Medical_flag && Violence_flag && Racy_flag)
+            {
+                product.visibility = product.visibility && true;
+            }
 
-            //FOR TESTING PURPOSES
+            
             product.visibility = true;
             try
             {
@@ -140,7 +140,7 @@ namespace pro.backend.Controllers
             if (await _repo.SaveAll())
             {
                 var photoToReturn = _mapper.Map<PhotoForReturnDto>(photo);
-                // return CreatedAtRoute("GetPhoto", new { id = photo.Id , visibility= product.visibility }, photoToReturn);
+               
                 return Ok(new { visibility = product.visibility });
             }
             return BadRequest("Coudn't add the Photo");
