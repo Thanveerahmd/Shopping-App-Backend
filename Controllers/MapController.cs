@@ -157,7 +157,7 @@ namespace pro.backend.Controllers
             TimeSpan timeDiff = (DateTime.UtcNow - DeviceInfo.LastNotifyTime);
             var time = Convert.ToInt32(timeDiff.TotalHours);
 
-            if (time < 1)
+            if (time < 6)
             {
                 return;
             }
@@ -185,10 +185,10 @@ namespace pro.backend.Controllers
                     newDictionary.Add(store, result);
                 }
 
-                if (newDictionary.Count == 10)
-                {
-                    break;
-                }
+                // if (newDictionary.Count == 10)
+                // {
+                //     break;
+                // }
 
             }
 
@@ -196,7 +196,9 @@ namespace pro.backend.Controllers
 
             foreach (KeyValuePair<Store, double> entry in newDictionary)
             {
-                var promotion = await _promoService.GetAllActivePromosOfSeller(entry.Key.UserId);
+                DayOfWeek wk = DateTime.Today.DayOfWeek;
+                var day = wk.ToString();
+                var promotion = await _promoService.GetAllActivePromosOfSellerOnSpecificDay(entry.Key.UserId,day);
 
                 if (promotion.Count != 0)
                 {

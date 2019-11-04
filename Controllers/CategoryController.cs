@@ -218,10 +218,10 @@ namespace pro.backend.Controllers
 
             }
 
-            await _categoryService.UpdateCategory(category);
+            
 
 
-            if (await _repo.SaveAll())
+            if (await _categoryService.UpdateCategory(category))
             {
                 return Ok(category.Id);
             }
