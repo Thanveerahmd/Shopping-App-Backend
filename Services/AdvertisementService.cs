@@ -167,5 +167,11 @@ namespace pro.backend.Services
 
             return PhotoForAd;
         }
+
+        public async Task<IEnumerable<Advertisement>> GetRecentlyAddedAdverts(string sellerId){
+            var adverts = await _context.Advertisement.Where(s => s.UserId == sellerId).OrderByDescending(s => s.Id).Take(5).ToListAsync();
+            
+            return adverts;
+        }
     }
 }
