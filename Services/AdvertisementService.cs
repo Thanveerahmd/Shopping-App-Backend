@@ -71,7 +71,6 @@ namespace pro.backend.Services
             return ad;
         }
 
-
         public async Task<bool> UpdateAdvertisement(Advertisement ad)
         {
             var advertisement = await _context.Advertisement.FindAsync(ad.Id);

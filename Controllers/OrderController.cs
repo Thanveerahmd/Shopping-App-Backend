@@ -6,7 +6,8 @@ using pro.backend.Entities;
 using pro.backend.iServices;
 using pro.backend.Dtos;
 using System.Collections.Generic;
-
+using Microsoft.AspNetCore.Identity;
+using Project.Entities;
 
 namespace pro.backend.Controllers
 {
@@ -17,13 +18,16 @@ namespace pro.backend.Controllers
         private readonly IMapper _mapper;
         public readonly iShoppingRepo _repo;
         private iOrderService _order;
+        private readonly UserManager<User> _usermanger;
 
         public OrderController(
                 IMapper mapper,
                 iShoppingRepo repo,
+                UserManager<User> usermanger,
                 iOrderService order
                 )
         {
+            _usermanger = usermanger;
             _mapper = mapper;
             _repo = repo;
             _order = order;
@@ -42,10 +46,10 @@ namespace pro.backend.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> UpdateDeliveryStatus(int orderId)
         {
-          if(await _order.UpdateOrderDeliveryStatus(orderId))
-              return Ok();
+            if (await _order.UpdateOrderDeliveryStatus(orderId))
+                return Ok();
 
-          return BadRequest();
+            return BadRequest();
         }
 
         [HttpGet("orders")]
@@ -54,6 +58,12 @@ namespace pro.backend.Controllers
         {
             var order = await _order.GetOrders();
             var orderToReturn = _mapper.Map<ICollection<OrderReturnDto>>(order);
+            foreach (var item in orderToReturn)
+            {
+                var user = await _usermanger.FindByIdAsync(item.BuyerId);
+                item.BuyerEmail = user.Email;
+            }
+
             return Ok(orderToReturn);
         }
 

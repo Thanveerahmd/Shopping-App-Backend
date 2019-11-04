@@ -113,6 +113,10 @@ namespace Project.Helpers
 
             CreateMap<OrderProductDto, Order>();
 
+            CreateMap<OrderReturnDto, Order>();
+            
+            CreateMap<Order, OrderReturnDto>();
+
             CreateMap<Order, OrderProductDto>();
 
             CreateMap<orderDetails, OrderInfoForSellerDto>();
@@ -142,16 +146,16 @@ namespace Project.Helpers
             CreateMap<SubCategoryDto, SubCategory>();
 
             CreateMap<OrderDetailsForUserPreference, orderDetails>();
-            
-            CreateMap<AdvertScoreDto,Advertisement>();
 
-            CreateMap<Advertisement,AdvertScoreDto>();
+            CreateMap<AdvertScoreDto, Advertisement>();
 
-            CreateMap<Promo,PromoScoreDto>();
+            CreateMap<Advertisement, AdvertScoreDto>();
 
-            CreateMap<PromoScoreDto,Promo>();
+            CreateMap<Promo, PromoScoreDto>();
 
-            CreateMap< orderDetails,OrderDetailsForUserPreference>();
+            CreateMap<PromoScoreDto, Promo>();
+
+            CreateMap<orderDetails, OrderDetailsForUserPreference>();
         }
     }
 }
