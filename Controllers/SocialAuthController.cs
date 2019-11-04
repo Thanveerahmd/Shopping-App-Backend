@@ -136,19 +136,21 @@ namespace pro.backend.Controllers
         {
 
             // 1. validate the user access token
-            var userAccessTokenValidationResponse = "";
-            try
-            {
-                userAccessTokenValidationResponse = await Client.GetStringAsync($"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={model.AccessToken}");
-            }
-            catch
-            {
-                return BadRequest("login_failure-Invalid google token");
-            }
-            var userAccessTokenValidation = JsonConvert.DeserializeObject<GoogleUserAccessTokenValidation>(userAccessTokenValidationResponse);
+            // var userAccessTokenValidationResponse = "";
+            // try
+            // {
+            //     userAccessTokenValidationResponse = await Client.GetStringAsync($"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={model.AccessToken}");
+            // }
+            // catch
+            // {
+            //     return BadRequest("login_failure-Invalid google token");
+            // }
+            // var userAccessTokenValidation = JsonConvert.DeserializeObject<GoogleUserAccessTokenValidation>(userAccessTokenValidationResponse);
 
             // 2. we've got a valid token so we can request user data from fb
-            var userInfoResponse = await Client.GetStringAsync($"https://www.googleapis.com/plus/v1/people/me?access_token={model.AccessToken}");
+            var userInfoResponse = await Client.GetStringAsync($"https://oauth2.googleapis.com/tokeninfo?id_token={model.AccessToken}");
+
+            //Check how to convert
             var userInfo = JsonConvert.DeserializeObject<GoogleUserData>(userInfoResponse);
 
             // 3. ready to create the local user account (if necessary) and jwt
