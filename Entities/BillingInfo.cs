@@ -13,5 +13,7 @@ namespace pro.backend.Entities
         public string OTP {get;set;}
         public bool isOTP {get;set;}
         public bool isDefault { get; set; }
+
+        public int OTPCount {get;set;}
     }
 }

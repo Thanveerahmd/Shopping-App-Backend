@@ -136,35 +136,37 @@ namespace pro.backend.Controllers
         {
 
             // 1. validate the user access token
-            var userAccessTokenValidationResponse = "";
-            try
-            {
-                userAccessTokenValidationResponse = await Client.GetStringAsync($"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={model.AccessToken}");
-            }
-            catch
-            {
-                return BadRequest("login_failure-Invalid google token");
-            }
-            var userAccessTokenValidation = JsonConvert.DeserializeObject<GoogleUserAccessTokenValidation>(userAccessTokenValidationResponse);
+            // var userAccessTokenValidationResponse = "";
+            // try
+            // {
+            //     userAccessTokenValidationResponse = await Client.GetStringAsync($"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={model.AccessToken}");
+            // }
+            // catch
+            // {
+            //     return BadRequest("login_failure-Invalid google token");
+            // }
+            // var userAccessTokenValidation = JsonConvert.DeserializeObject<GoogleUserAccessTokenValidation>(userAccessTokenValidationResponse);
 
             // 2. we've got a valid token so we can request user data from fb
-            var userInfoResponse = await Client.GetStringAsync($"https://www.googleapis.com/plus/v1/people/me?access_token={model.AccessToken}");
-            var userInfo = JsonConvert.DeserializeObject<GoogleUserData>(userInfoResponse);
+            var userInfoResponse = await Client.GetStringAsync($"https://oauth2.googleapis.com/tokeninfo?id_token={model.AccessToken}");
+
+            //Check how to convert
+            var userInfo = JsonConvert.DeserializeObject<GoogleUserDataV2>(userInfoResponse);
 
             // 3. ready to create the local user account (if necessary) and jwt
-            var user = await _userManager.FindByEmailAsync(userInfo.Emails[0].Value);
+            var user = await _userManager.FindByEmailAsync(userInfo.Email);
 
             if (user == null)
             {
                 var appUser = new User
                 {
-                    FirstName = userInfo.Name.GivenName,
-                    LastName = userInfo.Name.FamilyName,
-                    GoogleId = userInfo.Id,
-                    Email = userInfo.Emails[0].Value,
-                    UserName = userInfo.Emails[0].Value,
+                    FirstName = userInfo.GivenName,
+                    LastName = userInfo.FamilyName,
+                    GoogleId = userInfo.UserId,
+                    Email = userInfo.Email,
+                    UserName = userInfo.Email,
                     Role = "Buyer",
-                    imageUrl = userInfo.Picture.Url
+                    imageUrl = userInfo.PictureUrl
                 };
 
                 var cart = new Cart();
@@ -191,7 +193,7 @@ namespace pro.backend.Controllers
             }
 
             // generate the jwt for the local user...
-            var localUser = await _userManager.FindByNameAsync(userInfo.Emails[0].Value);
+            var localUser = await _userManager.FindByNameAsync(userInfo.Email);
 
             if (localUser == null)
             {

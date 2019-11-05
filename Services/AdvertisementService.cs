@@ -71,7 +71,6 @@ namespace pro.backend.Services
             return ad;
         }
 
-
         public async Task<bool> UpdateAdvertisement(Advertisement ad)
         {
             var advertisement = await _context.Advertisement.FindAsync(ad.Id);
@@ -167,6 +166,12 @@ namespace pro.backend.Services
            .FirstOrDefaultAsync(i => i.AdId == id);
 
             return PhotoForAd;
+        }
+
+        public async Task<IEnumerable<Advertisement>> GetRecentlyAddedAdverts(string sellerId){
+            var adverts = await _context.Advertisement.Where(s => s.UserId == sellerId).OrderByDescending(s => s.Id).Take(5).ToListAsync();
+            
+            return adverts;
         }
     }
 }

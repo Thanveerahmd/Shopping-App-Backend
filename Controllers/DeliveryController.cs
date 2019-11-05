@@ -137,6 +137,7 @@ namespace pro.backend.Controllers
             // HttpContent content = null;
 
             // await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{DeliveryInfoDto.MobileNumber}/{massege_body}/winkel/password", content);
+            BillingInfo.OTPCount++;
 
             _repo.Add(BillingInfo);
 
@@ -174,7 +175,7 @@ namespace pro.backend.Controllers
                 // HttpContent content = null;
 
                 // await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{DeliveryInfoDto.MobileNumber}/{massege_body}/winkel/password", content);
-
+                info.OTPCount++;
             }
 
             try
@@ -205,6 +206,7 @@ namespace pro.backend.Controllers
                 info.OTP = null;
                 info.isOTP = false;
                 info.isMobileVerfied = true;
+                info.OTPCount = 0;
                 await _repo.SaveAll();
 
                 return Ok();
@@ -277,6 +279,30 @@ namespace pro.backend.Controllers
             var BillingInfo = _mapper.Map<DeliveryInfoDto>(info);
 
             return Ok(BillingInfo);
+        }
+
+        [HttpPost("otpresend/{UserId}/{Id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendOTP(string UserId,int Id)
+        {
+
+            var BillingInfo = await _repo.GetBillingInfo(Id);
+            if(BillingInfo == null){
+                return BadRequest(new{message="Invalid Data"});
+            }
+            if(BillingInfo.isMobileVerfied){
+                return BadRequest(new{message="Mobile Number Already Verified"});
+            }
+            if(BillingInfo.OTPCount>=2){
+                return BadRequest(new{message="Sorry You Have Reached The OTP Limit"});
+            }
+            // HttpContent content = null;
+
+            // await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{DeliveryInfoDto.MobileNumber}/{massege_body}/winkel/password", content);
+
+            BillingInfo.OTPCount++;
+            await _repo.SaveAll();
+            return Ok();
         }
     }
 }

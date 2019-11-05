@@ -15,5 +15,7 @@ namespace pro.backend.Services
 
         Task<IEnumerable<Product>> GetProductsInfiniteScrolling(int page);
 
+        Task<IEnumerable<Product>> GetRecentlyAddedProducts(string sellerId);
+
     }
 }

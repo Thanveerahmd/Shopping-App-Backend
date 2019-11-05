@@ -143,9 +143,9 @@ namespace pro.backend.Controllers
             foreach (var item in Subcategorys)
             {
                 var subCategory = await _categoryService.GetSubCategorywithPhoto(item.Id);
-                
+
                 if (await _categoryService.IsProductAvailableForSubCategory(item.Id))
-                return Unauthorized();
+                    return Unauthorized();
 
             }
 
@@ -153,11 +153,11 @@ namespace pro.backend.Controllers
             foreach (var item in Subcategorys)
             {
                 var subCategory = await _categoryService.GetSubCategorywithPhoto(item.Id);
-                
-                
+
+
                 var photo = subCategory.PhotoForCategory;
-                if(photo!=null)
-                await _photosController.DeleteCategoryPhoto(photo.Id);
+                if (photo != null)
+                    await _photosController.DeleteCategoryPhoto(photo.Id);
             }
 
             _repo.DeleteAll(Subcategorys);
@@ -185,8 +185,8 @@ namespace pro.backend.Controllers
 
             var photo = Subcategory.PhotoForCategory;
 
-            if(photo!=null)
-            await _photosController.DeleteCategoryPhoto(photo.Id);
+            if (photo != null)
+                await _photosController.DeleteCategoryPhoto(photo.Id);
             _repo.Delete(Subcategory);
 
             if (await _repo.SaveAll())
@@ -212,19 +212,26 @@ namespace pro.backend.Controllers
             foreach (var item in Subcategorys)
             {
                 var subCategory = await _categoryService.GetSubCategorywithPhoto(item.Id);
-                
+
                 if (await _categoryService.IsProductAvailableForSubCategory(item.Id))
-                return Unauthorized();
+                    return Unauthorized();
 
             }
 
-            
 
-
-            if (await _categoryService.UpdateCategory(category))
+            try
             {
-                return Ok(category.Id);
+                if (await _categoryService.UpdateCategory(category))
+                {
+                    return Ok(category.Id);
+                }
             }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+
             return BadRequest();
 
         }
@@ -236,19 +243,28 @@ namespace pro.backend.Controllers
             // map dto to entity and set id
             var subCategory = _mapper.Map<SubCategory>(subCategoryDto);
             subCategory.Id = subCategoryDto.Id;
-            
+
             var subCategoryCheck = await _categoryService.GetSubCategorywithPhoto(subCategoryDto.Id);
 
             if (await _categoryService.IsProductAvailableForSubCategory(subCategory.Id))
                 return Unauthorized();
 
-
-            await _categoryService.UpdateSubCategory(subCategory);
-
-            if (await _repo.SaveAll())
+            try
             {
-                return Ok(subCategory.Id);
+                await _categoryService.UpdateSubCategory(subCategory);
+
+                if (await _repo.SaveAll())
+                {
+                    return Ok(subCategory.Id);
+                }
             }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+
+
             return BadRequest();
 
 

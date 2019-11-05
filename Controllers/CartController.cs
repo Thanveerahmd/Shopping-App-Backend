@@ -40,19 +40,29 @@ namespace pro.backend.Controllers
             if (preAddedProduct == null)
             {
                 cart.CartDetails.Add(cartProduct);
-                
+
             }
             else
             {
                 cartProduct.Id = preAddedProduct.Id;
                 cartProduct.Count = preAddedProduct.Count + cartProduct.Count;
-                await _repo.UpdateCartDetails(cartProduct);
+                
+                try
+                {
+                    await _repo.UpdateCartDetails(cartProduct);
+                }
+                catch (AppException ex)
+                {
+                    // return error message if there was an exception
+                    return BadRequest(new { message = ex.Message });
+                }
+
             }
 
             if (await _repo.SaveAll())
-                {
-                    return Ok(cart.Id);
-                }
+            {
+                return Ok(cart.Id);
+            }
             return BadRequest();
 
 
@@ -106,12 +116,20 @@ namespace pro.backend.Controllers
             var prod = _mapper.Map<CartProduct>(productDto);
             prod.Id = productDto.Id;
 
-        
-            await _repo.UpdateCartDetails(prod);
-            if (await _repo.SaveAll())
+            try
+            {
+                await _repo.UpdateCartDetails(prod);
+                if (await _repo.SaveAll())
                 {
                     return Ok(prod.Id);
                 }
+            }
+            catch (AppException ex)
+            {
+                // return error message if there was an exception
+                return BadRequest(new { message = ex.Message });
+            }
+
             return BadRequest();
 
 

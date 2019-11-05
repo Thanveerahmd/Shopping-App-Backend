@@ -8,6 +8,7 @@ namespace pro.backend.Dtos
 
         public int Id { get; set; }
         public string BuyerId { get; set; }
+        public string BuyerEmail { get; set; }
         public float Total_Price { get; set; }
         public DateTime DateAdded { get; set; }
         public int deliveyId { get; set; }

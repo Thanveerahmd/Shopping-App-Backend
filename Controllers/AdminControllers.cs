@@ -279,8 +279,18 @@ namespace Project.Controllers
 
             if (user.ActivationCode == model.ActivationCode)
             {
-                _adminService.UpdateAdminPassword(user, model.Password);
-                return StatusCode(200, "Password reset successful!");
+                try
+                {
+                    
+                    _adminService.UpdateAdminPassword(user, model.Password);
+                    return StatusCode(200, "Password reset successful!");
+                }
+                catch (AppException ex)
+                {
+                    // return error message if there was an exception
+                    return BadRequest(new { message = ex.Message });
+                }
+
             }
             else
             {
@@ -417,7 +427,7 @@ namespace Project.Controllers
             var prevPromo = await _promoService.GetPromo(promo.Id);
             var sellerId = prevPromo.UserId;
             var seller = await _usermanger.FindByIdAsync(sellerId);
-          
+
             try
             {
                 // save 
@@ -426,16 +436,16 @@ namespace Project.Controllers
                 {
 
 
-                    //     await _emailSender.SendEmailAsync(seller.UserName, "Accepted Promotion",
-                    //    $"Your Advertisement for product {prevPromo.ProductId} has been accepted.");
+                        await _emailSender.SendEmailAsync(seller.UserName, "Accepted Promotion",
+                       $"Your Promotion for product {prevPromo.ProductId} has been accepted.");
 
                     return Ok();
 
                 }
                 else if (promo.Status.ToLower().Equals("rejected"))
                 {
-                    //     await _emailSender.SendEmailAsync(seller.UserName, "Rejected Advertisement",
-                    //   $"Your Advertisement for product {prevPromo.ProductId} has been rejected.\nReason:{promo.Reason}");
+                        await _emailSender.SendEmailAsync(seller.UserName, "Rejected Promotion",
+                      $"Your Promotion for product {prevPromo.ProductId} has been rejected.\nReason:{promo.Reason}");
 
                     return Ok();
                 }
