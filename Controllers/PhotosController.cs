@@ -115,7 +115,7 @@ namespace pro.backend.Controllers
             }
 
             
-            product.visibility = true;
+            // product.visibility = true;
             try
             {
                 await _productService.UpdateProduct(product);
