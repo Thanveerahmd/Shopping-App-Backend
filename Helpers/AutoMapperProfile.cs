@@ -27,6 +27,8 @@ namespace Project.Helpers
                 opt.MapFrom(src => src.Photos.FirstOrDefault(p => p.isMain).Url);
             });
 
+            CreateMap<ProductDto, Product>();
+
             CreateMap<Product, ProductListDto>()
             .ForMember(dest => dest.PhotoUrl, opt =>
             {

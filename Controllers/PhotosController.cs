@@ -70,7 +70,9 @@ namespace pro.backend.Controllers
                 {
                     var UploadParams = new ImageUploadParams()
                     {
-                        File = new FileDescription(file.Name, stream)
+                        File = new FileDescription(file.Name, stream),
+                        Transformation = new Transformation()
+                         .Width(500).Height(500).Crop("fill").Gravity("face")
                     };
 
                     Upload_result = _cloudinary.Upload(UploadParams);
