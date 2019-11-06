@@ -126,7 +126,7 @@ namespace pro.backend.Controllers
                 BillingInfo.isDefault = true;
 
             string code = OTPGenerate.OTPCharacters();
-                string massege_body = "Your OTP is " + code +"%0a http://bit.do/eYdZE?otp="+code;
+            string massege_body = "Your OTP is " + code + "%0a http://bit.do/eYdZE?otp=" + code;
             BillingInfo.OTP = code;
             if (BillingInfo.OTP != null)
             {
@@ -164,7 +164,7 @@ namespace pro.backend.Controllers
             if (prev.MobileNumber != BillingUpdate.MobileNumber)
             {
                 string code = OTPGenerate.OTPCharacters();
-                string massege_body = "Your OTP is " + code +"%0a http://bit.do/eYdZE?otp="+code;
+                string massege_body = "Your OTP is " + code + "%0a http://bit.do/eYdZE?otp=" + code;
                 info.OTP = code;
                 if (info.OTP != null)
                 {
@@ -181,7 +181,7 @@ namespace pro.backend.Controllers
             try
             {
                 await _repo.UpdateBillingInfo(info);
-                return Ok(new {mobileChanged=val});
+                return Ok(new { mobileChanged = val });
             }
             catch (AppException ex)
             {
@@ -269,7 +269,7 @@ namespace pro.backend.Controllers
             return Ok(BillingInfo);
         }
 
-        
+
 
         [HttpGet("default/{UserId}")]
         [AllowAnonymous]
@@ -283,22 +283,34 @@ namespace pro.backend.Controllers
 
         [HttpPost("otpresend/{UserId}/{Id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> ResendOTP(string UserId,int Id)
+        public async Task<IActionResult> ResendOTP(string UserId, int Id)
         {
 
             var BillingInfo = await _repo.GetBillingInfo(Id);
-            if(BillingInfo == null){
-                return BadRequest(new{message="Invalid Data"});
+            if (BillingInfo == null)
+            {
+                return BadRequest(new { message = "Invalid Data" });
             }
-            if(BillingInfo.isMobileVerfied){
-                return BadRequest(new{message="Mobile Number Already Verified"});
+            if (BillingInfo.isMobileVerfied)
+            {
+                return BadRequest(new { message = "Mobile Number Already Verified" });
             }
-            if(BillingInfo.OTPCount>=2){
-                return BadRequest(new{message="Sorry You Have Reached The OTP Limit"});
+            if (BillingInfo.OTPCount >= 2)
+            {
+                return BadRequest(new { message = "Sorry You Have Reached The OTP Limit" });
             }
+            string code = OTPGenerate.OTPCharacters();
+            string massege_body = "Your OTP is " + code + "%0a http://bit.do/eYdZE?otp=" + code;
+            BillingInfo.OTP = code;
+            if (BillingInfo.OTP != null)
+            {
+                BillingInfo.isOTP = true;
+            }
+            else BillingInfo.isOTP = false;
+
             // HttpContent content = null;
 
-            // await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{DeliveryInfoDto.MobileNumber}/{massege_body}/winkel/password", content);
+            // await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{BillingInfo.MobileNumber}/{massege_body}/winkel/password", content);
 
             BillingInfo.OTPCount++;
             await _repo.SaveAll();
