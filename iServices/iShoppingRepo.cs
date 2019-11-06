@@ -14,6 +14,8 @@ namespace pro.backend.iServices
         Task<bool> SaveAll();
         Task<ICollection<Product>> GetProductsByNameAndSubCategory(int productId);
         Task<IEnumerable<Product>> GetAllProducts();
+
+        Task<IEnumerable<Product>> GetAllFlaggedProducts();
         Task<IEnumerable<Product>> GetAllProductsOfSeller(string sellerID);
 
         Task<IEnumerable<Product>> GetAllUnflaggedProductsOfSeller(string sellerID);

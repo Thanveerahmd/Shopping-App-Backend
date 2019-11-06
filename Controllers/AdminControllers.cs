@@ -35,6 +35,8 @@ namespace Project.Controllers
         private readonly IEmailSender _emailSender;
         private readonly iPromoService _promoService;
 
+        public readonly iShoppingRepo _repo;
+
 
 
 
@@ -46,7 +48,8 @@ namespace Project.Controllers
             iPromoService promoService,
             IEmailSender EmailSender,
             iAdvertisement AdService,
-            UserManager<User> usermanger
+            UserManager<User> usermanger,
+            iShoppingRepo repo
             )
         {
             _userService = userService;
@@ -57,6 +60,7 @@ namespace Project.Controllers
             _appSettings = appSettings.Value;
             _adService = AdService;
             _usermanger = usermanger;
+            _repo = repo;
         }
 
         [AllowAnonymous]
@@ -281,7 +285,7 @@ namespace Project.Controllers
             {
                 try
                 {
-                    
+
                     _adminService.UpdateAdminPassword(user, model.Password);
                     return StatusCode(200, "Password reset successful!");
                 }
@@ -436,16 +440,16 @@ namespace Project.Controllers
                 {
 
 
-                        await _emailSender.SendEmailAsync(seller.UserName, "Accepted Promotion",
-                       $"Your Promotion for product {prevPromo.ProductId} has been accepted.");
+                    await _emailSender.SendEmailAsync(seller.UserName, "Accepted Promotion",
+                   $"Your Promotion for product {prevPromo.ProductId} has been accepted.");
 
                     return Ok();
 
                 }
                 else if (promo.Status.ToLower().Equals("rejected"))
                 {
-                        await _emailSender.SendEmailAsync(seller.UserName, "Rejected Promotion",
-                      $"Your Promotion for product {prevPromo.ProductId} has been rejected.\nReason:{promo.Reason}");
+                    await _emailSender.SendEmailAsync(seller.UserName, "Rejected Promotion",
+                  $"Your Promotion for product {prevPromo.ProductId} has been rejected.\nReason:{promo.Reason}");
 
                     return Ok();
                 }
@@ -481,6 +485,34 @@ namespace Project.Controllers
             var promotions = await _promoService.GetAllPendingPromos();
 
             return Ok(promotions);
+        }
+
+        [HttpPost("unflag/{productId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UnflagProduct(int productId)
+        {
+
+            var product = await _repo.GetProduct(productId);
+            
+            if (product == null)
+            {
+                return BadRequest(new { message = "Product Not Found" });
+            }
+
+            if (product.visibility)
+            {
+                return BadRequest(new { message = "Product is already unflagged" });
+
+            }
+
+            product.visibility = true;
+
+            if (await _repo.SaveAll())
+            {
+                return Ok();
+
+            }
+            return BadRequest(new { message = "Error Unflagging Product" });
         }
     }
 

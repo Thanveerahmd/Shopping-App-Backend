@@ -49,6 +49,16 @@ namespace pro.backend.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("flag")]
+        public async Task<IActionResult> GetAllFlaggedProducts()
+        {
+            var products = await _repo.GetAllFlaggedProducts();
+            var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
+            return Ok(productsToReturn);
+
+        }
+
+        [AllowAnonymous]
         [HttpGet("userpreference")]
         public async Task<IActionResult> GetUserPreference()
         {
@@ -63,11 +73,34 @@ namespace pro.backend.Controllers
                 var products = await _analyticsService.GetUserPreference(userId);
                 var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
                 return Ok(productsToReturn);
-            }else {
+            }
+            else
+            {
                 return Ok();
             }
 
         }
+
+        [AllowAnonymous]
+        [HttpGet("admin/{id}")]
+        public async Task<IActionResult> GetProductByIdForAdmin(int id)
+        {
+
+            var product = await _repo.GetProduct(id);
+
+            if (product == null)
+            {
+                return BadRequest(new { message = "Product Not Found" });
+            }
+
+            var productToReturn = _mapper.Map<ProductDto>(product);
+
+            return Ok(productToReturn);
+
+
+        }
+
+
 
         [AllowAnonymous]
         [HttpGet("{id}")]
@@ -76,7 +109,7 @@ namespace pro.backend.Controllers
 
             var identity = HttpContext.User.Identity;
             string userId = "";
-            if (identity != null)           
+            if (identity != null)
             {
                 userId = identity.Name;
             }
@@ -541,11 +574,12 @@ namespace pro.backend.Controllers
             }
 
         }
-        
+
         [HttpGet("topSelling")]
         [AllowAnonymous]
 
-        public async Task<IActionResult> GetTopSelling(){
+        public async Task<IActionResult> GetTopSelling()
+        {
             var products = await _productService.TopSelling();
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
             return Ok(productsToReturn);
@@ -554,11 +588,12 @@ namespace pro.backend.Controllers
         [HttpGet("infinite/{page}")]
         [AllowAnonymous]
 
-        public async Task<IActionResult> GetProductsInfiniteScrolling(int page){
+        public async Task<IActionResult> GetProductsInfiniteScrolling(int page)
+        {
             var products = await _productService.GetProductsInfiniteScrolling(page);
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
-            if(productsToReturn==null)
-            return BadRequest();
+            if (productsToReturn == null)
+                return BadRequest();
 
             return Ok(productsToReturn);
         }
@@ -566,11 +601,12 @@ namespace pro.backend.Controllers
         [HttpGet("recentlyadded/{sellerId}")]
         [AllowAnonymous]
 
-        public async Task<IActionResult> GetRecentlyAddedProducts(string sellerId){
+        public async Task<IActionResult> GetRecentlyAddedProducts(string sellerId)
+        {
 
             var products = await _productService.GetRecentlyAddedProducts(sellerId);
             var productsToReturn = _mapper.Map<IEnumerable<ProductListDto>>(products);
-            
+
             return Ok(productsToReturn);
         }
     }
