@@ -39,6 +39,7 @@ namespace pro.backend.Services
         {
             var promo = await _context.Promo
             .Where(p => p.Status.ToLower().Equals("pending"))
+            .Include(p => p.user)
             .ToListAsync();
 
             return promo;
@@ -48,6 +49,7 @@ namespace pro.backend.Services
         {
             var promo = await _context.Promo
             .Where(p => p.Status.ToLower().Equals("accepted"))
+            .Include(p => p.user)
             .ToListAsync();
 
             return promo;
@@ -62,7 +64,7 @@ namespace pro.backend.Services
             return promo;
         }
 
-         public async Task<ICollection<Promo>> GetAllActivePromosOfSellerOnSpecificDay(string userId,string dayOfTheWeek)
+        public async Task<ICollection<Promo>> GetAllActivePromosOfSellerOnSpecificDay(string userId, string dayOfTheWeek)
         {
             var promo = await _context.Promo
             .Where(p => p.UserId == userId && p.Status.ToLower().Equals("accepted") && p.Day_of_The_Week.Contains(dayOfTheWeek))
