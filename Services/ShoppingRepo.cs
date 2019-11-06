@@ -153,7 +153,7 @@ namespace pro.backend.Services
 
         public async Task<Product> GetProduct(int id)
         {
-            var product = await _context.Products.Include(p => p.Photos).Include(p => p.Ratings).FirstOrDefaultAsync(i => i.Id == id);
+            var product = await _context.Products.Include(p => p.Photos).Include(p => p.Ratings).Include(p => p.subCategory).FirstOrDefaultAsync(i => i.Id == id);
 
             return product;
         }
