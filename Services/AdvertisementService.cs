@@ -21,7 +21,7 @@ namespace pro.backend.Services
         {
             var ad = await _context.Advertisement
             .Where(p => p.Status.ToLower().Equals("accepted") && p.PaymentStatus.ToLower().Equals("success") && p.ActivationStatus.ToLower().Equals("not expired"))
-            .ToListAsync();
+            .Include(p => p.user).ToListAsync();
 
             return ad;
 
@@ -52,6 +52,7 @@ namespace pro.backend.Services
         {
             var ad = await _context.Advertisement
             .Where(p => (p.PaymentStatus.ToLower().Equals("pending") && !p.Status.ToLower().Equals("rejected")))
+            .Include(p => p.user)
             .ToListAsync();
 
             return ad;
@@ -59,14 +60,14 @@ namespace pro.backend.Services
 
         public async Task<ICollection<Advertisement>> GetRejectedAdvertisement()
         {
-            var ad = await _context.Advertisement.Where(p => p.Status.ToLower().Equals("rejected")).ToListAsync();
+            var ad = await _context.Advertisement.Where(p => p.Status.ToLower().Equals("rejected")).Include(p => p.user).ToListAsync();
 
             return ad;
         }
 
         public async Task<ICollection<Advertisement>> GetExpiredAdvertisement()
         {
-            var ad = await _context.Advertisement.Where(p => p.ActivationStatus.ToLower().Equals("expired")).ToListAsync();
+            var ad = await _context.Advertisement.Where(p => p.ActivationStatus.ToLower().Equals("expired")).Include(p => p.user).ToListAsync();
 
             return ad;
         }
