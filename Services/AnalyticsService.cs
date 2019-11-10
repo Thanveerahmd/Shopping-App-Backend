@@ -142,12 +142,7 @@ namespace pro.backend.Services
                 long userID = BitConverter.ToInt64(bytes, 0);
                 long itemID = item.ProductId; // encoding
 
-                /*
-                    Decoding
-                    int i = result;
-                    byte[] bytes2 = BitConverter.GetBytes(i);
-                    string s2 = Encoding.ASCII.GetString(bytes);
-                 */
+               
 
                 var userPrefs = data.Get(userID);
                 if (userPrefs == null)
