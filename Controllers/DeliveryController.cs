@@ -126,7 +126,9 @@ namespace pro.backend.Controllers
                 BillingInfo.isDefault = true;
 
             string code = OTPGenerate.OTPCharacters();
-            string massege_body = "Your OTP is " + code + "%0a http://bit.do/eYdZE?otp=" + code;
+            // string massege_body = "Your OTP is " + code + "%0a http://bit.do/eYdZE?otp=" + code;
+            string massege_body = "Your OTP is " + code;
+
             BillingInfo.OTP = code;
             if (BillingInfo.OTP != null)
             {
@@ -134,9 +136,9 @@ namespace pro.backend.Controllers
             }
             else BillingInfo.isOTP = false;
 
-            // HttpContent content = null;
+            HttpContent content = null;
 
-            // await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{DeliveryInfoDto.MobileNumber}/{massege_body}/winkel/password", content);
+            var res = await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{DeliveryInfoDto.MobileNumber}/{massege_body}/winkel/password", content);
             BillingInfo.OTPCount++;
 
             _repo.Add(BillingInfo);
@@ -164,7 +166,8 @@ namespace pro.backend.Controllers
             if (prev.MobileNumber != BillingUpdate.MobileNumber)
             {
                 string code = OTPGenerate.OTPCharacters();
-                string massege_body = "Your OTP is " + code + "%0a http://bit.do/eYdZE?otp=" + code;
+                // string massege_body = "Your OTP is " + code + " http://bit.do/eYdZE?otp=" + code;
+                string massege_body = "Your OTP is " + code;
                 info.OTP = code;
                 if (info.OTP != null)
                 {
@@ -172,9 +175,9 @@ namespace pro.backend.Controllers
                 }
                 else info.isOTP = false;
                 info.isMobileVerfied = false;
-                // HttpContent content = null;
+                HttpContent content = null;
 
-                // await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{DeliveryInfoDto.MobileNumber}/{massege_body}/winkel/password", content);
+                var res = await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{BillingUpdate.MobileNumber}/{massege_body}/winkel/password", content);
                 info.OTPCount++;
             }
 
@@ -300,7 +303,9 @@ namespace pro.backend.Controllers
                 return BadRequest(new { message = "Sorry You Have Reached The OTP Limit" });
             }
             string code = OTPGenerate.OTPCharacters();
-            string massege_body = "Your OTP is " + code + "%0a http://bit.do/eYdZE?otp=" + code;
+            // string massege_body = "Your OTP is " + code + "%0a http://bit.do/eYdZE?otp=" + code;
+            string massege_body = "Your OTP is " + code;
+
             BillingInfo.OTP = code;
             if (BillingInfo.OTP != null)
             {
@@ -308,9 +313,9 @@ namespace pro.backend.Controllers
             }
             else BillingInfo.isOTP = false;
 
-            // HttpContent content = null;
+            HttpContent content = null;
 
-            // await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{BillingInfo.MobileNumber}/{massege_body}/winkel/password", content);
+            var res = await Client.PostAsync($"http://sms.techwirelanka.com/SMSAPIService.svc/SmsApi/TECHWIRE/{BillingInfo.MobileNumber}/{massege_body}/winkel/password", content);
 
             BillingInfo.OTPCount++;
             await _repo.SaveAll();
